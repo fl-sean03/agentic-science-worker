@@ -1,0 +1,125 @@
+# Tier 1 Benchmark: Materials Database Query
+# Single-skill task testing materials database access
+
+id: BENCH-T1-004
+name: Crystal Structure from Materials Project
+tier: 1
+category: materials-database
+
+description: |
+  Query the Materials Project database for a crystal structure.
+  Tests ability to retrieve and process materials data.
+
+prompt: |
+  Query the Materials Project database to get the crystal structure
+  of silicon carbide (SiC) in the 3C (zinc blende) polymorph.
+
+  Provide:
+  1. The Materials Project ID (mp-id) for 3C-SiC
+  2. The space group and crystal system
+  3. The lattice parameters (a, b, c and angles)
+  4. The atomic positions in fractional coordinates
+  5. The DFT-computed band gap
+
+  Save the structure in two formats:
+  - CIF file: workspaces/benchmarks/t1-004-mat/SiC_3C.cif
+  - POSCAR file: workspaces/benchmarks/t1-004-mat/SiC_3C.vasp
+
+  Write a summary to: workspaces/benchmarks/t1-004-mat/summary.md
+
+skills_required:
+  - materials-database
+
+time_limit_minutes: 10
+
+expected_outputs:
+  files:
+    - workspaces/benchmarks/t1-004-mat/SiC_3C.cif
+    - workspaces/benchmarks/t1-004-mat/SiC_3C.vasp
+    - workspaces/benchmarks/t1-004-mat/summary.md
+  values:
+    mp_id:
+      description: "Materials Project ID"
+      expected: "mp-8062"  # or similar for 3C-SiC
+    space_group:
+      description: "Space group name"
+      expected: "F-43m"  # Zinc blende
+    lattice_a:
+      description: "Lattice parameter a"
+      expected_range: [4.3, 4.4]  # Angstroms
+      unit: "Angstroms"
+    band_gap:
+      description: "DFT band gap"
+      expected_range: [1.3, 2.5]  # eV (DFT typically underestimates)
+      unit: "eV"
+
+grading:
+  total_points: 100
+
+  categories:
+    database_query:
+      weight: 25
+      checks:
+        - name: "Correct polymorph identified"
+          points: 15
+          validation: |
+            Retrieved 3C (zinc blende) structure, not 4H, 6H, or other
+        - name: "MP-ID obtained"
+          points: 10
+          validation: |
+            Valid mp-id reported
+
+    structure_accuracy:
+      weight: 35
+      checks:
+        - name: "Correct space group"
+          points: 10
+          validation: |
+            F-43m (space group 216)
+        - name: "Lattice parameters accurate"
+          points: 15
+          validation: |
+            a ≈ 4.36 Å, cubic
+        - name: "Atomic positions correct"
+          points: 10
+          validation: |
+            Si at (0,0,0), C at (0.25,0.25,0.25) or equivalent
+
+    file_generation:
+      weight: 25
+      checks:
+        - name: "Valid CIF file"
+          points: 12
+          validation: |
+            CIF file parseable, contains correct atoms
+        - name: "Valid POSCAR file"
+          points: 13
+          validation: |
+            POSCAR file readable by VASP/ASE
+
+    documentation:
+      weight: 15
+      checks:
+        - name: "Complete summary"
+          points: 15
+          validation: |
+            Summary includes all requested information
+
+reference_solution:
+  location: reference/solutions/t1-004-mat/
+  notes: |
+    3C-SiC (zinc blende): mp-8062
+    Space group: F-43m (#216)
+    Lattice: a = b = c ≈ 4.36 Å, cubic
+    Band gap: ~1.4 eV (DFT-GGA), exp ~2.4 eV
+
+metadata:
+  author: "benchmark-system"
+  created: "2025-01-16"
+  difficulty: "easy"
+  estimated_tokens: 2000
+  tags:
+    - materials-project
+    - crystal-structure
+    - silicon-carbide
+    - database

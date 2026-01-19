@@ -1,0 +1,237 @@
+# Tier 10 Benchmark: Novel Material Discovery Campaign
+# Autonomous discovery of new materials
+
+id: BENCH-T10-001
+name: Novel Material Discovery Campaign
+tier: 10
+category: frontier-challenge
+
+description: |
+  Conduct an autonomous materials discovery campaign to identify a novel
+  Li-ion battery cathode material. This is a complete research project
+  requiring literature research, hypothesis generation, computational
+  screening, validation, and scientific reporting.
+
+prompt: |
+  **Research Project: Discover Novel Li-ion Cathode Material**
+
+  You are tasked with discovering a new Li-ion battery cathode material
+  that is NOT currently in the Materials Project database. This is a
+  complete autonomous research project.
+
+  **Target Properties:**
+  - High voltage: > 4.0 V vs Li/Li+
+  - Good stability: Formation energy < -1 eV/atom
+  - Novel: Not already in Materials Project
+  - Reasonable elements: No radioactive, ultra-rare, or toxic elements
+
+  **Background:**
+  Successful cathode chemistries:
+  - LiCoO2: Layered, ~3.9V, expensive Co
+  - LiFePO4: Olivine, ~3.4V, cheap but low voltage
+  - LiNiMnCoO2 (NMC): Layered, ~3.8V, current state-of-art
+  - Li-rich: Li2MnO3-LiMO2, >4V, capacity fade issues
+
+  Promising but underexplored:
+  - Polyanionic compounds (sulfates, silicates)
+  - High-entropy compositions
+  - New layered structures
+  - Fluorinated compounds
+
+  **Phase 1: Literature Survey (Research)**
+
+  Step 1.1: Survey recent cathode research
+  - Search for papers on novel cathode materials (2022-2025)
+  - Identify promising unexplored chemical spaces
+  - Note: What compositions have NOT been well-studied?
+
+  Step 1.2: Database gap analysis
+  - Query Materials Project for existing cathode materials
+  - Identify under-represented element combinations
+  - Find chemical spaces with few reported compounds
+
+  Step 1.3: Formulate hypotheses
+  - Based on research, propose 3-5 compositional spaces to explore
+  - Justify each hypothesis with scientific reasoning
+
+  **Phase 2: Computational Screening (High-Throughput)**
+
+  Step 2.1: Structure generation
+  - Generate candidate structures in your chosen spaces
+  - Use substitution, prototype decoration, or generation tools
+  - Aim for 50-200 candidate structures
+
+  Step 2.2: MLIP screening
+  - Relax all candidates with MACE-MP-0 or CHGNet
+  - Calculate formation energies
+  - Filter: Keep only candidates with E_form < -0.5 eV/atom
+
+  Step 2.3: Voltage estimation
+  - For surviving candidates, estimate voltage vs Li/Li+
+  - V ≈ -ΔG/(nF) ≈ -(μ_Li,cathode - μ_Li,anode)/(ne)
+  - Simple estimate: V ≈ (E_delithiated - E_lithiated) / n_Li
+  - Filter: Keep only candidates with V > 4.0 V
+
+  **Phase 3: Validation (DFT)**
+
+  Step 3.1: DFT validation
+  - Select top 5-10 candidates from MLIP screening
+  - Run DFT (PBE) relaxation and energy calculation
+  - Verify MLIP predictions are reasonable
+
+  Step 3.2: Novelty check
+  - For validated candidates, check Materials Project
+  - Confirm structure is NOT in the database
+  - Check ICSD for experimental reports
+
+  Step 3.3: Stability assessment
+  - Check stability vs decomposition to competing phases
+  - Use Materials Project phase diagram data if available
+
+  **Phase 4: Deep Dive (Top Candidate)**
+
+  Step 4.1: Detailed analysis of best candidate
+  - Calculate electronic structure (if DFT feasible)
+  - Check for magnetic ordering
+  - Assess Li migration pathways (NEB or simple analysis)
+
+  Step 4.2: Property prediction
+  - Estimate capacity (mAh/g)
+  - Estimate energy density (Wh/kg)
+  - Compare to existing cathodes
+
+  **Phase 5: Research Report (Publication Quality)**
+
+  Write a complete research report including:
+
+  1. **Introduction**
+     - Motivation for cathode discovery
+     - Current state of the art
+     - Research gap addressed
+
+  2. **Methodology**
+     - Hypothesis generation process
+     - Screening workflow
+     - Validation approach
+
+  3. **Results**
+     - Screening statistics (how many candidates at each stage)
+     - Top candidates with properties
+     - Novelty verification
+
+  4. **Discussion**
+     - Why is your candidate promising?
+     - Comparison to existing materials
+     - Potential synthesis routes (speculative)
+     - Limitations and uncertainties
+
+  5. **Conclusion**
+     - Recommendation for experimental follow-up
+     - Broader implications
+
+  6. **Supplementary**
+     - Full list of screened candidates
+     - Calculation details
+
+  Work in: workspaces/benchmarks/BENCH-T10-001/
+
+skills_required:
+  - literature-search
+  - materials-database
+  - quantum-espresso
+  - data-analysis
+
+time_limit_minutes: 480
+
+expected_outputs:
+  files:
+    - name: "literature/survey.md"
+      description: "Literature survey notes"
+    - name: "hypotheses/candidate_spaces.md"
+      description: "Hypothesized chemical spaces"
+    - name: "screening/all_candidates.csv"
+      description: "Full screening results"
+    - name: "screening/passing_candidates.csv"
+      description: "Candidates passing filters"
+    - name: "validation/dft_results.csv"
+      description: "DFT validation results"
+    - name: "novelty/novelty_check.md"
+      description: "Novelty verification"
+    - name: "analysis/top_candidate_analysis.md"
+      description: "Deep analysis of best candidate"
+    - name: "report.md"
+      description: "Publication-quality research report"
+
+  values:
+    candidates_generated:
+      description: "Number of initial candidates"
+      expected_range: [50, 500]
+    candidates_validated:
+      description: "Candidates passing all filters"
+      expected_range: [1, 20]
+    novel_candidates:
+      description: "Truly novel (not in MP) candidates"
+      expected_range: [0, 10]
+    best_voltage:
+      description: "Voltage of best candidate"
+      expected_range: [3.5, 5.5]
+      unit: "V"
+
+grading:
+  categories:
+    - name: research_strategy
+      weight: 20
+      criteria:
+        - Literature survey comprehensive
+        - Hypotheses scientifically justified
+        - Novel approach identified
+        - Gap analysis performed
+
+    - name: computational_screening
+      weight: 25
+      criteria:
+        - Sufficient candidates generated
+        - MLIP screening executed correctly
+        - Filters appropriately applied
+        - Results well-organized
+
+    - name: validation
+      weight: 20
+      criteria:
+        - DFT validation performed
+        - Novelty verified
+        - Stability assessed
+        - False positives identified
+
+    - name: scientific_insight
+      weight: 20
+      criteria:
+        - Top candidate well-analyzed
+        - Comparison to state-of-art
+        - Limitations acknowledged
+        - Synthesis considerations
+
+    - name: report_quality
+      weight: 15
+      criteria:
+        - Publication-quality writing
+        - Complete methodology
+        - Clear figures/tables
+        - Actionable conclusions
+
+metadata:
+  difficulty: research-grade
+  estimated_time_minutes: 480
+  async_completion: true
+  gpu_recommended: true
+  dft_required: true
+  skills_tested:
+    - autonomous_discovery
+    - hypothesis_generation
+    - high_throughput_screening
+    - scientific_writing
+  notes: |
+    This is a true autonomous discovery benchmark. The agent must conduct
+    a complete research campaign from hypothesis to validated candidates.
+    Success is measured not just by finding a candidate, but by the
+    quality of the scientific reasoning and reporting throughout.

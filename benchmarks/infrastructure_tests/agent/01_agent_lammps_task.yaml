@@ -1,0 +1,67 @@
+# TRUE AGENTIC BENCHMARK: LAMMPS Task
+# This benchmark tests the AGENT's ability to solve a problem,
+# not just whether the tools work.
+
+name: agent-lammps-minimization
+description: Agent must create and run a LAMMPS minimization from scratch
+category: agent
+difficulty: medium
+expected_time: 180s
+skills_tested:
+  - lammps-simulation
+
+# This is an AGENT test - we send a prompt to Claude Code
+# and evaluate whether the agent solves the problem
+type: agent
+
+# The prompt we send to the agent (simulating user request)
+prompt: |
+  Create a simple Lennard-Jones system with 10 argon atoms in a 10x10x10 box,
+  then run an energy minimization using LAMMPS.
+
+  Use epsilon=0.238 kcal/mol and sigma=3.405 Angstrom for the LJ parameters.
+
+  Save the minimized structure to 'minimized.data'.
+  Report the initial and final energies.
+
+# What we expect the agent to do (for evaluation)
+expected_actions:
+  - Create a LAMMPS data file with 10 atoms
+  - Create a LAMMPS input script with correct LJ parameters
+  - Run LAMMPS minimization
+  - Report energies
+
+# How we validate the agent's solution
+validation:
+  # Files that should exist after agent completes
+  files_created:
+    - minimized.data
+
+  # Patterns that should appear in agent's output or files
+  output_contains:
+    - "epsilon"
+    - "sigma"
+    - "minimize"
+
+  # Functional validation - does the output work?
+  functional_checks:
+    - name: minimized_file_valid
+      type: command
+      command: "head -5 minimized.data | grep -q 'atoms'"
+
+    - name: energy_decreased
+      type: script
+      script: validate_minimization.py
+
+# Grading rubric (0-100)
+grading:
+  correct_structure: 25      # Created valid data file
+  correct_forcefield: 25     # Used correct LJ parameters
+  successful_run: 25         # LAMMPS ran without errors
+  output_file_valid: 15      # Output file is correct
+  reported_energies: 10      # Reported initial/final energies
+
+tags:
+  - agent
+  - lammps
+  - autonomous

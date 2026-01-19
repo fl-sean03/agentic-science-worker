@@ -1,0 +1,38 @@
+# Environment Benchmark: System Baseline
+# Validates that the system meets basic requirements
+
+name: system-baseline
+description: Verify WSL2 and basic system configuration
+category: environment
+difficulty: trivial
+expected_time: 5s
+
+type: validation
+
+checks:
+  - name: WSL2 kernel detected
+    type: command_succeeds
+    command: "uname -r | grep -i microsoft"
+
+  - name: Home directory exists
+    type: file_exists
+    path: /home/sf2
+
+  - name: Workspace directory exists
+    type: file_exists
+    path: /home/sf2/LabWork/Workspace
+
+  - name: Python3 available
+    type: command_succeeds
+    command: "python3 --version"
+
+  - name: Bash available
+    type: command_succeeds
+    command: "bash --version"
+
+validation:
+  exit_code: 0
+
+tags:
+  - baseline
+  - system

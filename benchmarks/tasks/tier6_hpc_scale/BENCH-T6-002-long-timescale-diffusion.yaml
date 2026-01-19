@@ -1,0 +1,179 @@
+# Tier 6 Benchmark: Long-Timescale Diffusion Study
+# Problems requiring nanoseconds of simulation time
+
+id: BENCH-T6-002
+name: Long-Timescale Diffusion Study
+tier: 6
+category: hpc-scale-research
+
+description: |
+  Calculate the self-diffusion coefficient of a system with slow dynamics,
+  requiring nanoseconds of simulation time. This is impossible on a local
+  workstation due to the long simulation times required, making it a true
+  test of HPC capability.
+
+prompt: |
+  **Research Question:**
+  What is the self-diffusion coefficient of a Lennard-Jones glass-forming
+  liquid at a temperature approaching the glass transition?
+
+  **Background:**
+  Near the glass transition, dynamics slow dramatically. While normal liquids
+  like argon at 94K have D ~ 10⁻⁵ cm²/s and equilibrate in picoseconds,
+  supercooled liquids can have D ~ 10⁻⁸ cm²/s or lower, requiring nanoseconds
+  to observe diffusive behavior.
+
+  **The System:**
+  Use the Kob-Andersen binary Lennard-Jones (KALJ) model - a classic glass-former:
+  - 80% A particles, 20% B particles
+  - LJ parameters (see literature):
+    - εAA = 1.0, σAA = 1.0
+    - εAB = 1.5, σAB = 0.8
+    - εBB = 0.5, σBB = 0.88
+  - Density: ρ = 1.2 (in LJ units)
+  - Study at T* = 0.5 (supercooled, slow dynamics)
+
+  **Your Study:**
+
+  **Step 1: Literature Research**
+  - Find the Kob-Andersen model parameters
+  - Find expected diffusion coefficients at T* = 0.5
+  - Estimate required simulation time for diffusive regime
+
+  **Step 2: Estimate Timescales**
+  At T* = 0.5, the system is supercooled:
+  - Expected D ~ 10⁻⁴ to 10⁻³ σ²/τ (in LJ units)
+  - Need MSD to reach diffusive regime (MSD >> σ²)
+  - Estimate: may need 10⁶ - 10⁷ timesteps
+
+  **Step 3: Design Simulation Protocol**
+  - System size: 1000-4000 particles
+  - Equilibration: May need very long equilibration at T* = 0.5
+  - Production: Long enough to observe diffusive MSD
+  - Consider: Starting from higher T and cooling slowly
+
+  **Step 4: Resource Planning**
+  This simulation requires HPC:
+  - Estimate total timesteps needed
+  - Plan for potentially multi-hour or multi-day runs
+  - Consider checkpointing for very long runs
+  - Use amilan or amilan128c for production
+
+  **Step 5: Execute Simulations**
+  - Run equilibration
+  - Run production MD
+  - Monitor MSD to ensure diffusive regime is reached
+  - May need to extend if MSD is still sub-diffusive
+
+  **Step 6: Analysis**
+  - Plot MSD vs time on log-log scale
+  - Identify ballistic, sub-diffusive, and diffusive regimes
+  - Extract D from linear fit to diffusive regime
+  - Calculate separately for A and B particles
+
+  **Step 7: Report**
+  Write a research report including:
+  - KALJ model details and parameters
+  - Simulation protocol (equilibration, production)
+  - MSD analysis showing all dynamic regimes
+  - Diffusion coefficients D_A and D_B
+  - Comparison to literature values
+  - Discussion of glass physics
+
+  Work in: workspaces/benchmarks/BENCH-T6-002/
+
+skills_required:
+  - hpc-cluster
+  - lammps-simulation
+  - literature-search
+  - data-analysis
+
+time_limit_minutes: 240  # 4 hours for setup; simulation runs async
+
+expected_outputs:
+  files:
+    - name: "literature/kalj_model.md"
+      description: "KALJ model parameters and literature"
+    - name: "inputs/kalj_equilibration.lmp"
+      description: "LAMMPS input for equilibration"
+    - name: "inputs/kalj_production.lmp"
+      description: "LAMMPS input for production"
+    - name: "jobs/job_equilibration.slurm"
+      description: "HPC job for equilibration"
+    - name: "jobs/job_production.slurm"
+      description: "HPC job for production"
+    - name: "analysis/msd_analysis.png"
+      description: "MSD vs time on log-log scale"
+    - name: "report.md"
+      description: "Full research report"
+
+  values:
+    diffusion_A:
+      description: "Diffusion coefficient of A particles"
+      expected_range: [1e-5, 1e-2]  # In LJ units
+      unit: "σ²/τ"
+    diffusion_B:
+      description: "Diffusion coefficient of B particles"
+      expected_range: [1e-5, 1e-2]
+      unit: "σ²/τ"
+
+grading:
+  categories:
+    - name: model_setup
+      weight: 20
+      criteria:
+        - Correct KALJ parameters from literature
+        - Binary mixture correctly implemented
+        - Appropriate system size
+        - Proper density
+
+    - name: timescale_planning
+      weight: 20
+      criteria:
+        - Estimated required simulation time
+        - Recognized slow dynamics challenge
+        - Planned appropriate production length
+        - Considered checkpointing
+
+    - name: hpc_execution
+      weight: 25
+      criteria:
+        - Successfully submitted long jobs
+        - Appropriate resources for long runs
+        - Checkpointing if needed
+        - Jobs completed or properly tracked
+
+    - name: msd_analysis
+      weight: 25
+      criteria:
+        - MSD plotted on log-log scale
+        - Dynamic regimes identified
+        - Diffusive regime reached
+        - D extracted correctly
+
+    - name: scientific_interpretation
+      weight: 10
+      criteria:
+        - Results compared to literature
+        - Glass physics discussed
+        - Limitations acknowledged
+
+metadata:
+  difficulty: expert
+  estimated_time_minutes: 240
+  async_completion: true
+  long_running: true
+  hpc_resources:
+    partition: amilan
+    cores: 32-64
+    time_limit: "24:00:00"  # May need long QoS
+  skills_tested:
+    - long_simulation_planning
+    - glass_physics
+    - timescale_estimation
+    - production_md
+  notes: |
+    This benchmark tests the agent's ability to handle genuinely long
+    simulations. The supercooled KALJ system has slow dynamics that
+    require orders of magnitude more simulation time than normal liquids.
+    This is a real research problem studied extensively in the glass physics community.

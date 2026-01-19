@@ -1,0 +1,177 @@
+# Tier 9 Benchmark: Autonomous Literature-to-Simulation
+# Reproduce computational result from paper without explicit instructions
+
+id: BENCH-T9-004
+name: Autonomous Literature-to-Simulation
+tier: 9
+category: autonomous-research
+
+description: |
+  Autonomously reproduce a key computational result from a published paper.
+  The agent must find the paper, extract methodology, implement calculations,
+  and validate results - mimicking how researchers reproduce published work.
+
+prompt: |
+  **Task: Reproduce Published MLIP Phonon Result**
+
+  A key skill for computational researchers is reproducing published results.
+  Your task is to autonomously find a recent MLIP paper, extract a specific
+  result, and reproduce it computationally.
+
+  **Target Paper:**
+  "Universal machine learning interatomic potentials are ready for phonons"
+  Published in npj Computational Materials, 2025
+
+  This paper systematically evaluates phonon predictions from universal MLIPs.
+
+  **Your Task:**
+  Reproduce ONE key result from this paper through autonomous research.
+
+  **Step 1: Find and Read the Paper**
+  - Search for the paper using literature search tools
+  - Download or access the paper
+  - Read the methodology section carefully
+
+  **Step 2: Identify Reproducible Result**
+  Find a specific, quantitative result to reproduce. Good candidates:
+  - Phonon frequency for a specific material at Γ point
+  - Phonon dispersion for Si, Cu, or MgO
+  - Comparison of MACE vs CHGNet for a specific system
+  - Quantification of the ~15% softening error
+
+  Document exactly what result you're trying to reproduce.
+
+  **Step 3: Extract Methodology**
+  From the paper, extract:
+  - Which MLIP was used (MACE, CHGNet, M3GNet, etc.)
+  - Model version/checkpoint
+  - Structure used (lattice constant, supercell size)
+  - Phonon calculation method
+  - Any specific parameters mentioned
+
+  **Step 4: Implement Calculation**
+  Set up your calculation to match the paper:
+  - Use same (or equivalent) MLIP
+  - Create matching structure
+  - Use same supercell size
+  - Apply same methodology
+
+  **Step 5: Run Calculation**
+  Execute your reproduction:
+  - Generate force constants
+  - Calculate phonon dispersion or specific frequencies
+  - Save all outputs
+
+  **Step 6: Compare to Published Result**
+  Quantitatively compare your result to the paper:
+  - Is frequency within X% of published value?
+  - Does dispersion shape match?
+  - Any systematic differences?
+
+  Calculate agreement: |Your value - Paper value| / Paper value × 100%
+
+  **Step 7: Analyze Discrepancies**
+  If results don't match exactly:
+  - What could explain the difference?
+  - Different model version?
+  - Different computational parameters?
+  - Numerical precision?
+
+  **Step 8: Report**
+  Write reproduction report including:
+  - Paper citation and specific result targeted
+  - Methodology extraction from paper
+  - Your implementation details
+  - Direct comparison (table or figure)
+  - Percent agreement/disagreement
+  - Analysis of any discrepancies
+  - Assessment: Was reproduction successful?
+
+  **Success Criterion:**
+  Reproduction is considered successful if your result agrees within 5% of
+  the published value (for phonon frequencies) or qualitatively matches
+  (for dispersion curves).
+
+  Work in: workspaces/benchmarks/BENCH-T9-004/
+
+skills_required:
+  - literature-search
+  - data-analysis
+
+time_limit_minutes: 180
+
+expected_outputs:
+  files:
+    - name: "literature/paper_notes.md"
+      description: "Notes from reading the paper"
+    - name: "literature/methodology_extraction.md"
+      description: "Extracted computational methodology"
+    - name: "reproduction/calculation_script.py"
+      description: "Script implementing the calculation"
+    - name: "reproduction/results/"
+      description: "Calculation outputs"
+    - name: "comparison/published_vs_reproduced.csv"
+      description: "Quantitative comparison"
+    - name: "comparison/comparison_figure.png"
+      description: "Visual comparison to paper figure"
+    - name: "report.md"
+      description: "Full reproduction report"
+
+  values:
+    percent_agreement:
+      description: "Agreement with published result"
+      expected_range: [90, 100]
+      unit: "%"
+    methodology_correctly_extracted:
+      description: "Key parameters identified from paper"
+      expected_range: [0.8, 1.0]
+      unit: "fraction"
+
+grading:
+  categories:
+    - name: literature_research
+      weight: 20
+      criteria:
+        - Paper found successfully
+        - Key result identified
+        - Methodology extracted
+        - Parameters documented
+
+    - name: implementation
+      weight: 30
+      criteria:
+        - Calculation matches paper methodology
+        - Correct MLIP used
+        - Appropriate structure
+        - Calculation completed
+
+    - name: comparison
+      weight: 30
+      criteria:
+        - Quantitative comparison made
+        - Agreement/disagreement calculated
+        - Visualization provided
+        - Fair comparison methodology
+
+    - name: analysis
+      weight: 20
+      criteria:
+        - Discrepancies explained
+        - Reproduction success assessed
+        - Insights provided
+        - Limitations discussed
+
+metadata:
+  difficulty: expert
+  estimated_time_minutes: 180
+  gpu_recommended: true
+  skills_tested:
+    - literature_comprehension
+    - methodology_extraction
+    - computational_reproduction
+    - scientific_validation
+  notes: |
+    This benchmark tests a fundamental research skill - reproducing
+    published work. The agent must autonomously navigate from a paper
+    title to a validated computational result. This mimics how new
+    researchers learn and verify published methods.

@@ -1,0 +1,71 @@
+id: BENCH-T2-004
+name: Force Field Parameter Validation
+tier: 2
+description: >
+  Test the agent's ability to find, validate, and cross-reference force field
+  parameters from multiple sources. The agent should demonstrate critical
+  thinking about parameter choices and identify any inconsistencies.
+
+prompt: |
+  You need to set up a molecular dynamics simulation of liquid water using the TIP4P model.
+
+  Your task:
+  1. Find the original paper that defined the TIP4P water model
+  2. Extract ALL the model parameters (charges, LJ parameters, geometry)
+  3. Search for at least ONE other source that reports TIP4P parameters
+  4. Compare the values - do they agree? Note any discrepancies
+  5. Create a summary document with:
+     - The full parameter set you will use
+     - Citations for each value
+     - Discussion of any inconsistencies found
+     - Your reasoning for the final parameter choices
+
+  Do NOT run any simulation - this is purely about finding and validating parameters.
+
+expected_outputs:
+  files:
+    - name: "tip4p_parameters.md"
+      description: "Summary of TIP4P parameters with citations and validation"
+    - name: "literature_notes.md"
+      description: "Notes from literature search"
+
+grading:
+  categories:
+    - name: literature_research
+      weight: 30
+      criteria:
+        - Found original Jorgensen 1983 paper
+        - Found at least one additional source
+        - Correctly extracted parameter values
+    - name: parameter_completeness
+      weight: 25
+      criteria:
+        - O-H bond length
+        - H-O-H angle
+        - O-M distance (TIP4P specific)
+        - LJ epsilon and sigma for oxygen
+        - Partial charges (qO, qH, qM)
+    - name: validation
+      weight: 25
+      criteria:
+        - Compared values across sources
+        - Identified any discrepancies
+        - Made reasoned choice when values differ
+    - name: documentation
+      weight: 20
+      criteria:
+        - Clear citations
+        - Organized presentation
+        - Reasoning explained
+
+time_limit_minutes: 20
+
+metadata:
+  difficulty: medium
+  skills_tested:
+    - literature_search
+    - critical_thinking
+    - parameter_validation
+  notes: >
+    Tests the agent's ability to work like a researcher - finding information,
+    cross-referencing, and making reasoned decisions about discrepancies.

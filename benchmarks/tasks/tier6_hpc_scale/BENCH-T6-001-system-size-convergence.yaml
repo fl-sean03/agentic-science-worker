@@ -1,0 +1,180 @@
+# Tier 6 Benchmark: System Size Convergence Study
+# HPC-scale research requiring large simulations
+
+id: BENCH-T6-001
+name: System Size Convergence Study
+tier: 6
+category: hpc-scale-research
+
+description: |
+  Conduct a systematic study of finite-size effects on the self-diffusion
+  coefficient of liquid argon. This requires running simulations at multiple
+  system sizes, including sizes that are only feasible on HPC (32,000+ atoms).
+  The goal is to extrapolate to the infinite-size limit and determine the
+  minimum system size needed for converged results.
+
+prompt: |
+  **Research Question:**
+  What is the minimum system size needed to calculate a converged self-diffusion
+  coefficient for liquid argon? How do finite-size effects scale with system size?
+
+  **Background:**
+  Diffusion coefficients calculated from MD simulations have finite-size effects
+  due to periodic boundary conditions. The Yeh-Hummer correction predicts:
+
+  D(L) = D(∞) - k_B T / (6 π η L)
+
+  where L is the box size and η is the viscosity. By running simulations at
+  multiple sizes and plotting D vs 1/L, we can extrapolate to infinite size.
+
+  **Your Study:**
+
+  **Step 1: Literature Research**
+  - Find expected diffusion coefficient for argon at 94.4K (~2.4 × 10⁻⁵ cm²/s)
+  - Research finite-size corrections for diffusion
+  - Find the Yeh-Hummer correction formula
+
+  **Step 2: Design Size Series**
+  Plan simulations at increasing system sizes:
+  - 256 atoms (4×4×4 unit cells) - can run locally
+  - 864 atoms (6×6×6 unit cells) - can run locally
+  - 2,048 atoms (8×8×8 unit cells)
+  - 4,000 atoms (10×10×10 unit cells)
+  - 10,976 atoms (14×14×14 unit cells)
+  - 32,000 atoms (20×20×20 unit cells) - **requires HPC**
+
+  For each size:
+  - Same density (1.374 g/cm³)
+  - Same temperature (94.4 K)
+  - NVT equilibration followed by NVE production
+  - Calculate MSD and extract diffusion coefficient
+
+  **Step 3: Resource Planning**
+  Estimate resources needed for each system size:
+  - Small (256-864): Local workstation or atesting
+  - Medium (2k-4k): atesting or amilan
+  - Large (10k-32k): amilan or amilan128c
+
+  Create job scripts with appropriate resources for each size.
+
+  **Step 4: Execute Simulations**
+  - Run small systems locally or on atesting for quick validation
+  - Submit larger systems to HPC
+  - Use async workflow for jobs with long queues
+  - Track all jobs systematically
+
+  **Step 5: Convergence Analysis**
+  When results are ready:
+  - Plot D vs N (number of atoms)
+  - Plot D vs 1/L (inverse box length)
+  - Fit to extract D(∞) = infinite-size limit
+  - Determine minimum N for <5% error from D(∞)
+
+  **Step 6: Research Report**
+  Write a report including:
+  - Methodology and simulation details
+  - Table of D(N) values with uncertainties
+  - Convergence plots
+  - D(∞) with uncertainty
+  - Minimum system size recommendation
+  - Comparison to Yeh-Hummer prediction
+
+  Work in: workspaces/benchmarks/BENCH-T6-001/
+
+skills_required:
+  - hpc-cluster
+  - lammps-simulation
+  - literature-search
+  - data-analysis
+
+time_limit_minutes: 180  # 3 hours, but jobs run async
+
+expected_outputs:
+  files:
+    - name: "literature_review.md"
+      description: "Background on finite-size effects"
+    - name: "study_design.md"
+      description: "Planned system sizes and resources"
+    - name: "inputs/input_N*.lmp"
+      description: "LAMMPS inputs for each system size"
+    - name: "jobs/job_N*.slurm"
+      description: "Job scripts for each size"
+    - name: "analysis/convergence_plot.png"
+      description: "D vs N and D vs 1/L plots"
+    - name: "analysis/diffusion_results.csv"
+      description: "Table of D values for each size"
+    - name: "report.md"
+      description: "Full research report"
+
+  values:
+    d_infinite:
+      description: "Extrapolated infinite-size D"
+      expected_range: [2.0e-5, 2.8e-5]  # cm²/s
+      unit: "cm²/s"
+    min_converged_size:
+      description: "Minimum atoms for <5% error"
+      expected_range: [500, 5000]
+
+grading:
+  categories:
+    - name: literature_research
+      weight: 10
+      criteria:
+        - Found relevant finite-size correction literature
+        - Cited Yeh-Hummer or equivalent
+        - Stated expected D value
+
+    - name: study_design
+      weight: 20
+      criteria:
+        - Appropriate range of system sizes
+        - Largest size requires HPC (>10k atoms)
+        - Consistent methodology across sizes
+        - Resource estimates reasonable
+
+    - name: hpc_execution
+      weight: 25
+      criteria:
+        - Successfully ran large systems on HPC
+        - Appropriate partition selection
+        - Proper async handling for long jobs
+        - All sizes completed
+
+    - name: convergence_analysis
+      weight: 30
+      criteria:
+        - D extracted correctly for each size
+        - Proper plotting of convergence
+        - Extrapolation to infinite size
+        - Uncertainty quantified
+        - Minimum size determined
+
+    - name: scientific_quality
+      weight: 15
+      criteria:
+        - Results physically reasonable
+        - Comparison to theory
+        - Limitations discussed
+        - Report is publication-quality
+
+metadata:
+  difficulty: hard
+  estimated_time_minutes: 180
+  async_completion: true  # Jobs may complete after benchmark timeout
+  hpc_resources:
+    small_jobs:
+      partition: atesting
+      cores: 4
+    large_jobs:
+      partition: amilan
+      cores: 32-64
+    time_limit: "04:00:00"
+  skills_tested:
+    - convergence_studies
+    - scale_up_methodology
+    - resource_estimation
+    - scientific_analysis
+  notes: |
+    This benchmark tests true HPC-scale research. The 32k atom simulation
+    is impractical on a workstation but routine on HPC. The scientific
+    question (finite-size effects) is real and important for production MD.

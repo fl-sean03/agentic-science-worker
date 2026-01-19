@@ -1,0 +1,150 @@
+# Tier 5 Benchmark: GPU Job Submission
+# Test running GPU-accelerated simulations on HPC
+
+id: BENCH-T5-005
+name: GPU Job Submission
+tier: 5
+category: hpc-fundamentals
+
+description: |
+  Run a GPU-accelerated LAMMPS simulation on HPC. This tests the agent's
+  ability to request GPU resources, configure LAMMPS for GPU execution,
+  and compare performance between CPU and GPU runs.
+
+prompt: |
+  Run a LAMMPS simulation using GPU acceleration on the HPC cluster.
+
+  **The Simulation:**
+  A larger LJ fluid system that benefits from GPU acceleration:
+  - 32,000 atoms (20×20×20 unit cells of FCC lattice)
+  - LJ potential with standard argon parameters
+  - NVT at 94.4 K for 50,000 steps
+  - This system is large enough to benefit from GPU acceleration
+
+  **Step 1: Create the Simulation Input**
+  Create a LAMMPS input file for a 32,000 atom LJ system.
+  The simulation should output timing information.
+
+  **Step 2: Test on CPU First (atesting)**
+  - Create job script for atesting partition
+  - Run with 4 CPU cores
+  - Record the execution time
+  - Verify simulation completes correctly
+
+  **Step 3: Check GPU Queue**
+  Check the queue status for GPU partitions:
+  - atesting_a100 (for testing, 1 GPU, 1 hour limit)
+  - aa100 (production, up to 3 GPUs, 24 hour limit)
+
+  If atesting_a100 has reasonable queue, use it for testing.
+
+  **Step 4: Configure for GPU**
+  Create a GPU job script:
+  - Request 1 GPU (--gres=gpu:1)
+  - Use atesting_a100 partition first
+  - Configure LAMMPS for GPU (KOKKOS or GPU package)
+  - Example GPU flags: `-k on g 1 -sf kk -pk kokkos gpu/aware off`
+
+  **Step 5: Run GPU Version**
+  - Submit GPU job
+  - Record execution time
+  - Verify results match CPU version (energies should be same)
+
+  **Step 6: Performance Comparison**
+  Create a report comparing:
+  - CPU time vs GPU time
+  - Speedup factor
+  - Energy/temperature consistency between runs
+  - When GPU acceleration is worthwhile
+
+  Work in: workspaces/benchmarks/BENCH-T5-005/
+
+skills_required:
+  - hpc-cluster
+  - lammps-simulation
+
+time_limit_minutes: 45
+
+expected_outputs:
+  files:
+    - name: "input_large.lmp"
+      description: "LAMMPS input for 32k atom system"
+    - name: "job_cpu.slurm"
+      description: "CPU job script"
+    - name: "job_gpu.slurm"
+      description: "GPU job script with KOKKOS/GPU flags"
+    - name: "performance_report.md"
+      description: "CPU vs GPU comparison"
+
+  values:
+    gpu_speedup:
+      description: "GPU speedup over CPU (should be >2x for this system size)"
+      expected_range: [1.5, 20]
+    energy_match:
+      description: "Final energies match between CPU and GPU"
+      expected: true
+
+grading:
+  categories:
+    - name: simulation_setup
+      weight: 20
+      criteria:
+        - Created valid large LJ system (32k atoms)
+        - Correct parameters and settings
+        - Timing output configured
+
+    - name: cpu_baseline
+      weight: 20
+      criteria:
+        - Valid CPU job script
+        - Ran on atesting
+        - Recorded timing
+        - Simulation completed successfully
+
+    - name: gpu_configuration
+      weight: 30
+      criteria:
+        - Correct GPU resource request (--gres=gpu:1)
+        - Correct partition (atesting_a100 or aa100)
+        - Proper LAMMPS GPU flags (KOKKOS or GPU package)
+        - Job script is valid
+
+    - name: gpu_execution
+      weight: 15
+      criteria:
+        - GPU job submitted successfully
+        - Job completed without errors
+        - Results are physically reasonable
+
+    - name: performance_analysis
+      weight: 15
+      criteria:
+        - Timing comparison presented
+        - Speedup calculated
+        - Results consistency verified
+        - Meaningful conclusions drawn
+
+metadata:
+  difficulty: medium-hard
+  estimated_time_minutes: 40
+  hpc_resources:
+    cpu_job:
+      partition: atesting
+      nodes: 1
+      cores: 4
+      time_limit: "00:30:00"
+    gpu_job:
+      partition: atesting_a100
+      nodes: 1
+      cores: 4
+      gpus: 1
+      time_limit: "00:30:00"
+  skills_tested:
+    - gpu_job_submission
+    - lammps_gpu_configuration
+    - performance_benchmarking
+    - resource_comparison
+  notes: |
+    GPU acceleration requires proper LAMMPS configuration. The agent needs
+    to find the right flags for the HPC LAMMPS installation. System size
+    of 32k atoms should show meaningful GPU speedup (typically 3-10x).

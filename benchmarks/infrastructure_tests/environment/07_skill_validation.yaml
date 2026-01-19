@@ -1,0 +1,21 @@
+# Environment Benchmark: Skill Validation
+# Validates skill files follow best practices
+
+name: skill-validation
+description: Verify skills have valid frontmatter and structure
+category: environment
+difficulty: easy
+expected_time: 10s
+
+type: script
+script: validate_skills.py
+
+validation:
+  exit_code: 0
+  stdout_contains:
+    - "All skills validated"
+
+tags:
+  - skills
+  - validation
+  - best-practices

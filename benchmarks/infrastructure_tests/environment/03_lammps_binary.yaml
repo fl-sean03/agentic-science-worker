@@ -1,0 +1,31 @@
+# Environment Benchmark: LAMMPS Binary
+# Validates LAMMPS installation and GPU support
+
+name: lammps-binary
+description: Verify LAMMPS binary exists and runs
+category: environment
+difficulty: trivial
+expected_time: 5s
+
+type: validation
+
+checks:
+  - name: LAMMPS binary exists
+    type: file_exists
+    path: /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/md-lammps/install/bin/lmp
+
+  - name: LAMMPS responds to -help
+    type: command_succeeds
+    command: "/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/md-lammps/install/bin/lmp -help 2>&1 | head -5"
+
+  - name: LAMMPS GPU package available
+    type: command_succeeds
+    command: "/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/md-lammps/install/bin/lmp -help 2>&1 | grep -i 'gpu'"
+
+validation:
+  exit_code: 0
+
+tags:
+  - lammps
+  - binary
+  - gpu

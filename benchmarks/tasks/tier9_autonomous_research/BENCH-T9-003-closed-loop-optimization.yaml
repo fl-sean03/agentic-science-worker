@@ -1,0 +1,185 @@
+# Tier 9 Benchmark: Closed-Loop Optimization
+# Optimize material property through iterative simulation
+
+id: BENCH-T9-003
+name: Closed-Loop Optimization
+tier: 9
+category: autonomous-research
+
+description: |
+  Optimize the thermal conductivity of silicon-germanium alloys through
+  closed-loop iterative simulation. The agent must propose compositions,
+  run simulations, analyze results, and decide what to try next - mimicking
+  autonomous experimental optimization.
+
+prompt: |
+  **Task: Optimize Si-Ge Alloy Thermal Conductivity**
+
+  Silicon-germanium alloys are used in thermoelectrics where LOW thermal
+  conductivity is desirable (to maximize ZT figure of merit). Your task is
+  to find the Si_xGe_{1-x} composition that minimizes thermal conductivity.
+
+  **Background:**
+  - Pure Si: κ ≈ 150 W/m·K
+  - Pure Ge: κ ≈ 60 W/m·K
+  - Alloy scattering reduces κ dramatically
+  - Minimum κ occurs near x ≈ 0.5 (alloy scattering maximum)
+  - Literature: Si0.5Ge0.5 κ ≈ 5-10 W/m·K
+
+  **Constraints:**
+  - Maximum 10 compositions to test
+  - Each simulation: 5000+ atoms, 100+ ps MD
+  - Must find composition with κ within 20% of true minimum
+
+  **Step 1: Initial Exploration**
+  Start with 3 compositions to map the landscape:
+  - x = 0.0 (pure Ge)
+  - x = 0.5 (equal mix)
+  - x = 1.0 (pure Si)
+
+  For each, calculate thermal conductivity using MLIP + NEMD or Green-Kubo.
+
+  **Step 2: Thermal Conductivity Calculation**
+  Use Non-Equilibrium MD (NEMD) or Green-Kubo method:
+
+  NEMD approach:
+  1. Create long simulation cell (Lx >> Ly, Lz)
+  2. Apply heat source at one end, sink at other
+  3. Measure steady-state temperature gradient
+  4. κ = Q / (A × dT/dx)
+
+  Green-Kubo approach:
+  1. Run NVE MD
+  2. Calculate heat current autocorrelation
+  3. Integrate to get κ
+
+  Use MACE or M3GNet for forces (Stillinger-Weber also valid for Si-Ge).
+
+  **Step 3: Build Model**
+  After initial 3 points, build a model of κ(x):
+  - Simple: quadratic or polynomial fit
+  - Better: Bayesian model with uncertainty
+
+  **Step 4: Propose Next Composition**
+  Using your model, propose the next composition to test:
+  - Option A: Test predicted minimum
+  - Option B: Test where uncertainty is highest (exploration)
+  - Option C: Balance both (acquisition function)
+
+  Justify your choice.
+
+  **Step 5: Iterate**
+  Repeat steps 2-4 until:
+  - Budget exhausted (10 compositions)
+  - OR minimum found with confidence
+
+  Track all compositions tested and their κ values.
+
+  **Step 6: Final Minimum**
+  Report your best composition:
+  - Composition x with lowest κ
+  - Thermal conductivity value
+  - Comparison to literature minimum
+
+  **Step 7: Optimization Analysis**
+  Analyze your optimization trajectory:
+  - Plot κ vs x with all data points
+  - Show which compositions were tested and in what order
+  - Was the optimization efficient? Could you have found minimum faster?
+
+  **Step 8: Report**
+  Write report including:
+  - Methodology for κ calculation
+  - Optimization strategy
+  - All compositions tested (table)
+  - κ(x) plot
+  - Final optimal composition
+  - Comparison to literature
+  - Efficiency analysis
+
+  Work in: workspaces/benchmarks/BENCH-T9-003/
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 180
+
+expected_outputs:
+  files:
+    - name: "structures/sige_x*.cif"
+      description: "Si-Ge structures at each composition"
+    - name: "simulations/*/md.log"
+      description: "MD logs for each composition"
+    - name: "analysis/thermal_conductivity.csv"
+      description: "κ values for all compositions"
+    - name: "optimization/iteration_log.csv"
+      description: "Log of optimization iterations"
+    - name: "optimization/kappa_vs_x.png"
+      description: "Thermal conductivity vs composition plot"
+    - name: "optimization/trajectory.png"
+      description: "Optimization trajectory visualization"
+    - name: "report.md"
+      description: "Optimization report"
+
+  values:
+    optimal_composition:
+      description: "Composition x with minimum κ"
+      expected_range: [0.3, 0.7]
+    minimum_kappa:
+      description: "Lowest thermal conductivity found"
+      expected_range: [3, 20]
+      unit: "W/m·K"
+    compositions_tested:
+      description: "Number of compositions evaluated"
+      expected_range: [5, 10]
+
+grading:
+  categories:
+    - name: thermal_conductivity_method
+      weight: 25
+      criteria:
+        - Valid κ calculation method
+        - Sufficient system size
+        - Adequate simulation time
+        - Results are reasonable
+
+    - name: optimization_strategy
+      weight: 30
+      criteria:
+        - Clear strategy defined
+        - Balances exploration/exploitation
+        - Decisions justified
+        - Efficient use of budget
+
+    - name: results
+      weight: 25
+      criteria:
+        - Found composition near true minimum
+        - κ value is physically reasonable
+        - Compared to literature
+        - Uncertainty considered
+
+    - name: analysis
+      weight: 20
+      criteria:
+        - Clear visualization
+        - Efficiency discussed
+        - Limitations acknowledged
+        - Recommendations provided
+
+metadata:
+  difficulty: expert
+  estimated_time_minutes: 180
+  gpu_recommended: true
+  skills_tested:
+    - thermal_conductivity
+    - optimization
+    - autonomous_decision_making
+    - nemd_simulation
+  notes: |
+    This benchmark tests closed-loop autonomous optimization - a key
+    capability for self-driving labs. The agent must make intelligent
+    decisions about what to simulate next based on previous results.
+    The thermal conductivity minimum is well-documented in literature,
+    providing clear success criteria.

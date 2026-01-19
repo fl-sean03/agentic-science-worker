@@ -1,0 +1,166 @@
+# Tier 5 Benchmark: Async Job Management
+# Test non-blocking job submission for long queue times
+
+id: BENCH-T5-006
+name: Async Job Management
+tier: 5
+category: hpc-fundamentals
+
+description: |
+  Submit a job that may have a long queue time and manage it asynchronously.
+  This tests the agent's ability to submit jobs without blocking, save
+  tracking information, and check status later - essential for HPC where
+  jobs may queue for hours or days.
+
+prompt: |
+  **CRITICAL INSTRUCTIONS - READ CAREFULLY:**
+
+  1. You are EXECUTING this task autonomously - you do ALL the work yourself
+  2. You must CREATE ALL 5 FILES listed below in the workspace directory
+  3. Do NOT just provide recommendations - actually write the files
+  4. Use the Write tool to create each file
+  5. The task is INCOMPLETE until all 5 files exist
+
+  **START by using TodoWrite to create a checklist of the 5 deliverables:**
+  - [ ] queue_status.md - Save queue analysis to this file
+  - [ ] job_production.slurm - Write the SLURM job script
+  - [ ] job_tracking.json - Create after submitting job
+  - [ ] check_status.sh - Write a bash script to check job status
+  - [ ] async_workflow_guide.md - Document the async workflow
+
+  **WORKFLOW:**
+  1. First, create the workspace structure
+  2. Check queue status and WRITE results to queue_status.md (use Write tool!)
+  3. Create job_production.slurm with LAMMPS input
+  4. Submit the job and create job_tracking.json
+  5. Create check_status.sh
+  6. Create async_workflow_guide.md
+  7. Verify all 5 files exist before finishing
+
+  **Important Context:**
+  On HPC, jobs don't start immediately. Queue times can range from minutes
+  to days depending on partition and demand. The agent should NEVER block
+  waiting for jobs with long queues. Instead, submit and track asynchronously.
+
+  **The Simulation:**
+  A moderately sized liquid argon simulation:
+  - 4,000 atoms
+  - NVT equilibration: 100,000 steps
+  - NVE production: 500,000 steps
+  - Calculate MSD for diffusion coefficient
+  - Estimated runtime: ~1-2 hours
+
+  **Step 1: Check Queue Status**
+  Before submitting, check queue status for:
+  - amilan (production CPU)
+  - amilan128c (high-core production)
+
+  Report estimated wait times for each.
+
+  **Step 2: Create Job Script**
+  Create a job script that:
+  - Uses appropriate partition based on queue analysis
+  - Requests reasonable resources (8-16 cores for this size)
+  - Sets up email notifications (--mail-type=BEGIN,END,FAIL)
+  - Includes checkpointing if runtime might be long
+
+  **Step 3: Submit Asynchronously**
+  Submit the job using async workflow:
+  - Do NOT wait for completion
+  - Save job tracking information (job ID, submit time, estimated start)
+  - Create a tracking file that can be used to check status later
+
+  **Step 4: Demonstrate Status Checking**
+  Show how to check job status:
+  - Write a script or commands to check if job is pending/running/complete
+  - Show current job status
+  - Show estimated start time if available
+
+  **Step 5: Document Async Workflow**
+  Create documentation explaining:
+  - Why async submission is necessary
+  - How to track submitted jobs
+  - How to retrieve results when job completes
+  - Best practices for long-running HPC jobs
+
+  **Note:** This benchmark does NOT require waiting for job completion.
+  The focus is on proper async submission and tracking setup.
+
+  Work in: workspaces/benchmarks/BENCH-T5-006/
+
+skills_required:
+  - hpc-cluster
+  - lammps-simulation
+
+time_limit_minutes: 30
+
+expected_outputs:
+  files:
+    - name: "queue_status.md"
+      description: "Current queue status analysis"
+    - name: "job_production.slurm"
+      description: "Production job script with email notifications"
+    - name: "job_tracking.json"
+      description: "Tracking file with job ID, status, timestamps"
+    - name: "check_status.sh"
+      description: "Script to check job status"
+    - name: "async_workflow_guide.md"
+      description: "Documentation of async workflow"
+
+grading:
+  categories:
+    - name: queue_analysis
+      weight: 20
+      criteria:
+        - Checked queue status before submission
+        - Reported estimated wait times
+        - Made informed partition choice
+
+    - name: job_script_quality
+      weight: 25
+      criteria:
+        - Valid SLURM directives
+        - Email notifications configured
+        - Reasonable resource requests
+        - Proper partition selection
+
+    - name: async_submission
+      weight: 30
+      criteria:
+        - Job submitted without blocking
+        - Tracking information saved
+        - Job ID recorded
+        - Submit time recorded
+        - Estimated start time captured if available
+
+    - name: status_checking
+      weight: 15
+      criteria:
+        - Method to check status provided
+        - Current status correctly reported
+        - Can determine pending/running/complete
+
+    - name: documentation
+      weight: 10
+      criteria:
+        - Clear explanation of async workflow
+        - Useful for future reference
+        - Explains why blocking is bad
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 25
+  hpc_resources:
+    partition: amilan  # or amilan128c based on queue
+    nodes: 1
+    cores: 16
+    time_limit: "04:00:00"
+  skills_tested:
+    - async_job_submission
+    - job_tracking
+    - status_monitoring
+    - email_notifications
+  notes: |
+    This benchmark tests the critical skill of non-blocking HPC usage.
+    Agents that block waiting for long-queue jobs waste time and context.
+    Proper async workflow is essential for real research.

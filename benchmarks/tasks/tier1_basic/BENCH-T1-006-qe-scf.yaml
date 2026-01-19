@@ -1,0 +1,122 @@
+# Tier 1 Benchmark: QE SCF Calculation
+# Single-skill task testing Quantum ESPRESSO DFT capability
+
+id: BENCH-T1-006
+name: Silicon SCF Calculation
+tier: 1
+category: quantum-espresso
+
+description: |
+  Run a self-consistent field (SCF) calculation on bulk silicon.
+  Tests ability to set up and run basic DFT calculations.
+
+prompt: |
+  Run a Quantum ESPRESSO SCF calculation for bulk silicon with
+  the following specifications:
+
+  - Diamond cubic structure (space group Fd-3m)
+  - Experimental lattice constant: 5.43 Angstroms
+  - 2 atoms in the primitive cell
+  - Use PBE exchange-correlation functional
+  - Plane wave cutoff: 40 Ry
+  - K-point grid: 4x4x4 Monkhorst-Pack
+  - Use a suitable Si pseudopotential from the QE library
+
+  Report:
+  1. Total energy (in Ry)
+  2. Whether SCF convergence was achieved
+  3. Number of SCF iterations
+  4. Fermi energy (if applicable)
+
+  Work in: workspaces/benchmarks/t1-006-qe-scf/
+
+skills_required:
+  - quantum-espresso
+
+time_limit_minutes: 15
+
+expected_outputs:
+  files:
+    - workspaces/benchmarks/t1-006-qe-scf/si.in
+    - workspaces/benchmarks/t1-006-qe-scf/si.out
+  values:
+    total_energy:
+      description: "Total SCF energy"
+      expected_range: [-15.9, -15.7]  # Ry for 2-atom Si cell (approx)
+      unit: "Ry"
+    converged:
+      description: "SCF convergence achieved"
+      expected: true
+    n_iterations:
+      description: "Number of SCF iterations"
+      expected_range: [3, 15]  # Typical for Si
+
+grading:
+  total_points: 100
+
+  categories:
+    input_setup:
+      weight: 35
+      checks:
+        - name: "Correct structure"
+          points: 10
+          validation: |
+            Diamond cubic with 2 atoms, correct positions
+        - name: "Lattice constant"
+          points: 5
+          validation: |
+            celldm(1) or A corresponds to 5.43 Å
+        - name: "Cutoffs appropriate"
+          points: 10
+          validation: |
+            ecutwfc >= 30 Ry
+        - name: "K-points reasonable"
+          points: 5
+          validation: |
+            At least 4x4x4 k-grid
+        - name: "Valid pseudopotential"
+          points: 5
+          validation: |
+            Pseudopotential file exists and is referenced
+
+    execution_success:
+      weight: 35
+      checks:
+        - name: "Calculation completed"
+          points: 20
+          validation: |
+            Output contains "JOB DONE" or similar completion marker
+        - name: "SCF converged"
+          points: 15
+          validation: |
+            "convergence achieved" in output
+
+    result_quality:
+      weight: 30
+      checks:
+        - name: "Energy reasonable"
+          points: 20
+          validation: |
+            Total energy in expected range for Si
+        - name: "Results reported"
+          points: 10
+          validation: |
+            Agent extracted and reported required values
+
+reference_solution:
+  location: reference/solutions/t1-006-qe-scf/
+  notes: |
+    Si with PBE, 40 Ry cutoff, 4x4x4 k-points
+    Expected total energy: ~-15.85 Ry for 2-atom cell
+    Converges in ~6-10 SCF iterations
+
+metadata:
+  author: "benchmark-system"
+  created: "2025-01-16"
+  difficulty: "easy"
+  estimated_tokens: 3000
+  tags:
+    - quantum-espresso
+    - dft
+    - scf
+    - silicon

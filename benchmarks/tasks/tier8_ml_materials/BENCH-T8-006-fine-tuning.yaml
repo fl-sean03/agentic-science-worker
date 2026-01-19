@@ -1,0 +1,187 @@
+# Tier 8 Benchmark: Fine-Tuning Universal Potential
+# Transfer learning to improve MLIP accuracy for specific chemistry
+
+id: BENCH-T8-006
+name: Fine-Tuning Universal Potential
+tier: 8
+category: ml-materials
+
+description: |
+  Fine-tune a universal MLIP (MACE-MP-0) to improve accuracy for gold surfaces.
+  Universal potentials have higher errors for surfaces; fine-tuning on a small
+  DFT dataset can dramatically improve accuracy. This demonstrates transfer
+  learning for domain-specific applications.
+
+prompt: |
+  **Task: Fine-Tune MACE for Gold Surfaces**
+
+  Universal MLIPs are trained primarily on bulk structures and have larger
+  errors for surfaces. Fine-tuning on a small domain-specific dataset can
+  significantly improve accuracy. Your task is to fine-tune MACE-MP-0 for
+  gold surface calculations.
+
+  **Background:**
+  - Universal MLIP surface energy errors: ~100-200 meV/Å²
+  - After fine-tuning: can reduce to ~10-50 meV/Å²
+  - Required data: 10-50 DFT calculations
+  - Fine-tuning time: minutes to hours
+
+  **Experimental Reference (Au surfaces):**
+  - Au(111) surface energy: ~0.08 eV/Å² (~1.3 J/m²)
+  - Au(100) surface energy: ~0.09 eV/Å²
+  - Au(110) surface energy: ~0.10 eV/Å²
+
+  **Step 1: Baseline Evaluation**
+  Using MACE-MP-0 (no fine-tuning):
+  1. Create Au(111), (100), (110) surface slabs (4+ layers, vacuum)
+  2. Calculate surface energies with MACE-MP-0
+  3. Compare to experimental values
+  4. Record baseline errors
+
+  **Step 2: Generate Training Data**
+  Create DFT training data using Quantum ESPRESSO:
+  1. Au(111) surface: 3-5 configurations (relaxed, slightly displaced)
+  2. Au(100) surface: 3-5 configurations
+  3. Au(110) surface: 3-5 configurations
+  4. Au bulk reference: 2-3 configurations
+
+  For each configuration, calculate:
+  - Total energy
+  - Forces on all atoms
+  - Stress tensor (optional)
+
+  Save in .xyz format with energies/forces.
+
+  **Step 3: Fine-Tuning Setup**
+  Prepare MACE fine-tuning:
+  ```python
+  # Using MACE's fine-tuning capability
+  # See: https://github.com/ACEsuit/mace
+
+  # Key parameters:
+  # - Foundation model: MACE-MP-0
+  # - Learning rate: 1e-4 to 1e-5 (small for fine-tuning)
+  # - Epochs: 50-200
+  # - Energy/force weights: balance appropriately
+  ```
+
+  Note: If full MACE fine-tuning is too complex, demonstrate the workflow
+  conceptually and evaluate the pre-trained model's limitations.
+
+  **Step 4: Fine-Tuning Execution**
+  Run fine-tuning:
+  - Monitor training and validation loss
+  - Watch for overfitting
+  - Save best model checkpoint
+
+  **Step 5: Evaluation**
+  Compare fine-tuned model to baseline:
+  | Surface | Exp (eV/Å²) | MACE-MP-0 | Fine-tuned | Improvement |
+  |---------|-------------|-----------|------------|-------------|
+  | (111)   | 0.08        | ???       | ???        | ???%        |
+  | (100)   | 0.09        | ???       | ???        | ???%        |
+  | (110)   | 0.10        | ???       | ???        | ???%        |
+
+  Also test on held-out configurations not in training.
+
+  **Step 6: Report**
+  Write report including:
+  - Baseline MACE-MP-0 performance on surfaces
+  - Training data generation methodology
+  - Fine-tuning parameters and procedure
+  - Before/after accuracy comparison
+  - Discussion of data efficiency (how few DFT calcs needed?)
+  - When is fine-tuning worth the effort?
+
+  **Fallback (if fine-tuning infrastructure too complex):**
+  If MACE fine-tuning is not feasible, document:
+  - The baseline surface energy errors
+  - The DFT data that WOULD be generated
+  - The expected improvement based on literature
+  - A conceptual workflow diagram
+
+  Work in: workspaces/benchmarks/BENCH-T8-006/
+
+skills_required:
+  - quantum-espresso
+  - data-analysis
+
+time_limit_minutes: 180
+
+expected_outputs:
+  files:
+    - name: "baseline/surface_energies_baseline.csv"
+      description: "Pre-fine-tuning surface energies"
+    - name: "training_data/*.xyz"
+      description: "DFT training configurations"
+    - name: "training_data/generate_data.py"
+      description: "DFT data generation script"
+    - name: "fine_tuning/config.yaml"
+      description: "Fine-tuning configuration"
+    - name: "evaluation/comparison.csv"
+      description: "Before/after comparison"
+    - name: "report.md"
+      description: "Full fine-tuning report"
+
+  values:
+    baseline_111_error:
+      description: "Baseline MACE-MP-0 error on Au(111)"
+      expected_range: [0.01, 0.10]
+      unit: "eV/Å²"
+    finetuned_111_error:
+      description: "Fine-tuned model error on Au(111)"
+      expected_range: [0.005, 0.05]
+      unit: "eV/Å²"
+    training_configs:
+      description: "Number of DFT training configurations"
+      expected_range: [10, 50]
+
+grading:
+  categories:
+    - name: baseline_evaluation
+      weight: 20
+      criteria:
+        - Surface slabs correctly created
+        - Surface energies calculated properly
+        - Baseline errors quantified
+        - Comparison to experiment
+
+    - name: training_data
+      weight: 30
+      criteria:
+        - DFT calculations set up correctly
+        - Multiple configurations generated
+        - Data formatted properly
+        - Energy/force extraction
+
+    - name: fine_tuning_workflow
+      weight: 25
+      criteria:
+        - Fine-tuning approach documented
+        - Parameters justified
+        - Training monitored
+        - Or conceptual workflow if not executed
+
+    - name: scientific_analysis
+      weight: 25
+      criteria:
+        - Improvement quantified
+        - Data efficiency discussed
+        - Practical recommendations
+        - Limitations acknowledged
+
+metadata:
+  difficulty: expert
+  estimated_time_minutes: 180
+  gpu_recommended: true
+  dft_required: true
+  skills_tested:
+    - transfer_learning
+    - surface_calculations
+    - dft_data_generation
+    - model_evaluation
+  notes: |
+    This benchmark tests advanced MLIP usage - fine-tuning for specific
+    domains. Fine-tuning infrastructure can be complex, so partial credit
+    is given for demonstrating the workflow conceptually with baseline
+    evaluation and DFT data generation, even if fine-tuning isn't executed.

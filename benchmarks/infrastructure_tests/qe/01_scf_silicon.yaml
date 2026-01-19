@@ -1,0 +1,80 @@
+# QE Benchmark: SCF Silicon
+# Test basic SCF calculation on silicon
+
+name: qe-scf-silicon
+description: Run Quantum ESPRESSO SCF on silicon (CPU)
+category: qe
+difficulty: medium
+expected_time: 120s
+skills_tested:
+  - quantum-espresso
+
+type: command
+
+command: |
+  cd /tmp && rm -rf qe_bench_scf && mkdir -p qe_bench_scf/pseudo && cd qe_bench_scf
+
+  # Download Si pseudopotential if not present
+  PSEUDO_URL="https://pseudopotentials.quantum-espresso.org/upf_files/Si.pz-vbc.UPF"
+  if [ ! -f pseudo/Si.pz-vbc.UPF ]; then
+    curl -L -o pseudo/Si.pz-vbc.UPF "$PSEUDO_URL" 2>/dev/null || \
+    wget -q -O pseudo/Si.pz-vbc.UPF "$PSEUDO_URL" || \
+    echo "Could not download pseudopotential"
+  fi
+
+  # Create input file
+  cat > si_scf.in << 'EOF'
+  &CONTROL
+      calculation = 'scf'
+      prefix = 'silicon'
+      outdir = './tmp'
+      pseudo_dir = './pseudo'
+      verbosity = 'high'
+  /
+
+  &SYSTEM
+      ibrav = 2
+      celldm(1) = 10.26
+      nat = 2
+      ntyp = 1
+      ecutwfc = 20.0
+      ecutrho = 80.0
+  /
+
+  &ELECTRONS
+      conv_thr = 1.0d-6
+      mixing_beta = 0.7
+  /
+
+  ATOMIC_SPECIES
+  Si  28.086  Si.pz-vbc.UPF
+
+  ATOMIC_POSITIONS crystal
+  Si  0.00  0.00  0.00
+  Si  0.25  0.25  0.25
+
+  K_POINTS automatic
+  2 2 2 0 0 0
+  EOF
+
+  mkdir -p tmp
+
+  # Run QE CPU
+  /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < si_scf.in > si_scf.out 2>&1
+
+  # Show results
+  grep "!" si_scf.out || echo "Energy not found"
+  grep "convergence has been achieved" si_scf.out || echo "Not converged"
+
+timeout: 300
+
+validation:
+  exit_code: 0
+  stdout_contains:
+    - "total energy"
+
+tags:
+  - qe
+  - scf
+  - dft
+  - silicon

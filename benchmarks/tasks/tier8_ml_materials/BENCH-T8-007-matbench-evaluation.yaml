@@ -1,0 +1,186 @@
+# Tier 8 Benchmark: Matbench Discovery Evaluation
+# Participate in community ML benchmark
+
+id: BENCH-T8-007
+name: Matbench Discovery Evaluation
+tier: 8
+category: ml-materials
+
+description: |
+  Participate in the Matbench Discovery benchmark - the community standard for
+  evaluating ML models on materials stability prediction. This tests the agent's
+  ability to work with standardized benchmarks and evaluate model performance
+  rigorously.
+
+prompt: |
+  **Task: Evaluate MLIP on Matbench Discovery**
+
+  Matbench Discovery is the community benchmark for evaluating ML models on
+  crystal stability prediction. Your task is to evaluate a universal MLIP
+  on this benchmark and compare to published results.
+
+  **Background:**
+  - Matbench Discovery: https://matbench-discovery.materialsproject.org/
+  - Test set: WBM dataset (experimental structures)
+  - Task: Predict which structures are thermodynamically stable
+  - Key metric: F1 score (balance precision and recall)
+
+  Current leaderboard top performers:
+  - EquiformerV2-OMAT24: F1 = 0.924
+  - MACE: F1 ≈ 0.7-0.8
+  - CHGNet: F1 ≈ 0.6-0.7
+
+  **Step 1: Understand the Benchmark**
+  Research Matbench Discovery:
+  - What is the test set? (WBM structures)
+  - What is being predicted? (Formation energy, stability)
+  - How is stability defined? (Energy above hull < threshold)
+  - What metrics are used? (F1, MAE, DAF)
+
+  **Step 2: Get Test Data**
+  Option A: Use matbench-discovery package
+  ```python
+  pip install matbench-discovery
+  from matbench_discovery.data import DataFiles
+  ```
+
+  Option B: Download subset manually if package is complex
+  - Get 100-500 structures for evaluation
+  - Ensure mix of stable and unstable
+
+  **Step 3: Run Predictions**
+  For each test structure using MACE-MP-0:
+  1. Load structure
+  2. Relax with MLIP (optional, can use unrelaxed)
+  3. Calculate formation energy
+  4. Predict stability (E_above_hull < 0.1 eV/atom = stable)
+
+  Track:
+  - Predicted formation energies
+  - Predicted stability (binary: stable/unstable)
+  - Actual stability (from benchmark labels)
+
+  **Step 4: Calculate Metrics**
+  Compute classification metrics:
+  - True Positives (correctly predicted stable)
+  - False Positives (predicted stable, actually unstable)
+  - True Negatives (correctly predicted unstable)
+  - False Negatives (predicted unstable, actually stable)
+
+  Calculate:
+  - Precision = TP / (TP + FP)
+  - Recall = TP / (TP + FN)
+  - F1 = 2 × Precision × Recall / (Precision + Recall)
+  - Accuracy = (TP + TN) / Total
+
+  Also calculate:
+  - MAE for formation energy (where ground truth available)
+  - Discovery Acceleration Factor (DAF) if possible
+
+  **Step 5: Compare to Leaderboard**
+  Compare your results to published values:
+  - Is your F1 consistent with reported MACE performance?
+  - Where does MACE rank among models?
+  - What types of materials does it get wrong?
+
+  **Step 6: Error Analysis**
+  Analyze failures:
+  - What are the false positives? (Predicted stable but unstable)
+  - What are the false negatives? (Missed stable materials)
+  - Are there patterns in the errors? (Certain elements, structures?)
+
+  **Step 7: Report**
+  Write report including:
+  - Benchmark methodology
+  - Your evaluation results (F1, Precision, Recall, MAE)
+  - Comparison to leaderboard
+  - Error analysis
+  - Discussion of MLIP limitations revealed by benchmark
+  - Recommendations for improvement
+
+  Work in: workspaces/benchmarks/BENCH-T8-007/
+
+skills_required:
+  - literature-search
+  - data-analysis
+
+time_limit_minutes: 120
+
+expected_outputs:
+  files:
+    - name: "scripts/benchmark_evaluation.py"
+      description: "Full evaluation script"
+    - name: "results/predictions.csv"
+      description: "Predictions for all test structures"
+    - name: "results/metrics.json"
+      description: "Calculated metrics"
+    - name: "analysis/confusion_matrix.png"
+      description: "Confusion matrix visualization"
+    - name: "analysis/error_analysis.csv"
+      description: "Analysis of failure cases"
+    - name: "report.md"
+      description: "Benchmark report"
+
+  values:
+    f1_score:
+      description: "F1 score for stability prediction"
+      expected_range: [0.5, 0.85]
+    precision:
+      description: "Precision for stable prediction"
+      expected_range: [0.4, 0.9]
+    recall:
+      description: "Recall for stable prediction"
+      expected_range: [0.4, 0.9]
+    formation_energy_mae:
+      description: "MAE for formation energy"
+      expected_range: [0.02, 0.15]
+      unit: "eV/atom"
+
+grading:
+  categories:
+    - name: benchmark_understanding
+      weight: 15
+      criteria:
+        - Correctly describes benchmark
+        - Understands stability definition
+        - Knows relevant metrics
+        - Aware of leaderboard
+
+    - name: evaluation_execution
+      weight: 35
+      criteria:
+        - Test structures obtained
+        - MLIP predictions run correctly
+        - Sufficient sample size
+        - Efficient computation
+
+    - name: metric_calculation
+      weight: 25
+      criteria:
+        - F1 calculated correctly
+        - Precision/Recall correct
+        - MAE calculated if applicable
+        - Confusion matrix provided
+
+    - name: analysis_quality
+      weight: 25
+      criteria:
+        - Compared to published results
+        - Error patterns identified
+        - Insights provided
+        - Recommendations made
+
+metadata:
+  difficulty: hard
+  estimated_time_minutes: 120
+  gpu_recommended: true
+  skills_tested:
+    - ml_benchmarking
+    - stability_prediction
+    - metric_calculation
+    - error_analysis
+  notes: |
+    This benchmark tests whether the agent can engage with community
+    ML benchmarks. Matbench Discovery is the gold standard for evaluating
+    materials ML models. The agent should discover that universal MLIPs
+    perform well but not perfectly, and identify systematic limitations.

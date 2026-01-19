@@ -1,0 +1,132 @@
+# Tier 5 Benchmark: Local-to-HPC Migration
+# Test migrating a working local simulation to HPC
+
+id: BENCH-T5-002
+name: Local-to-HPC Migration
+tier: 5
+category: hpc-fundamentals
+
+description: |
+  Take a working LAMMPS simulation that runs locally and migrate it to run
+  on HPC. This tests the agent's ability to create job scripts, transfer files,
+  load correct modules, and verify results match between local and HPC execution.
+
+prompt: |
+  You have a working LAMMPS simulation of a Lennard-Jones fluid that runs on
+  the local workstation. Your task is to migrate this simulation to run on HPC.
+
+  **Step 1: Run Locally First**
+  Create and run a simple LJ fluid simulation locally:
+  - 256 atoms, LJ potential (ε=1.0, σ=1.0 in LJ units)
+  - NVT at T*=1.0 for 10,000 steps
+  - Record final energy and temperature
+
+  **Step 2: Prepare for HPC**
+  - Create a SLURM job script for the `atesting` partition
+  - The script should:
+    - Load appropriate modules (find LAMMPS on HPC)
+    - Run the same simulation
+    - Use 4 MPI processes
+  - Organize files in a clean directory structure
+
+  **Step 3: Transfer and Submit**
+  - Create a run directory on HPC: /scratch/alpine/$USER/Agent_Runs/bench-t5-002-migration/
+  - Upload the input file and job script
+  - Submit the job to atesting
+  - Wait for completion
+
+  **Step 4: Verify Results**
+  - Download the output files
+  - Compare final energy and temperature between local and HPC runs
+  - They should match within numerical precision (< 0.1% difference)
+  - If they don't match, investigate why
+
+  **Step 5: Report**
+  - Document the migration process
+  - Show local vs HPC comparison
+  - Note any differences in execution (performance, etc.)
+
+  Work in: workspaces/benchmarks/BENCH-T5-002/
+
+skills_required:
+  - lammps-simulation
+  - hpc-cluster
+
+time_limit_minutes: 30
+
+expected_outputs:
+  files:
+    - name: "input.lmp"
+      description: "LAMMPS input file"
+    - name: "job.slurm"
+      description: "SLURM job script"
+    - name: "local_log.lammps"
+      description: "Log from local execution"
+    - name: "hpc_log.lammps"
+      description: "Log from HPC execution"
+    - name: "comparison_report.md"
+      description: "Report comparing local vs HPC results"
+
+  values:
+    energy_match:
+      description: "Final energies match within tolerance"
+      expected: true
+    temperature_match:
+      description: "Final temperatures match within tolerance"
+      expected: true
+
+grading:
+  categories:
+    - name: local_execution
+      weight: 20
+      criteria:
+        - Valid LAMMPS input created
+        - Local simulation completed
+        - Results recorded correctly
+
+    - name: job_script_quality
+      weight: 25
+      criteria:
+        - Correct SLURM directives
+        - Appropriate partition (atesting)
+        - Correct module loading
+        - Proper MPI execution command
+
+    - name: file_transfer
+      weight: 20
+      criteria:
+        - Files uploaded to correct HPC location
+        - Directory structure organized
+        - All necessary files transferred
+
+    - name: hpc_execution
+      weight: 20
+      criteria:
+        - Job submitted successfully
+        - Job completed without errors
+        - Output files generated
+
+    - name: result_verification
+      weight: 15
+      criteria:
+        - Results compared quantitatively
+        - Match within tolerance confirmed
+        - Differences explained if any
+
+metadata:
+  difficulty: easy-medium
+  estimated_time_minutes: 20
+  hpc_resources:
+    partition: atesting
+    nodes: 1
+    cores: 4
+    time_limit: "00:30:00"
+  skills_tested:
+    - job_script_creation
+    - file_transfer
+    - module_loading
+    - result_verification
+  notes: |
+    This benchmark establishes the basic workflow for running simulations
+    on HPC. The simulation is intentionally simple to focus on the
+    migration process rather than scientific complexity.

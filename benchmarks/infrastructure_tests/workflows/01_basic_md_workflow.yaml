@@ -1,0 +1,142 @@
+# Workflow Benchmark: Basic MD Workflow
+# Test complete MD workflow: create input -> run -> analyze
+
+name: basic-md-workflow
+description: End-to-end MD workflow - minimize, equilibrate, analyze
+category: workflow
+difficulty: medium
+expected_time: 180s
+skills_tested:
+  - lammps-simulation
+  - data-analysis
+
+type: command
+
+command: |
+  cd /tmp && rm -rf workflow_md && mkdir workflow_md && cd workflow_md
+
+  echo "=== Step 1: Create Structure ==="
+
+  # Create FCC structure
+  cat > structure.data << 'EOF'
+  LAMMPS FCC structure
+
+  32 atoms
+  1 atom types
+
+  0.0 7.2 xlo xhi
+  0.0 7.2 ylo yhi
+  0.0 7.2 zlo zhi
+
+  Masses
+
+  1 39.948  # Argon
+
+  Atoms
+
+  1 1 0.0 0.0 0.0
+  2 1 0.0 1.8 1.8
+  3 1 1.8 0.0 1.8
+  4 1 1.8 1.8 0.0
+  5 1 3.6 0.0 0.0
+  6 1 3.6 1.8 1.8
+  7 1 5.4 0.0 1.8
+  8 1 5.4 1.8 0.0
+  9 1 0.0 3.6 0.0
+  10 1 0.0 5.4 1.8
+  11 1 1.8 3.6 1.8
+  12 1 1.8 5.4 0.0
+  13 1 3.6 3.6 0.0
+  14 1 3.6 5.4 1.8
+  15 1 5.4 3.6 1.8
+  16 1 5.4 5.4 0.0
+  17 1 0.0 0.0 3.6
+  18 1 0.0 1.8 5.4
+  19 1 1.8 0.0 5.4
+  20 1 1.8 1.8 3.6
+  21 1 3.6 0.0 3.6
+  22 1 3.6 1.8 5.4
+  23 1 5.4 0.0 5.4
+  24 1 5.4 1.8 3.6
+  25 1 0.0 3.6 3.6
+  26 1 0.0 5.4 5.4
+  27 1 1.8 3.6 5.4
+  28 1 1.8 5.4 3.6
+  29 1 3.6 3.6 3.6
+  30 1 3.6 5.4 5.4
+  31 1 5.4 3.6 5.4
+  32 1 5.4 5.4 3.6
+  EOF
+
+  echo "=== Step 2: Energy Minimization ==="
+
+  cat > in.min << 'EOF'
+  units real
+  atom_style atomic
+  boundary p p p
+
+  read_data structure.data
+
+  pair_style lj/cut 8.5
+  pair_coeff 1 1 0.238 3.405  # Argon LJ parameters
+
+  thermo 50
+  thermo_style custom step pe press
+
+  minimize 1.0e-4 1.0e-6 1000 10000
+  write_data minimized.data
+  EOF
+
+  /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/md-lammps/install/bin/lmp -in in.min
+
+  echo "=== Step 3: NVT Equilibration ==="
+
+  cat > in.nvt << 'EOF'
+  units real
+  atom_style atomic
+  boundary p p p
+
+  read_data minimized.data
+
+  pair_style lj/cut 8.5
+  pair_coeff 1 1 0.238 3.405
+
+  velocity all create 85.0 12345 mom yes rot yes
+
+  fix 1 all nvt temp 85.0 85.0 100.0
+  timestep 1.0
+
+  thermo 100
+  thermo_style custom step temp pe ke etotal press
+
+  run 1000
+  write_restart equilibrated.restart
+  EOF
+
+  /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/md-lammps/install/bin/lmp -in in.nvt > nvt.log 2>&1
+
+  echo "=== Step 4: Analyze Results ==="
+
+  python3 /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/scripts/parse_lammps_log.py nvt.log --stats
+
+  echo "=== Workflow Complete ==="
+  ls -la
+
+timeout: 300
+
+validation:
+  exit_code: 0
+  stdout_contains:
+    - "Step 1:"
+    - "Step 2:"
+    - "Step 3:"
+    - "Step 4:"
+    - "Workflow Complete"
+  files_created:
+    - /tmp/workflow_md/minimized.data
+    - /tmp/workflow_md/equilibrated.restart
+
+tags:
+  - workflow
+  - md
+  - end-to-end

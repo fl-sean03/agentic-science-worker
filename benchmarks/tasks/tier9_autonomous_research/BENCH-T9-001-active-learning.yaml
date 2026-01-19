@@ -1,0 +1,191 @@
+# Tier 9 Benchmark: Active Learning for MLIP Training
+# Efficiently train MLIP using intelligent data acquisition
+
+id: BENCH-T9-001
+name: Active Learning for MLIP Training
+tier: 9
+category: autonomous-research
+
+description: |
+  Use active learning to efficiently train an MLIP for a chemistry not well
+  represented in universal potential training data. This tests the agent's
+  ability to intelligently select which DFT calculations to run, maximizing
+  model accuracy while minimizing computational cost.
+
+prompt: |
+  **Task: Train MLIP for Ag-Cu Alloys via Active Learning**
+
+  Ag-Cu alloys are poorly represented in universal MLIP training data.
+  Your task is to train an accurate MLIP using active learning - intelligently
+  selecting which configurations to calculate with DFT to maximize data efficiency.
+
+  **Background:**
+  - Universal MLIPs fail for alloy mixing thermodynamics
+  - Random sampling is inefficient - wastes DFT budget on similar configs
+  - Active learning: select configs where model is most uncertain
+  - Target: <50 meV/atom error with only 50 DFT calculations
+
+  **Active Learning Workflow:**
+  ```
+  1. Start with universal MLIP (MACE-MP-0)
+  2. Generate candidate configurations (MD, random structures)
+  3. Evaluate uncertainty on candidates
+  4. Select high-uncertainty configs for DFT
+  5. Run DFT on selected configs
+  6. Add to training set, fine-tune model
+  7. Repeat until budget exhausted or target met
+  ```
+
+  **Step 1: Define Target Property**
+  Goal: Accurate mixing enthalpy for Ag-Cu alloys
+
+  ΔH_mix = E(Ag_xCu_{1-x}) - x×E(Ag) - (1-x)×E(Cu)
+
+  Test compositions: x = 0.25, 0.50, 0.75
+
+  **Step 2: Initial Baseline**
+  Test MACE-MP-0 on Ag-Cu without any fine-tuning:
+  1. Create Ag, Cu, and alloy structures
+  2. Calculate mixing enthalpies
+  3. Compare to literature (CALPHAD data shows positive mixing enthalpy)
+  4. Quantify baseline error
+
+  **Step 3: Generate Candidate Pool**
+  Create diverse candidate configurations:
+  - Random Ag-Cu structures at various compositions
+  - MD snapshots at different temperatures
+  - Different crystal structures (FCC, BCC, disordered)
+  - Aim for ~500-1000 candidate configs
+
+  **Step 4: Uncertainty Estimation**
+  For each candidate, estimate model uncertainty:
+
+  Option A (ensemble): If multiple models available, use prediction variance
+  Option B (committee): Train small committee of models, use disagreement
+  Option C (heuristic): Use distance from training data in descriptor space
+
+  Rank candidates by uncertainty.
+
+  **Step 5: Active Learning Loop**
+  Iteration budget: 50 DFT calculations total
+
+  For each iteration:
+  1. Select top 5-10 highest-uncertainty configs
+  2. Run DFT (QE or VASP if available)
+  3. Add energies/forces to training set
+  4. Fine-tune MLIP on updated training set
+  5. Re-evaluate uncertainties
+  6. Check if target accuracy reached
+
+  **Step 6: Evaluate Final Model**
+  Test fine-tuned model:
+  - Mixing enthalpy at x = 0.25, 0.50, 0.75
+  - Compare to literature/DFT reference
+  - Calculate improvement over baseline
+
+  **Step 7: Comparison to Random Sampling**
+  For fair comparison, also test:
+  - Train with same budget (50 configs) but randomly selected
+  - Compare accuracy: active learning vs random
+  - Quantify data efficiency gain
+
+  **Step 8: Report**
+  Write report including:
+  - Active learning methodology
+  - Uncertainty estimation approach
+  - Learning curve (error vs # DFT calcs)
+  - Final model accuracy
+  - Comparison to random sampling
+  - Data efficiency analysis
+  - Recommendations for practical use
+
+  Work in: workspaces/benchmarks/BENCH-T9-001/
+
+skills_required:
+  - quantum-espresso
+  - data-analysis
+
+time_limit_minutes: 240
+
+expected_outputs:
+  files:
+    - name: "baseline/baseline_evaluation.csv"
+      description: "Pre-training MLIP errors"
+    - name: "candidates/candidate_pool.xyz"
+      description: "Pool of candidate configurations"
+    - name: "active_learning/iteration_log.csv"
+      description: "Log of each AL iteration"
+    - name: "training_data/dft_calculations/*.out"
+      description: "DFT calculation outputs"
+    - name: "models/finetuned_model.pt"
+      description: "Fine-tuned MLIP model"
+    - name: "evaluation/learning_curve.png"
+      description: "Error vs training set size"
+    - name: "evaluation/al_vs_random.png"
+      description: "Active learning vs random comparison"
+    - name: "report.md"
+      description: "Full active learning report"
+
+  values:
+    final_mixing_error:
+      description: "Final mixing enthalpy error"
+      expected_range: [0.01, 0.10]
+      unit: "eV/atom"
+    baseline_mixing_error:
+      description: "Baseline MACE-MP-0 error"
+      expected_range: [0.05, 0.30]
+      unit: "eV/atom"
+    data_efficiency_gain:
+      description: "AL vs random efficiency (lower error with same data)"
+      expected_range: [1.2, 3.0]
+      unit: "x improvement"
+
+grading:
+  categories:
+    - name: active_learning_design
+      weight: 25
+      criteria:
+        - Clear AL workflow defined
+        - Uncertainty estimation method chosen
+        - Candidate pool diverse
+        - Selection strategy justified
+
+    - name: implementation
+      weight: 30
+      criteria:
+        - DFT calculations executed correctly
+        - Model fine-tuning performed
+        - Iterations properly tracked
+        - Budget respected (50 calcs)
+
+    - name: evaluation
+      weight: 25
+      criteria:
+        - Baseline established
+        - Final accuracy measured
+        - Comparison to random sampling
+        - Learning curve generated
+
+    - name: scientific_insight
+      weight: 20
+      criteria:
+        - Data efficiency quantified
+        - AL benefit demonstrated
+        - Practical recommendations
+        - Limitations discussed
+
+metadata:
+  difficulty: expert
+  estimated_time_minutes: 240
+  gpu_recommended: true
+  dft_required: true
+  skills_tested:
+    - active_learning
+    - uncertainty_quantification
+    - data_efficient_training
+    - alloy_thermodynamics
+  notes: |
+    This benchmark tests autonomous data acquisition - a key capability
+    for AI-assisted research. The agent must balance exploration (trying
+    new regions) with exploitation (refining known areas) while staying
+    within a fixed DFT budget. This mirrors real research constraints.

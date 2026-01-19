@@ -1,0 +1,198 @@
+# Tier 9 Benchmark: Autonomous Error Diagnosis
+# Diagnose and fix ML model failures
+
+id: BENCH-T9-005
+name: Autonomous Error Diagnosis
+tier: 9
+category: autonomous-research
+
+description: |
+  Diagnose why an MLIP is giving incorrect results for a specific system
+  and propose/implement fixes. This tests debugging skills critical for
+  autonomous AI-assisted research where things inevitably go wrong.
+
+prompt: |
+  **Task: Debug MLIP Failure for MgO**
+
+  A collaborator reports that CHGNet gives unreasonable formation energies
+  for MgO - off by ~0.5 eV/atom compared to DFT and experiment. Your task
+  is to investigate this issue, diagnose the root cause, and propose fixes.
+
+  **The Problem:**
+  - Material: MgO (rock salt structure)
+  - Experimental formation energy: -6.2 eV/atom (from elements)
+  - DFT (PBE) formation energy: ~-5.9 eV/atom
+  - Reported CHGNet result: Off by 0.5 eV/atom
+
+  **Step 1: Reproduce the Error**
+  First, verify the problem exists:
+  1. Create MgO rock salt structure (a ≈ 4.21 Å)
+  2. Calculate formation energy using CHGNet
+  3. Compare to DFT reference from Materials Project
+  4. Quantify the error
+
+  Formation energy calculation:
+  E_form = E(MgO) - E(Mg_metal) - 0.5 × E(O2)
+
+  Note: Oxygen reference is tricky - may need correction.
+
+  **Step 2: Identify Possible Causes**
+  Brainstorm potential causes for the error:
+
+  A. **User Error**
+  - Wrong structure?
+  - Wrong reference energies?
+  - Calculation not converged?
+
+  B. **Model Limitation**
+  - MgO not well-represented in training data?
+  - Ionic materials challenging for this architecture?
+  - Oxygen reference issue?
+
+  C. **Known Issue**
+  - Is this a documented limitation?
+  - Are there literature reports of this problem?
+
+  **Step 3: Systematic Investigation**
+  Test each hypothesis:
+
+  Test A: Structure verification
+  - Verify MgO structure matches Materials Project
+  - Check lattice constant
+  - Ensure rock salt structure is correct
+
+  Test B: Reference energies
+  - Calculate Mg metal energy with CHGNet
+  - Calculate O2 energy with CHGNet
+  - Compare to DFT references
+  - Check if error is in compound or references
+
+  Test C: Model comparison
+  - Calculate MgO formation with MACE-MP-0
+  - Calculate with M3GNet
+  - Is error CHGNet-specific or universal?
+
+  Test D: Related systems
+  - Test other oxides: CaO, BaO, ZnO
+  - Is error specific to MgO or general to oxides?
+
+  **Step 4: Determine Root Cause**
+  Based on investigation, identify the most likely cause:
+  - Document evidence for your conclusion
+  - Rule out alternative explanations
+
+  **Step 5: Propose Fix**
+  Depending on root cause, propose solution:
+
+  If user error:
+  - Correct the calculation
+  - Document what was wrong
+
+  If model limitation:
+  - Recommend different model
+  - Or propose fine-tuning approach
+  - Or document as known limitation
+
+  **Step 6: Implement and Verify Fix**
+  Test your proposed solution:
+  - Does it resolve the error?
+  - Does it break anything else?
+  - Quantify improvement
+
+  **Step 7: Report**
+  Write diagnostic report including:
+  - Problem description
+  - Investigation methodology
+  - Tests performed and results
+  - Root cause identification with evidence
+  - Proposed fix
+  - Verification of fix
+  - Recommendations to avoid similar issues
+
+  Work in: workspaces/benchmarks/BENCH-T9-005/
+
+skills_required:
+  - materials-database
+  - data-analysis
+
+time_limit_minutes: 120
+
+expected_outputs:
+  files:
+    - name: "investigation/reproduce_error.py"
+      description: "Script reproducing the error"
+    - name: "investigation/test_results.csv"
+      description: "Results of diagnostic tests"
+    - name: "investigation/model_comparison.csv"
+      description: "Comparison across models"
+    - name: "investigation/reference_energies.csv"
+      description: "Reference energy analysis"
+    - name: "diagnosis/root_cause.md"
+      description: "Root cause analysis"
+    - name: "fix/proposed_solution.md"
+      description: "Proposed fix documentation"
+    - name: "fix/verification.py"
+      description: "Fix verification script"
+    - name: "report.md"
+      description: "Full diagnostic report"
+
+  values:
+    original_error:
+      description: "Initial formation energy error"
+      expected_range: [0.3, 0.8]
+      unit: "eV/atom"
+    final_error:
+      description: "Error after fix (if applicable)"
+      expected_range: [0.0, 0.2]
+      unit: "eV/atom"
+    root_cause_identified:
+      description: "Was root cause correctly identified"
+      expected_values: [true, false]
+
+grading:
+  categories:
+    - name: problem_reproduction
+      weight: 15
+      criteria:
+        - Error successfully reproduced
+        - Calculation setup documented
+        - Error magnitude quantified
+
+    - name: systematic_investigation
+      weight: 35
+      criteria:
+        - Multiple hypotheses tested
+        - Tests are appropriate
+        - Results clearly documented
+        - Systematic approach
+
+    - name: root_cause_analysis
+      weight: 25
+      criteria:
+        - Root cause identified
+        - Evidence provided
+        - Alternative explanations ruled out
+        - Analysis is logical
+
+    - name: solution
+      weight: 25
+      criteria:
+        - Fix proposed
+        - Fix implemented or documented
+        - Verification performed
+        - Recommendations practical
+
+metadata:
+  difficulty: hard
+  estimated_time_minutes: 120
+  gpu_recommended: true
+  skills_tested:
+    - debugging
+    - systematic_investigation
+    - model_evaluation
+    - scientific_reasoning
+  notes: |
+    This benchmark tests a critical real-world skill - debugging when
+    ML models give wrong answers. The agent must think systematically
+    about possible causes, design tests, and identify the true issue.
+    This is essential for autonomous research where failures are common.

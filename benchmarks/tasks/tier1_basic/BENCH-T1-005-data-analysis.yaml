@@ -1,0 +1,128 @@
+# Tier 1 Benchmark: Simulation Data Analysis
+# Single-skill task testing data analysis capability
+
+id: BENCH-T1-005
+name: LAMMPS Log File Analysis
+tier: 1
+category: data-analysis
+
+description: |
+  Analyze thermodynamic data from a LAMMPS simulation log file.
+  Tests ability to parse, process, and visualize simulation output.
+
+prompt: |
+  I have run a LAMMPS NVT simulation and saved the log file to:
+  benchmarks/reference/test_data/lammps_nvt_log.txt
+
+  Analyze this simulation data and produce:
+
+  1. A plot of temperature vs time (save as temperature.png)
+  2. A plot of total energy vs time (save as energy.png)
+  3. A statistical summary including:
+     - Average, min, max, std dev for temperature
+     - Average, min, max, std dev for total energy
+     - Equilibration time (when temperature stabilizes)
+
+  4. Determine if the simulation reached thermal equilibrium
+     (temperature fluctuations within expected range)
+
+  Save all outputs to: workspaces/benchmarks/t1-005-analysis/
+  Write your analysis to: workspaces/benchmarks/t1-005-analysis/report.md
+
+skills_required:
+  - data-analysis
+
+time_limit_minutes: 10
+
+# Note: Test data file must be created as part of benchmark setup
+setup:
+  create_test_data:
+    file: benchmarks/reference/test_data/lammps_nvt_log.txt
+    generator: scripts/generate_test_lammps_log.py
+
+expected_outputs:
+  files:
+    - workspaces/benchmarks/t1-005-analysis/temperature.png
+    - workspaces/benchmarks/t1-005-analysis/energy.png
+    - workspaces/benchmarks/t1-005-analysis/report.md
+  values:
+    avg_temperature:
+      description: "Average temperature from equilibrated region"
+      expected_range: [92, 97]  # K (test data at 94.4 K)
+      unit: "K"
+    equilibrium_reached:
+      description: "Did simulation equilibrate?"
+      expected: true
+
+grading:
+  total_points: 100
+
+  categories:
+    data_parsing:
+      weight: 25
+      checks:
+        - name: "Log file parsed correctly"
+          points: 15
+          validation: |
+            Extracted Step, Temp, TotEng columns
+        - name: "All data points captured"
+          points: 10
+          validation: |
+            Correct number of data points extracted
+
+    visualization:
+      weight: 30
+      checks:
+        - name: "Temperature plot created"
+          points: 15
+          validation: |
+            temperature.png exists and is valid image
+        - name: "Energy plot created"
+          points: 10
+          validation: |
+            energy.png exists and is valid image
+        - name: "Plots have labels/titles"
+          points: 5
+          validation: |
+            Axes labeled, title present
+
+    statistical_analysis:
+      weight: 30
+      checks:
+        - name: "Statistics calculated"
+          points: 15
+          validation: |
+            Mean, std, min, max reported for T and E
+        - name: "Equilibration identified"
+          points: 15
+          validation: |
+            Equilibration time estimated reasonably
+
+    interpretation:
+      weight: 15
+      checks:
+        - name: "Equilibrium assessment"
+          points: 10
+          validation: |
+            Clear statement about equilibration status
+        - name: "Scientific reasoning"
+          points: 5
+          validation: |
+            Justification based on fluctuation analysis
+
+reference_solution:
+  location: reference/solutions/t1-005-analysis/
+  notes: |
+    Test data represents 10,000 step NVT run at 94.4 K.
+    First 2000 steps show equilibration, then stable.
+
+metadata:
+  author: "benchmark-system"
+  created: "2025-01-16"
+  difficulty: "easy"
+  estimated_tokens: 2500
+  tags:
+    - data-analysis
+    - lammps
+    - plotting
+    - statistics

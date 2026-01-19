@@ -1,0 +1,113 @@
+# Tier 1 Benchmark: Literature Search
+# Single-skill task testing literature search capability
+
+id: BENCH-T1-003
+name: Force Field Parameter Literature Search
+tier: 1
+category: literature-search
+
+description: |
+  Search scientific literature for force field parameters.
+  Tests the agent's ability to find specific technical information in papers.
+
+prompt: |
+  Search the scientific literature to find Lennard-Jones parameters
+  for modeling liquid water with the TIP4P model.
+
+  I need:
+  1. The original paper that introduced TIP4P
+  2. The LJ parameters (epsilon and sigma) for the oxygen atom
+  3. The bond lengths and angles in the TIP4P model
+  4. At least 2 other papers that cite or validate this model
+
+  Write a brief summary (200-300 words) of your findings with
+  proper citations.
+
+  Save your findings to: workspaces/benchmarks/t1-003-lit/report.md
+
+skills_required:
+  - literature-search
+
+time_limit_minutes: 10
+
+expected_outputs:
+  files:
+    - workspaces/benchmarks/t1-003-lit/report.md
+  values:
+    original_paper:
+      description: "TIP4P original reference"
+      expected: "Jorgensen et al., 1983"  # J. Chem. Phys. 79, 926
+    epsilon_value:
+      description: "LJ epsilon for oxygen"
+      expected_range: [0.15, 0.16]  # kcal/mol
+      unit: "kcal/mol"
+    sigma_value:
+      description: "LJ sigma for oxygen"
+      expected_range: [3.15, 3.16]  # Angstroms
+      unit: "Angstroms"
+
+grading:
+  total_points: 100
+
+  categories:
+    search_effectiveness:
+      weight: 30
+      checks:
+        - name: "Found original paper"
+          points: 15
+          validation: |
+            Report mentions Jorgensen AND 1983 AND (J. Chem. Phys. OR JCP)
+        - name: "Found citing papers"
+          points: 15
+          validation: |
+            At least 2 additional papers cited
+
+    parameter_accuracy:
+      weight: 40
+      checks:
+        - name: "Correct epsilon"
+          points: 15
+          validation: |
+            epsilon reported as ~0.1550 kcal/mol
+        - name: "Correct sigma"
+          points: 15
+          validation: |
+            sigma reported as ~3.1536 Angstroms
+        - name: "Geometry parameters"
+          points: 10
+          validation: |
+            O-H bond ~0.9572 Å, H-O-H angle ~104.52°
+
+    report_quality:
+      weight: 30
+      checks:
+        - name: "Proper citations"
+          points: 10
+          validation: |
+            Citations include author, year, journal
+        - name: "Well-organized"
+          points: 10
+          validation: |
+            Clear sections, readable format
+        - name: "Appropriate length"
+          points: 10
+          validation: |
+            200-400 words (some flexibility)
+
+reference_solution:
+  location: reference/solutions/t1-003-lit/
+  notes: |
+    TIP4P: Jorgensen, Chandrasekhar, Madura, Impey, Klein
+    J. Chem. Phys. 79, 926 (1983)
+    O-O LJ: ε = 0.1550 kcal/mol, σ = 3.15365 Å
+
+metadata:
+  author: "benchmark-system"
+  created: "2025-01-16"
+  difficulty: "easy"
+  estimated_tokens: 2500
+  tags:
+    - literature
+    - force-field
+    - water
+    - parameters

@@ -1,0 +1,134 @@
+# Tier 5 Benchmark: Queue-Aware Partition Selection
+# Test intelligent partition choice based on queue status
+
+id: BENCH-T5-003
+name: Queue-Aware Partition Selection
+tier: 5
+category: hpc-fundamentals
+
+description: |
+  Choose the optimal HPC partition based on job requirements AND current queue
+  status. This tests the agent's ability to analyze queue conditions and make
+  informed decisions about resource allocation rather than blindly submitting.
+
+prompt: |
+  You need to run a LAMMPS simulation with the following requirements:
+  - 64 CPU cores (can fit on 1 node of amilan or amilan128c)
+  - Estimated runtime: ~2 hours
+  - No GPU needed
+  - Want results as soon as reasonably possible
+
+  **Your Task: Make an informed partition choice**
+
+  **Step 1: Analyze Queue Status**
+  Check the current queue status for relevant partitions:
+  - `atesting` (for validation)
+  - `amilan` (64-core nodes, 387 nodes total)
+  - `amilan128c` (128-core nodes, 16 nodes total)
+
+  For each partition, determine:
+  - Number of pending jobs
+  - Number of running jobs
+  - Estimated wait time (if available)
+  - Node availability
+
+  **Step 2: Analyze Trade-offs**
+  Consider:
+  - amilan: More nodes = shorter queue, but 64 cores max per node
+  - amilan128c: Fewer nodes = longer queue, but 128 cores per node
+  - For a 64-core job, both partitions can run it on 1 node
+
+  **Step 3: Make Justified Decision**
+  Choose a partition and document your reasoning:
+  - Why did you choose this partition?
+  - What queue metrics informed your decision?
+  - What's the estimated wait time?
+  - Are there trade-offs you accepted?
+
+  **Step 4: Validate on atesting**
+  Before committing to production:
+  - Create a short test version of your job (reduced timesteps)
+  - Submit to atesting to validate the job script works
+  - Confirm it completes successfully
+
+  **Step 5: Submit Production Job**
+  - Create the full production job script
+  - Submit to your chosen partition
+  - Report the job ID and estimated start time
+
+  **Step 6: Document Everything**
+  Write a decision report including:
+  - Queue analysis data
+  - Decision rationale
+  - Test job results
+  - Production job submission details
+
+  Work in: workspaces/benchmarks/BENCH-T5-003/
+
+skills_required:
+  - hpc-cluster
+  - lammps-simulation
+
+time_limit_minutes: 25
+
+expected_outputs:
+  files:
+    - name: "queue_analysis.md"
+      description: "Analysis of queue status for each partition"
+    - name: "job_test.slurm"
+      description: "Test job script for atesting"
+    - name: "job_production.slurm"
+      description: "Production job script"
+    - name: "decision_report.md"
+      description: "Documented decision with rationale"
+
+grading:
+  categories:
+    - name: queue_analysis
+      weight: 30
+      criteria:
+        - Checked multiple partitions
+        - Collected pending/running job counts
+        - Attempted to estimate wait times
+        - Presented data clearly
+
+    - name: decision_quality
+      weight: 30
+      criteria:
+        - Choice is reasonable given queue status
+        - Trade-offs acknowledged
+        - Rationale clearly explained
+        - Didn't blindly pick without checking
+
+    - name: testing_workflow
+      weight: 20
+      criteria:
+        - Created test job for atesting
+        - Test job validated before production
+        - Confirmed test success
+
+    - name: production_submission
+      weight: 20
+      criteria:
+        - Valid production job script
+        - Correct resource requests
+        - Successfully submitted
+        - Job ID and start estimate reported
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 20
+  hpc_resources:
+    partition: variable  # Agent chooses
+    nodes: 1
+    cores: 64
+    time_limit: "04:00:00"
+  skills_tested:
+    - queue_analysis
+    - partition_selection
+    - decision_making
+    - testing_workflow
+  notes: |
+    This benchmark tests queue-awareness. The "right" answer depends on
+    current queue conditions, so grading focuses on the PROCESS of
+    analyzing and deciding, not the specific partition chosen.

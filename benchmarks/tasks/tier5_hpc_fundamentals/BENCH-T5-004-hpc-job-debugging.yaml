@@ -1,0 +1,200 @@
+# Tier 5 Benchmark: HPC Job Debugging
+# Test diagnosing and fixing failing HPC jobs
+
+id: BENCH-T5-004
+name: HPC Job Debugging
+tier: 5
+category: hpc-fundamentals
+
+description: |
+  Debug a failing LAMMPS job on HPC. The job script and input files contain
+  deliberate errors that cause the job to fail. The agent must diagnose the
+  issues, fix them, and successfully complete the job.
+
+prompt: |
+  A colleague tried to run a LAMMPS simulation on HPC but the job keeps failing.
+  They've asked you to debug it. The files are provided below.
+
+  **The Broken Job Script (job_broken.slurm):**
+  ```bash
+  #!/bin/bash
+  #SBATCH --job-name=argon_sim
+  #SBATCH --partition=amilan
+  #SBATCH --nodes=1
+  #SBATCH --ntasks=16
+  #SBATCH --time=01:00:00
+  #SBATCH --output=%x_%j.out
+
+  cd $SLURM_SUBMIT_DIR
+
+  module load lammps
+
+  mpirun -np 16 lmp < input.lmp
+  ```
+
+  **The Input File (input.lmp):**
+  ```
+  units           real
+  atom_style      atomic
+  boundary        p p p
+
+  lattice         fcc 5.26
+  region          box block 0 5 0 5 0 5
+  create_box      1 box
+  create_atoms    1 box
+  mass            1 39.948
+
+  pair_style      lj/cut 10.0
+  pair_coeff      1 1 0.238 3.405
+
+  velocity        all create 94.4 12345
+
+  fix             1 all nvt temp 94.4 94.4 100.0
+  timestep        2.0
+  thermo          100
+
+  run             10000
+  ```
+
+  **Your Task: Debug and Fix**
+
+  **Step 1: Reproduce the Failure**
+  - Upload these files to HPC
+  - Submit to `atesting` partition (modify partition in script)
+  - Observe the failure
+
+  **Step 2: Diagnose the Problem**
+  - Read the error logs (.out and .err files)
+  - Identify what went wrong
+  - There may be MULTIPLE issues
+
+  **Hints for common HPC issues:**
+  - Module names on CURC don't match generic names
+  - Paths to executables may need to be explicit
+  - LAMMPS input redirection syntax varies
+
+  **Step 3: Fix the Issues**
+  - Create corrected versions of the files
+  - Document each issue you found and how you fixed it
+
+  **Step 4: Verify the Fix**
+  - Submit the corrected job
+  - Confirm it completes successfully
+  - Check the output makes sense (energy, temperature)
+
+  **Step 5: Write Debug Report**
+  Document:
+  - Original error messages
+  - Root cause(s) identified
+  - Fixes applied
+  - Verification of success
+
+  Work in: workspaces/benchmarks/BENCH-T5-004/
+
+skills_required:
+  - hpc-cluster
+  - lammps-simulation
+
+time_limit_minutes: 30
+
+setup_files:
+  - source: "job_broken.slurm"
+    content: |
+      #!/bin/bash
+      #SBATCH --job-name=argon_sim
+      #SBATCH --partition=amilan
+      #SBATCH --nodes=1
+      #SBATCH --ntasks=16
+      #SBATCH --time=01:00:00
+      #SBATCH --output=%x_%j.out
+
+      cd $SLURM_SUBMIT_DIR
+
+      module load lammps
+
+      mpirun -np 16 lmp < input.lmp
+
+  - source: "input.lmp"
+    content: |
+      units           real
+      atom_style      atomic
+      boundary        p p p
+
+      lattice         fcc 5.26
+      region          box block 0 5 0 5 0 5
+      create_box      1 box
+      create_atoms    1 box
+      mass            1 39.948
+
+      pair_style      lj/cut 10.0
+      pair_coeff      1 1 0.238 3.405
+
+      velocity        all create 94.4 12345
+
+      fix             1 all nvt temp 94.4 94.4 100.0
+      timestep        2.0
+      thermo          100
+
+      run             10000
+
+expected_outputs:
+  files:
+    - name: "job_fixed.slurm"
+      description: "Corrected job script"
+    - name: "debug_report.md"
+      description: "Documentation of issues and fixes"
+    - name: "successful_output.txt"
+      description: "Output from successful job"
+
+grading:
+  categories:
+    - name: error_identification
+      weight: 35
+      criteria:
+        - Submitted broken job and observed failure
+        - Read error logs
+        - Correctly identified the module loading issue
+        - Identified any additional issues (input redirection, paths)
+
+    - name: fix_implementation
+      weight: 35
+      criteria:
+        - Fixed module loading (found correct LAMMPS path on CURC)
+        - Fixed LAMMPS execution command
+        - Changed partition to atesting for debugging
+        - All fixes are correct and complete
+
+    - name: verification
+      weight: 20
+      criteria:
+        - Resubmitted fixed job
+        - Job completed successfully
+        - Output shows reasonable results
+
+    - name: documentation
+      weight: 10
+      criteria:
+        - Clear explanation of each issue
+        - Documented the fix for each issue
+        - Report is useful for future reference
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 25
+  hpc_resources:
+    partition: atesting
+    nodes: 1
+    cores: 4
+    time_limit: "00:30:00"
+  skills_tested:
+    - error_diagnosis
+    - hpc_debugging
+    - module_system
+    - iterative_problem_solving
+  deliberate_errors:
+    - "'module load lammps' - generic name doesn't exist on CURC"
+    - "'lmp < input.lmp' - may need -in flag instead of redirection"
+    - "partition should be atesting for debugging, not amilan"
+  notes: |
+    This tests real-world debugging skills. HPC jobs fail for many reasons
+    and the agent needs to systematically diagnose and fix issues.

@@ -1,0 +1,175 @@
+# Tier 8 Benchmark: MLIP-Accelerated MD
+# Run long MD simulations enabled by MLIP speed
+
+id: BENCH-T8-005
+name: MLIP-Accelerated MD
+tier: 8
+category: ml-materials
+
+description: |
+  Calculate the self-diffusion coefficient of Li+ in Li3PS4 solid electrolyte
+  using MLIP-accelerated molecular dynamics. This problem is ONLY feasible with
+  MLIPs - DFT-MD would be prohibitively expensive for the required timescales.
+
+prompt: |
+  **Task: Calculate Li+ Diffusion in Solid Electrolyte**
+
+  Solid-state batteries require fast Li+ conductors. Li3PS4 is a promising
+  sulfide solid electrolyte with high ionic conductivity. Your task is to
+  calculate the Li+ diffusion coefficient using MLIP-accelerated MD.
+
+  **Why This Needs MLIPs:**
+  - Diffusion requires long simulations (100+ ps)
+  - DFT-MD: ~1 ps/day = would take months
+  - MLIP-MD: ~100 ps/hour = feasible in this benchmark
+  - CHGNet is ideal: charge-aware, good for sulfides
+
+  **Background:**
+  - Li3PS4: Superionic conductor
+  - Experimental σ ≈ 0.1-1 mS/cm at room temperature
+  - D ≈ 10⁻⁸ to 10⁻⁷ cm²/s at 300K (estimated)
+  - Higher temperatures → faster diffusion, shorter simulation needed
+
+  **Step 1: Get Structure**
+  Obtain Li3PS4 structure:
+  - From Materials Project (mp-985583 or similar)
+  - Or build β-Li3PS4 (orthorhombic, Pnma)
+  - Create supercell with at least 100-200 atoms
+
+  **Step 2: Setup MD**
+  Using ASE with CHGNet calculator (charge-aware, good for Li):
+  ```python
+  from chgnet.model import CHGNetCalculator
+  from ase.md.langevin import Langevin
+  ```
+
+  MD parameters:
+  - Temperature: 600K (elevated to accelerate diffusion)
+  - Timestep: 1-2 fs
+  - Ensemble: NVT (Langevin thermostat)
+
+  **Step 3: Equilibration**
+  - Run 10 ps equilibration
+  - Monitor temperature stability
+  - Verify structure doesn't melt or collapse
+
+  **Step 4: Production MD**
+  - Run 100+ ps production MD
+  - Save positions every 10-100 steps
+  - Track only Li atoms for MSD
+
+  **Step 5: MSD Analysis**
+  Calculate Mean Square Displacement for Li atoms:
+  - MSD(t) = <|r(t) - r(0)|²>
+  - Average over all Li atoms and time origins
+  - Plot MSD vs time on log-log scale
+
+  **Step 6: Extract Diffusion Coefficient**
+  From Einstein relation: D = MSD / (6t) in 3D
+
+  - Identify linear (diffusive) regime in MSD
+  - Fit slope in diffusive regime
+  - Calculate D with uncertainty
+
+  **Step 7: Arrhenius Extrapolation (Optional)**
+  If time permits, run at multiple temperatures (500K, 600K, 700K):
+  - Plot ln(D) vs 1/T
+  - Extract activation energy
+  - Extrapolate to room temperature
+
+  **Step 8: Report**
+  Write report including:
+  - Methodology and simulation parameters
+  - MSD plot showing diffusive regime
+  - Calculated D at 600K
+  - Comparison to literature values
+  - Discussion of MLIP advantages for this problem
+  - Estimated time DFT would have required
+
+  **Key Insight:**
+  This calculation would be impossible with DFT-MD due to timescale.
+  MLIPs enable studying ionic diffusion at DFT-like accuracy.
+
+  Work in: workspaces/benchmarks/BENCH-T8-005/
+
+skills_required:
+  - materials-database
+  - data-analysis
+
+time_limit_minutes: 120
+
+expected_outputs:
+  files:
+    - name: "structures/li3ps4_supercell.cif"
+      description: "Li3PS4 supercell structure"
+    - name: "scripts/md_simulation.py"
+      description: "MD simulation script"
+    - name: "trajectories/production.traj"
+      description: "MD trajectory file"
+    - name: "analysis/msd_plot.png"
+      description: "MSD vs time plot"
+    - name: "analysis/diffusion_fit.png"
+      description: "Linear fit to diffusive regime"
+    - name: "results/diffusion_coefficient.txt"
+      description: "Calculated D value"
+    - name: "report.md"
+      description: "Full analysis report"
+
+  values:
+    diffusion_coefficient:
+      description: "Li+ diffusion coefficient at 600K"
+      expected_range: [1e-7, 1e-5]  # cm²/s, elevated T
+      unit: "cm²/s"
+    simulation_time:
+      description: "Total production MD time"
+      expected_range: [50, 500]
+      unit: "ps"
+
+grading:
+  categories:
+    - name: structure_preparation
+      weight: 15
+      criteria:
+        - Valid Li3PS4 structure obtained
+        - Appropriate supercell size
+        - Structure verified before MD
+
+    - name: md_simulation
+      weight: 30
+      criteria:
+        - CHGNet used appropriately
+        - Temperature control working
+        - Sufficient simulation length
+        - Trajectory properly saved
+
+    - name: msd_analysis
+      weight: 30
+      criteria:
+        - MSD calculated correctly
+        - Li atoms tracked properly
+        - Diffusive regime identified
+        - Linear fit performed
+
+    - name: scientific_interpretation
+      weight: 25
+      criteria:
+        - D value is reasonable
+        - Compared to literature
+        - MLIP advantage discussed
+        - Limitations acknowledged
+
+metadata:
+  difficulty: hard
+  estimated_time_minutes: 120
+  gpu_recommended: true
+  gpu_required_for_speed: true
+  skills_tested:
+    - ionic_diffusion
+    - long_md_simulations
+    - msd_analysis
+    - solid_electrolytes
+  notes: |
+    This benchmark demonstrates the key advantage of MLIPs: enabling
+    simulations at timescales impossible with DFT. The agent should
+    recognize that CHGNet's charge awareness makes it suitable for
+    ionic conductors. A GPU significantly speeds up this benchmark.

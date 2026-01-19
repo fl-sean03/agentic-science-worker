@@ -1,0 +1,209 @@
+# Tier 4 Benchmark: Investigate Simulation Anomaly
+# Tests scientific debugging: Can the agent diagnose an unexpected result?
+
+id: BENCH-T4-004
+name: Investigate Anomalous Diffusion Result
+tier: 4
+category: scientific-reasoning
+
+description: |
+  Real research often involves unexpected results. A simulation produces
+  a number that doesn't match literature. Is it:
+  - A bug in the simulation?
+  - A force field limitation?
+  - Actually correct (literature is wrong)?
+  - Something new and interesting?
+
+  This benchmark tests whether the agent can systematically investigate
+  an anomaly and reach a justified conclusion - a critical research skill.
+
+prompt: |
+  **The situation:**
+  A student ran a molecular dynamics simulation of lithium diffusion
+  in BCC iron at 600K and got a diffusion coefficient of:
+
+  D = 8.5 × 10⁻¹⁰ m²/s
+
+  But literature values for Li in Fe at 600K are around:
+
+  D ≈ 2-3 × 10⁻¹¹ m²/s  (experimental, various sources)
+
+  That's a factor of ~30-40× difference! The student asks:
+  "Is my simulation wrong, or is something interesting happening?"
+
+  **Your task:**
+  Investigate this anomaly systematically.
+
+  You should:
+  1. Search literature for Li diffusion in Fe - what's the expected value?
+  2. Research common sources of error in diffusion simulations:
+     - Force field accuracy for Li-Fe interactions
+     - Finite size effects
+     - Temperature control issues
+     - Statistical errors
+     - Equilibration problems
+  3. Propose diagnostic tests to identify the cause
+  4. Consider: could the simulation actually be right?
+     - What if the EAM potential gives different physics?
+     - What if the literature values have issues?
+  5. Make a scientific assessment with recommendations
+
+  **Important:**
+  Don't assume the simulation is wrong. Real anomalies sometimes
+  lead to new discoveries. Think critically about ALL possibilities.
+
+  Work in: workspaces/benchmarks/t4-004-anomaly-investigation/
+
+skills_required:
+  - literature-search
+  - data-analysis
+
+time_limit_minutes: 90
+
+evaluation_type: scientific_reasoning
+
+milestones:
+  - id: M1
+    description: "Researched literature values"
+    weight: 0.20
+    validation: |
+      Found experimental D values for Li in Fe
+      Noted temperature dependence
+      Identified sources and methods
+
+  - id: M2
+    description: "Identified possible error sources"
+    weight: 0.25
+    validation: |
+      Listed systematic error sources
+      Discussed force field limitations
+      Considered finite size effects
+
+  - id: M3
+    description: "Proposed diagnostic approach"
+    weight: 0.25
+    validation: |
+      Specific tests to run
+      How to distinguish error sources
+      Logical troubleshooting sequence
+
+  - id: M4
+    description: "Critical assessment"
+    weight: 0.30
+    validation: |
+      Considered all possibilities
+      Didn't assume simulation is wrong
+      Justified conclusion
+
+expected_outputs:
+  files:
+    - workspaces/benchmarks/t4-004-anomaly-investigation/literature_review.md
+    - workspaces/benchmarks/t4-004-anomaly-investigation/error_analysis.md
+    - workspaces/benchmarks/t4-004-anomaly-investigation/diagnostic_plan.md
+    - workspaces/benchmarks/t4-004-anomaly-investigation/conclusion.md
+
+grading:
+  total_points: 100
+
+  categories:
+    literature_research:
+      weight: 20
+      checks:
+        - name: "Found literature values"
+          points: 10
+          validation: |
+            Experimental D values cited
+        - name: "Understood measurement methods"
+          points: 10
+          validation: |
+            Discussed how D was measured experimentally
+
+    error_analysis:
+      weight: 30
+      checks:
+        - name: "Systematic error sources"
+          points: 15
+          validation: |
+            Listed: force field, size, thermostat, statistics
+        - name: "Quantitative estimates"
+          points: 15
+          validation: |
+            Estimated magnitude of each error source
+
+    diagnostic_thinking:
+      weight: 25
+      checks:
+        - name: "Logical test sequence"
+          points: 12
+          validation: |
+            Tests ordered by likelihood/ease
+        - name: "Specific actionable tests"
+          points: 13
+          validation: |
+            Clear instructions for what to try
+
+    scientific_judgment:
+      weight: 25
+      checks:
+        - name: "Considered alternative explanations"
+          points: 10
+          validation: |
+            Didn't assume simulation wrong
+        - name: "Reached justified conclusion"
+          points: 10
+          validation: |
+            Clear assessment with reasoning
+        - name: "Appropriate uncertainty"
+          points: 5
+          validation: |
+            Acknowledged limits of analysis
+
+reference_solution:
+  location: reference/solutions/t4-004-anomaly-investigation/
+  notes: |
+    Key investigation points:
+
+    1. Literature Values:
+       - Li in α-Fe: D ~ 10⁻¹¹ m²/s at 600K
+       - Activation energy ~0.5 eV
+       - Measured by various techniques
+
+    2. Possible Error Sources (simulation):
+       - EAM potential not fitted for Li-Fe
+       - Small system size → finite size effects
+       - Poor equilibration
+       - Thermostat artifacts
+       - MSD analysis errors
+
+    3. Possible Explanations (not errors):
+       - Li interstitial diffusion faster than expected
+       - Classical vs quantum nuclear effects
+       - Potential predicts different saddle points
+       - Experimental values might be for different conditions
+
+    4. Recommended Diagnostics:
+       a) Check force field source - was it fitted for Li?
+       b) Run size convergence test
+       c) Compare MSD analysis methods
+       d) Check NVE energy conservation
+       e) Compare to DFT migration barriers
+
+    5. Most Likely Cause:
+       EAM potential not parameterized for Li-Fe system.
+       Using generic mixing rules gives poor barriers.
+
+metadata:
+  author: "benchmark-system"
+  created: "2025-01-16"
+  difficulty: "expert"
+  estimated_tokens: 18000
+  scientific_domain: "diffusion"
+  benchmark_type: "scientific-debugging"
+  requires_judgment: true
+  tags:
+    - anomaly
+    - debugging
+    - diffusion
+    - error-analysis
+    - scientific-reasoning
+    - critical-thinking

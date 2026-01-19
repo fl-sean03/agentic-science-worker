@@ -1,0 +1,239 @@
+# Tier 7 Benchmark: Autonomous Error Recovery
+# Handle realistic HPC failures without human intervention
+
+id: BENCH-T7-002
+name: Autonomous Error Recovery
+tier: 7
+category: research-campaign
+
+description: |
+  Complete a research objective while handling realistic HPC failures
+  autonomously. The benchmark intentionally creates scenarios where jobs
+  fail, resources are unavailable, or results are incorrect, testing the
+  agent's ability to diagnose and recover without human intervention.
+
+prompt: |
+  **CRITICAL: HPC EXECUTION REQUIRED**
+
+  This benchmark tests your ability to handle HPC failures. You MUST:
+  1. Execute calculations on the HPC cluster (cu_alpine), NOT locally
+  2. Submit jobs via SLURM and handle real HPC failure modes
+  3. Document all errors in logs/error_log.md and logs/recovery_actions.md
+  4. Create SLURM job scripts in jobs/ directory
+
+  Running locally defeats the purpose of this benchmark. The test is about
+  HPC error recovery, not just computing the correct answer.
+
+  ---
+
+  **Research Objective:**
+  Calculate the vacancy formation energy in copper using molecular dynamics.
+  This fundamental defect property is crucial for understanding diffusion
+  and mechanical properties.
+
+  **Background:**
+  The vacancy formation energy (Ef) is calculated as:
+  Ef = E(N-1, vacancy) - (N-1)/N × E(N, perfect)
+
+  Where:
+  - E(N, perfect) = energy of perfect crystal with N atoms
+  - E(N-1, vacancy) = energy of crystal with N-1 atoms (one removed)
+
+  For copper:
+  - Experimental Ef ≈ 1.28 eV
+  - EAM potentials typically give 1.0-1.3 eV
+
+  **Your Task:**
+
+  Complete this calculation while handling whatever issues arise.
+  This is a realistic research scenario where things go wrong.
+
+  **Expected Challenges (you will encounter some of these):**
+
+  1. **Partition Unavailable**
+     - Your preferred partition might be down for maintenance
+     - You'll need to adapt to use an alternative
+
+  2. **Job Timeout**
+     - A job might hit its time limit before completing
+     - You'll need to extend time or optimize the calculation
+
+  3. **Out-of-Memory Errors**
+     - A job might request too little memory
+     - You'll need to diagnose from error logs and adjust
+
+  4. **Convergence Issues**
+     - Energy minimization might not converge
+     - You'll need to adjust minimizer parameters
+
+  5. **Wrong Results**
+     - You might get a result that's clearly wrong (negative Ef, or Ef > 5 eV)
+     - You'll need to diagnose and fix the issue
+
+  6. **File Transfer Failures**
+     - File transfers might fail partway
+     - You'll need to retry or use alternative methods
+
+  7. **Queue Preemption**
+     - A job might be killed due to higher-priority jobs
+     - You'll need to resubmit
+
+  **Success Criteria:**
+
+  Despite whatever issues arise, produce:
+  1. A valid vacancy formation energy (within reasonable range)
+  2. Documentation of what went wrong and how you fixed it
+  3. A robust workflow that handles failures
+
+  **Methodology:**
+
+  Step 1: Setup
+  - Get Cu structure (FCC, a = 3.615 Å)
+  - Find appropriate EAM potential
+  - Create perfect supercell (at least 4×4×4 = 256 atoms)
+
+  Step 2: Perfect Crystal Calculation
+  - Create perfect Cu supercell
+  - Energy minimize
+  - Record total energy E(N, perfect)
+
+  Step 3: Vacancy Calculation
+  - Remove one central atom
+  - Energy minimize with neighboring atoms relaxing
+  - Record total energy E(N-1, vacancy)
+
+  Step 4: Calculate Ef
+  - Apply formula
+  - Compare to literature
+
+  **Error Handling Requirements:**
+
+  For each error encountered:
+  1. Identify the error type from logs/output
+  2. Diagnose the root cause
+  3. Implement a fix
+  4. Retry the calculation
+  5. Document the issue and solution
+
+  **Resilience Features to Implement:**
+  - Checkpointing for long minimizations
+  - Input validation before submission
+  - Output validation after completion
+  - Automatic retry logic for transient failures
+
+  **REQUIRED OUTPUT STRUCTURE:**
+  ```
+  workspaces/benchmarks/BENCH-T7-002/
+  ├── jobs/
+  │   ├── perfect_cu.slurm       # SLURM script for perfect crystal
+  │   └── vacancy_cu.slurm       # SLURM script for vacancy calculation
+  ├── logs/
+  │   ├── error_log.md           # All errors encountered with timestamps
+  │   └── recovery_actions.md    # How each error was diagnosed and fixed
+  ├── inputs/
+  │   ├── perfect_cu.lmp
+  │   └── vacancy_cu.lmp
+  ├── results/
+  │   └── formation_energy.txt   # Final Ef value
+  └── report.md                  # Summary including challenges overcome
+  ```
+
+  Work in: workspaces/benchmarks/BENCH-T7-002/
+
+skills_required:
+  - hpc-cluster
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 240
+
+expected_outputs:
+  files:
+    - name: "inputs/perfect_cu.lmp"
+      description: "LAMMPS input for perfect crystal"
+    - name: "inputs/vacancy_cu.lmp"
+      description: "LAMMPS input for vacancy calculation"
+    - name: "jobs/*.slurm"
+      description: "Job submission scripts"
+    - name: "logs/error_log.md"
+      description: "Documentation of errors encountered"
+    - name: "logs/recovery_actions.md"
+      description: "How each error was resolved"
+    - name: "results/formation_energy.txt"
+      description: "Final vacancy formation energy"
+    - name: "report.md"
+      description: "Summary including challenges overcome"
+
+  values:
+    vacancy_formation_energy:
+      description: "Calculated Ef for Cu"
+      expected_range: [0.8, 1.5]  # eV, reasonable for EAM
+      unit: "eV"
+    errors_encountered:
+      description: "Number of distinct error types handled"
+      expected_range: [2, 7]
+    successful_recovery_rate:
+      description: "Fraction of errors successfully recovered"
+      expected_range: [0.8, 1.0]
+
+grading:
+  categories:
+    - name: error_diagnosis
+      weight: 25
+      criteria:
+        - Correctly identified error types
+        - Read and interpreted error logs
+        - Found root causes, not just symptoms
+        - Distinguished transient vs persistent errors
+
+    - name: recovery_implementation
+      weight: 30
+      criteria:
+        - Implemented appropriate fixes for each error
+        - Fixes were efficient (not brute force)
+        - Didn't break other parts of workflow
+        - Recovery was automatic where possible
+
+    - name: robustness_features
+      weight: 20
+      criteria:
+        - Input validation implemented
+        - Output validation implemented
+        - Checkpointing used appropriately
+        - Retry logic reasonable
+
+    - name: scientific_result
+      weight: 15
+      criteria:
+        - Got a valid vacancy formation energy
+        - Result is physically reasonable
+        - Method was correct despite challenges
+        - Compared to literature
+
+    - name: documentation
+      weight: 10
+      criteria:
+        - Errors clearly documented
+        - Recovery actions explained
+        - Lessons learned noted
+        - Report is useful for others
+
+metadata:
+  difficulty: expert
+  estimated_time_minutes: 240
+  async_completion: true
+  error_injection: true  # Benchmark harness may inject errors
+  hpc_resources:
+    partition: atesting  # May need to adapt
+    cores: 4-32
+    time_limit: "01:00:00"
+  skills_tested:
+    - error_diagnosis
+    - autonomous_recovery
+    - robust_workflows
+    - defect_calculations
+  notes: |
+    This benchmark tests resilience. Real HPC work involves constant
+    failures - jobs timeout, nodes crash, queues fill up, calculations
+    diverge. A capable agent must handle these autonomously. The benchmark
+    may inject artificial errors to test specific recovery capabilities.

@@ -1,0 +1,63 @@
+id: BENCH-T1-007
+name: Pseudopotential Acquisition
+tier: 1
+description: >
+  Test the agent's ability to find, download, and document a pseudopotential
+  for DFT calculations. The agent should demonstrate it can acquire resources
+  independently.
+
+prompt: |
+  You need to set up a DFT calculation for copper (Cu) using the PBE functional.
+
+  Task:
+  1. Find an appropriate pseudopotential for Cu with PBE
+     - Search SSSP, PseudoDojo, or the QE pseudopotential library
+  2. Download the .UPF file to the workspace
+  3. Note the recommended cutoffs (ecutwfc, ecutrho) for this pseudopotential
+  4. Create a summary document with:
+     - Source URL where you found the pseudopotential
+     - Type (NC, US, or PAW)
+     - Recommended cutoffs
+     - Any validation information available
+
+  Do NOT run a DFT calculation - just acquire and document the pseudopotential.
+
+expected_outputs:
+  files:
+    - name: "*.UPF"
+      description: "Downloaded pseudopotential file"
+    - name: "pseudopotential_info.md"
+      description: "Documentation of the pseudopotential"
+
+grading:
+  categories:
+    - name: acquisition
+      weight: 40
+      criteria:
+        - Successfully downloaded a .UPF file
+        - File is valid (not empty, correct format)
+        - Appropriate for Cu with PBE
+    - name: documentation
+      weight: 30
+      criteria:
+        - Source URL documented
+        - Type identified correctly
+        - Cutoff recommendations noted
+    - name: methodology
+      weight: 30
+      criteria:
+        - Used appropriate search strategy
+        - Chose from reputable source (SSSP, PseudoDojo, etc.)
+        - Could explain choice
+
+time_limit_minutes: 15
+
+metadata:
+  difficulty: easy
+  skills_tested:
+    - resource_acquisition
+    - web_navigation
+    - documentation
+  notes: >
+    Tests the most basic agentic behavior - can the agent find and download
+    a resource it needs, rather than assuming it exists or asking for it?

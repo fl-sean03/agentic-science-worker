@@ -1,0 +1,29 @@
+# Literature Benchmark: Search Script
+# Test the literature search Python script
+
+name: literature-search-script
+description: Test search_semantic_scholar.py script
+category: literature
+difficulty: easy
+expected_time: 30s
+skills_tested:
+  - literature-search
+
+type: command
+
+command: |
+  cd /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent
+  python3 scripts/search_semantic_scholar.py search "DFT materials science" --limit 3
+
+timeout: 60
+
+validation:
+  exit_code: 0
+  stdout_contains:
+    - "Found"
+    - "Title:"
+
+tags:
+  - literature
+  - script
+  - search

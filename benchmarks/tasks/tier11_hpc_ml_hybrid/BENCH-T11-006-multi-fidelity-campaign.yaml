@@ -1,0 +1,326 @@
+# Tier 11 Benchmark: Multi-Fidelity Campaign on HPC
+# HPC + ML Hybrid - Pyramid screening from MLIP to PBE to HSE
+
+id: BENCH-T11-006
+name: Multi-Fidelity Campaign on HPC
+tier: 11
+category: hpc-ml-hybrid
+
+description: |
+  Execute a multi-fidelity materials screening campaign that progresses
+  from cheap ML predictions through increasingly expensive DFT. This tests:
+  1. Managing multiple fidelity levels (MLIP → PBE → HSE)
+  2. Intelligent candidate selection at each tier
+  3. Coordinating local and HPC resources
+  4. Building predictive models across fidelity levels
+
+  Key insight: High-accuracy calculations (HSE hybrid DFT) are expensive.
+  Multi-fidelity approaches use cheap methods to filter, expensive methods
+  only on promising candidates. This requires careful coordination.
+
+prompt: |
+  **Scientific Challenge: Find Wide-Bandgap Transparent Conductors**
+
+  Transparent conducting oxides (TCOs) need both optical transparency
+  (bandgap > 3.1 eV) and electrical conductivity. You're searching for
+  new TCO candidates using a multi-fidelity approach.
+
+  **Target Property: Bandgap**
+  - MLIP: Can estimate relative stability, not bandgap
+  - PBE DFT: Bandgap (systematically underestimated by ~30-40%)
+  - HSE DFT: Accurate bandgap (expensive, 10-50x PBE cost)
+
+  **Your Task: Multi-Fidelity Bandgap Screening**
+
+  **Tier 1: MLIP Stability Screening (Local or HPC)**
+
+  1. Generate 200 candidate oxide compositions:
+     - Binary oxides: M₂O₃, MO₂ (M = various metals)
+     - Focus on: In, Ga, Zn, Sn, Cd, Al, Si, Ge, Ti, Nb
+     - Known TCOs: In₂O₃, SnO₂, ZnO, Ga₂O₃
+     - Create crystal structures (corundum, rutile, wurtzite)
+
+  2. MLIP relaxation of all 200 structures
+     - Calculate formation energies
+     - Remove clearly unstable (E_form > 0.5 eV/atom)
+     - Rank remaining by stability
+     - Select top 50 most stable for PBE
+
+  **Tier 2: PBE DFT Screening (HPC)**
+
+  3. Prepare PBE calculations for 50 structures:
+     - Full geometry relaxation
+     - Electronic structure for bandgap
+     - Use HPC job array
+
+  4. Submit to HPC and collect results:
+     - Parse relaxed structures and bandgaps
+     - Filter: keep those with PBE bandgap > 2.0 eV
+     - (PBE underestimates, so 2.0 PBE → ~3.0 real)
+     - Select top 15 for HSE validation
+
+  **Tier 3: HSE Hybrid DFT (HPC - Expensive)**
+
+  5. Prepare HSE calculations for 15 structures:
+     - Use PBE-relaxed geometries
+     - HSE06 functional for accurate bandgap
+     - These are expensive: 4-24 hours each on HPC
+
+  6. Submit HSE jobs to HPC:
+     - Longer wall times needed
+     - More cores per job
+     - Collect final accurate bandgaps
+
+  **Analysis and Multi-Fidelity Model**
+
+  7. Build multi-fidelity relationship:
+     - Plot PBE vs HSE bandgaps
+     - Fit correction: E_HSE ≈ a × E_PBE + b
+     - Use to estimate HSE bandgaps for all PBE candidates
+
+  8. Final rankings and report:
+     - List candidates with HSE bandgap > 3.1 eV
+     - Identify known TCOs in top results
+     - Recommend novel candidates for synthesis
+     - Discuss accuracy of multi-fidelity approach
+
+  **Technical Requirements:**
+  - Must use three fidelity levels (MLIP, PBE, HSE)
+  - HPC required for DFT calculations
+  - Demonstrate filtering at each stage
+  - Build PBE→HSE correction model
+
+  **Expected Results:**
+  - Known TCOs (In₂O₃, SnO₂, Ga₂O₃) should appear in final list
+  - PBE→HSE correction typically: HSE ≈ 1.3×PBE + 0.5 eV
+  - ~5-10 candidates should pass all filters
+
+  Work in: workspaces/benchmarks/BENCH-T11-006/
+
+skills_required:
+  - mlip-simulation
+  - quantum-espresso
+  - hpc-cluster
+  - data-analysis
+
+time_limit_minutes: 180
+
+setup_files: []
+
+expected_outputs:
+  files:
+    - name: "tier1_mlip/"
+      description: "MLIP screening results"
+    - name: "tier2_pbe/"
+      description: "PBE DFT inputs and outputs"
+    - name: "tier3_hse/"
+      description: "HSE DFT inputs and outputs"
+    - name: "pbe_jobs.slurm"
+      description: "SLURM script for PBE array"
+    - name: "hse_jobs.slurm"
+      description: "SLURM script for HSE calculations"
+    - name: "filtering_analysis.py"
+      description: "Script for candidate selection"
+    - name: "multifidelity_model.py"
+      description: "PBE→HSE correction fitting"
+    - name: "campaign_report.md"
+      description: "Full analysis and final rankings"
+
+grading:
+  categories:
+    - name: tier1_mlip_screening
+      weight: 15
+      criteria:
+        - description: "Generated diverse oxide candidates"
+          points: 5
+          grader_looks_for: |
+            - 150+ oxide structures
+            - Multiple structure types (rutile, corundum, etc.)
+            - Appropriate metal elements for TCOs
+        - description: "MLIP evaluation completed"
+          points: 5
+          grader_looks_for: |
+            - Relaxation performed
+            - Energies calculated
+            - Formation energies estimated
+        - description: "Filtered to 50 for PBE"
+          points: 5
+          grader_looks_for: |
+            - Clear selection criteria (stability)
+            - ~50 candidates selected
+            - Documented reasoning
+
+    - name: tier2_pbe_dft
+      weight: 25
+      criteria:
+        - description: "Valid PBE QE inputs"
+          points: 6
+          grader_looks_for: |
+            Input files with:
+            - PBE functional
+            - Reasonable cutoffs (40-60 Ry)
+            - K-point sampling
+            - Relax + bands/nscf for gap
+        - description: "HPC job array submitted"
+          points: 6
+          grader_looks_for: |
+            - Job array for ~50 structures
+            - Appropriate partition
+            - Jobs ran successfully
+        - description: "Bandgaps extracted correctly"
+          points: 7
+          grader_looks_for: |
+            - Band structure or DOS calculated
+            - Bandgap values extracted
+            - Reasonable values (0-6 eV range)
+        - description: "Filtered to 15 for HSE"
+          points: 6
+          grader_looks_for: |
+            - Selection based on PBE bandgap > threshold
+            - ~10-20 candidates selected
+            - Known TCOs included if in set
+
+    - name: tier3_hse_dft
+      weight: 25
+      criteria:
+        - description: "Valid HSE QE inputs"
+          points: 7
+          grader_looks_for: |
+            Input files with:
+            - HSE06 or HSE functional
+            - input_dft = 'hse'
+            - Appropriate k-points (usually sparser)
+            - Starting from PBE geometry
+        - description: "HSE jobs submitted to HPC"
+          points: 6
+          grader_looks_for: |
+            - Jobs submitted with long wall time
+            - More resources (HSE is expensive)
+            - Jobs ran (at least partially)
+        - description: "HSE bandgaps obtained"
+          points: 7
+          grader_looks_for: |
+            - At least 5 HSE calculations completed
+            - Bandgap values extracted
+            - Values larger than PBE (expected)
+        - description: "Results are reasonable"
+          points: 5
+          grader_looks_for: |
+            - HSE gaps larger than PBE
+            - Known TCOs have gaps 3-5 eV
+            - No obviously wrong values
+
+    - name: multifidelity_model
+      weight: 20
+      criteria:
+        - description: "PBE vs HSE correlation analyzed"
+          points: 8
+          grader_looks_for: |
+            - Scatter plot of PBE vs HSE bandgaps
+            - Linear fit performed
+            - Correlation coefficient reported
+        - description: "Correction model built"
+          points: 7
+          grader_looks_for: |
+            - Equation: HSE_pred = a * PBE + b
+            - a typically 1.2-1.5
+            - b typically 0.3-0.8 eV
+            - RMSE of fit reported
+        - description: "Applied to all PBE candidates"
+          points: 5
+          grader_looks_for: |
+            - Predicted HSE gaps for all 50
+            - Ranking by predicted HSE gap
+            - Identified additional candidates
+
+    - name: final_analysis
+      weight: 15
+      criteria:
+        - description: "Final TCO candidate list"
+          points: 5
+          grader_looks_for: |
+            - List of candidates with gap > 3.1 eV
+            - Both measured (HSE) and predicted
+            - Known TCOs appear if screened
+        - description: "Known TCOs identified"
+          points: 5
+          grader_looks_for: |
+            - In₂O₃, SnO₂, ZnO, Ga₂O₃ appear
+            - Or explained if not in candidate set
+            - Validates the workflow
+        - description: "Novel candidates discussed"
+          points: 5
+          grader_looks_for: |
+            - Any novel predictions identified
+            - Scientific reasoning for candidates
+            - Recommendations for validation
+
+metadata:
+  difficulty: very_hard
+  estimated_time_minutes: 150
+
+  hpc_resources:
+    pbe_jobs:
+      partition: amilan
+      cores_per_job: 8
+      time_per_job: "02:00:00"
+      array_size: 50
+    hse_jobs:
+      partition: amilan
+      cores_per_job: 16
+      time_per_job: "24:00:00"
+      count: 15
+
+  ml_requirements:
+    model: "CHGNet or MACE-MP-0"
+    task: "Stability screening"
+
+  dft_requirements:
+    pbe:
+      code: "Quantum ESPRESSO"
+      functional: "PBE"
+      calculation: "relax + bands"
+    hse:
+      code: "Quantum ESPRESSO"
+      functional: "HSE06"
+      calculation: "scf + bands (fixed geometry)"
+
+  scientific_context:
+    property: "Electronic bandgap"
+    application: "Transparent conducting oxides"
+    target_bandgap: ">3.1 eV"
+    known_tcos: ["In₂O₃", "SnO₂", "ZnO", "Ga₂O₃"]
+
+  skills_tested:
+    - multi_fidelity_workflows
+    - hpc_resource_allocation
+    - dft_bandgap_calculation
+    - statistical_modeling
+    - materials_screening
+
+  key_challenge: |
+    Coordinating three fidelity levels with different costs.
+    The agent must manage resources wisely - HSE is 10-50x
+    more expensive than PBE, so filtering is essential.
+
+  common_failures:
+    - "Running HSE on all candidates (too expensive)"
+    - "Wrong bandgap extraction from QE output"
+    - "No PBE→HSE correlation model"
+    - "Missing HSE06 setup in QE"
+    - "Not filtering at each stage"
+    - "Known TCOs not appearing (wrong structures)"
+
+notes: |
+  This benchmark represents a realistic materials discovery workflow.
+  The three-tier pyramid (MLIP→PBE→HSE) is exactly how computational
+  screening is done in practice.
+
+  The TCO application is chosen because:
+  1. Bandgap is the key property (clearly defined)
+  2. PBE is known to underestimate (needs HSE)
+  3. Known materials exist to validate workflow
+  4. Real industrial/scientific interest
+
+  Even partial completion (e.g., MLIP→PBE without HSE) demonstrates
+  understanding of multi-fidelity approaches.

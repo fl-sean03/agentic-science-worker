@@ -1,0 +1,257 @@
+# Tier 4 Benchmark: Reproduce Classic Paper
+# The ultimate test: Can the agent reproduce a published scientific result?
+
+id: BENCH-T4-001
+name: Reproduce Rahman 1964 Argon Simulation
+tier: 4
+category: paper-reproduction
+
+description: |
+  Reproduce the results from the foundational molecular dynamics paper:
+  Rahman, A. "Correlations in the Motion of Atoms in Liquid Argon"
+  Physical Review 136, A405-A411 (1964).
+
+  This paper launched modern molecular dynamics simulation. The agent must:
+  1. Find and read the original paper
+  2. Extract all simulation parameters
+  3. Set up and run the simulation
+  4. Calculate the self-diffusion coefficient
+  5. Compare to Rahman's published result
+
+  This is the "Hello World" of computational materials science.
+
+prompt: |
+  Your task is to reproduce the results from this classic paper:
+
+  **Rahman, A. (1964). "Correlations in the Motion of Atoms in Liquid Argon"
+  Physical Review, 136(2A), A405-A411.**
+
+  This is the foundational paper of modern molecular dynamics simulation.
+  It was the first MD simulation of a realistic system (liquid argon with
+  Lennard-Jones potential).
+
+  Your objective:
+  1. Find the paper (search literature databases, it's freely available)
+  2. Read and understand the methodology
+  3. Extract all simulation parameters:
+     - System size (number of atoms)
+     - Thermodynamic conditions (T, density)
+     - Force field parameters (LJ epsilon, sigma)
+     - Any other relevant details
+  4. Set up a LAMMPS simulation that replicates the study
+  5. Run the simulation
+  6. Calculate the self-diffusion coefficient using the Einstein relation
+     (mean square displacement method)
+  7. Compare your result to Rahman's published value
+
+  Requirements:
+  - You must document where each parameter came from
+  - Use modern best practices (appropriate timestep, equilibration)
+  - Calculate statistical uncertainty on your result
+  - Discuss any deviations from the original methodology
+
+  Deliverables:
+  - literature_notes.md: Notes from reading the paper, extracted parameters
+  - input.lmp: LAMMPS input file with comments explaining each choice
+  - analysis.py: Script to calculate diffusion coefficient from MSD
+  - diffusion_plot.png: MSD vs time with linear fit
+  - report.md: Full report comparing your results to Rahman's
+
+  Work in: workspaces/benchmarks/t4-001-rahman-1964/
+
+skills_required:
+  - literature-search
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 120
+
+# This is a Tier 4 open-ended task - milestones guide but don't restrict
+milestones:
+  - id: M1
+    description: "Paper found and parameters extracted"
+    weight: 0.20
+    validation: |
+      Found paper (Phys. Rev. 136, A405, 1964)
+      Extracted: N=864 atoms, T=94.4K, ρ=1.374 g/cm³
+      LJ parameters: ε/kB=120K (or ε=0.238 kcal/mol), σ=3.4Å
+
+  - id: M2
+    description: "Simulation designed with modern improvements"
+    weight: 0.15
+    validation: |
+      LAMMPS input created
+      Appropriate timestep (1-2 fs, not Rahman's 10 fs)
+      Proper equilibration strategy
+
+  - id: M3
+    description: "Simulation completed successfully"
+    weight: 0.20
+    validation: |
+      NVT equilibration completed
+      NVE/NVT production run completed
+      MSD data collected
+
+  - id: M4
+    description: "Diffusion coefficient calculated"
+    weight: 0.25
+    validation: |
+      MSD vs time plotted
+      Linear regime identified and fitted
+      D calculated using Einstein relation: D = lim(t→∞) MSD/(6t)
+
+  - id: M5
+    description: "Results compared to Rahman 1964"
+    weight: 0.20
+    validation: |
+      Agent's D value reported with units
+      Rahman's value cited: D = 2.43 × 10⁻⁵ cm²/s
+      Reasonable agreement (within 20%)
+      Differences discussed
+
+expected_outputs:
+  files:
+    - workspaces/benchmarks/t4-001-rahman-1964/literature_notes.md
+    - workspaces/benchmarks/t4-001-rahman-1964/input.lmp
+    - workspaces/benchmarks/t4-001-rahman-1964/analysis.py
+    - workspaces/benchmarks/t4-001-rahman-1964/diffusion_plot.png
+    - workspaces/benchmarks/t4-001-rahman-1964/report.md
+
+  values:
+    diffusion_coefficient:
+      description: "Calculated self-diffusion coefficient"
+      expected_range: [1.9e-5, 3.0e-5]  # cm²/s, within ~20% of 2.43e-5
+      unit: "cm²/s"
+
+    relative_error:
+      description: "Error vs Rahman's 2.43e-5 cm²/s"
+      expected_range: [0, 0.20]  # Within 20%
+
+grading:
+  total_points: 100
+
+  categories:
+    literature_comprehension:
+      weight: 25
+      checks:
+        - name: "Found original paper"
+          points: 8
+          validation: |
+            Cited: Rahman, Phys. Rev. 136, A405 (1964)
+        - name: "Extracted correct parameters"
+          points: 10
+          validation: |
+            N=864, T=94.4K, ρ=1.374 g/cm³
+            ε/kB≈120K, σ≈3.4Å
+        - name: "Understood methodology"
+          points: 7
+          validation: |
+            Notes show understanding of:
+            - LJ potential form
+            - Periodic boundaries
+            - Integration method
+
+    simulation_quality:
+      weight: 30
+      checks:
+        - name: "Correct system setup"
+          points: 10
+          validation: |
+            864 atoms at correct density/temperature
+        - name: "Modern improvements applied"
+          points: 10
+          validation: |
+            Timestep < 5 fs (Rahman used 10 fs)
+            Proper equilibration
+        - name: "Successful execution"
+          points: 10
+          validation: |
+            No errors, energy conserved in NVE
+
+    analysis_quality:
+      weight: 25
+      checks:
+        - name: "MSD correctly calculated"
+          points: 10
+          validation: |
+            MSD from trajectory, proper averaging
+        - name: "Linear fit performed"
+          points: 8
+          validation: |
+            Identified diffusive regime, fit slope
+        - name: "Uncertainty estimated"
+          points: 7
+          validation: |
+            Statistical error reported
+
+    scientific_communication:
+      weight: 20
+      checks:
+        - name: "Result accuracy"
+          points: 10
+          validation: |
+            D within 20% of 2.43×10⁻⁵ cm²/s
+        - name: "Proper comparison"
+          points: 5
+          validation: |
+            Explicit comparison to Rahman's value
+        - name: "Discussion of differences"
+          points: 5
+          validation: |
+            Explains sources of deviation
+
+clear_metrics:
+  cost:
+    max_tokens: 80000
+    max_simulation_time: 3600
+    max_api_calls: 50
+
+  latency:
+    target_completion: 7200  # 2 hours
+
+  assurance:
+    parameters_from_literature: required
+    reproducibility_documented: required
+
+reference_solution:
+  location: reference/solutions/t4-001-rahman-1964/
+  notes: |
+    Rahman 1964 Results:
+    - D = 2.43 × 10⁻⁵ cm²/s
+    - First RDF peak at ~3.7 Å
+
+    Modern Reproductions:
+    - Hunter Heidenreich (2024): D = 2.47 × 10⁻⁵ cm²/s (2% deviation)
+    - MedeA (LAMMPS): D = 2.50 × 10⁻⁵ cm²/s
+
+    Key Implementation Notes:
+    - Rahman used 10 fs timestep; modern best practice is 1-2 fs
+    - Rahman used predictor-corrector; we use Velocity Verlet
+    - These differences account for small deviations
+
+    Original Paper:
+    Rahman, A. "Correlations in the Motion of Atoms in Liquid Argon"
+    Phys. Rev. 136, A405-A411 (1964)
+    DOI: 10.1103/PhysRev.136.A405
+
+metadata:
+  author: "benchmark-system"
+  created: "2025-01-16"
+  difficulty: "expert"
+  estimated_tokens: 25000
+  scientific_domain: "transport-properties"
+  benchmark_type: "paper-reproduction"
+  paper_doi: "10.1103/PhysRev.136.A405"
+  paper_year: 1964
+  historical_significance: |
+    This is the paper that launched modern molecular dynamics.
+    First simulation of a realistic system with continuous potential.
+  tags:
+    - paper-reproduction
+    - classic-paper
+    - lammps
+    - diffusion
+    - argon
+    - lennard-jones
+    - rahman
+    - historical

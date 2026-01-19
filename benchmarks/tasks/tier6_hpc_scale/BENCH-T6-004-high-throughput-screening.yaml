@@ -1,0 +1,185 @@
+# Tier 6 Benchmark: High-Throughput Materials Screening
+# Screen multiple materials in parallel
+
+id: BENCH-T6-004
+name: High-Throughput Materials Screening
+tier: 6
+category: hpc-scale-research
+
+description: |
+  Screen multiple metal systems for a target property (hydrogen adsorption
+  energy) using parallel calculations on HPC. This tests the agent's ability
+  to design and execute high-throughput computational workflows.
+
+prompt: |
+  **CRITICAL INSTRUCTIONS - READ CAREFULLY:**
+
+  1. You are EXECUTING this task autonomously - you do ALL the work yourself
+  2. You must CREATE ALL required files and RUN actual calculations
+  3. Do NOT stop after literature research - that is only Step 2 of 7
+  4. The task is INCOMPLETE until you have calculated adsorption energies and a report
+  5. Use Write tool to create files, Bash to run calculations
+
+  **START by using TodoWrite to create a checklist of ALL 7 STEPS:**
+  - [ ] Step 1: Get structures for 10 metals from Materials Project
+  - [ ] Step 2: Literature research (save to literature/notes.md)
+  - [ ] Step 3: Create LAMMPS inputs for surface+H calculations
+  - [ ] Step 4: Run calculations (locally or via HPC job array)
+  - [ ] Step 5: Collect results
+  - [ ] Step 6: Analyze and rank metals
+  - [ ] Step 7: Write report.md with tables and recommendations
+
+  **Research Question:**
+  Which transition metals have the most favorable hydrogen adsorption energy
+  for hydrogen storage or catalysis applications?
+
+  **Background:**
+  Hydrogen adsorption energy (ΔE_ads) is a key descriptor for hydrogen
+  storage materials and hydrogenation catalysts. The optimal value depends
+  on the application:
+  - Too weak: H₂ won't stick
+  - Too strong: H won't release
+
+  For hydrogen evolution catalysis, ΔG_H ≈ 0 eV is ideal.
+
+  **Your Screening Study:**
+
+  **Step 1: Select Materials**
+  Screen 10 FCC metals:
+  - Pd, Pt, Ni, Cu, Ag, Au, Rh, Ir, Al, Pb
+
+  **Step 2: Literature Research**
+  - Find experimental or DFT hydrogen adsorption energies for comparison
+  - Identify appropriate EAM potentials for each metal
+  - Note: Not all metals will have good EAM potentials for H
+
+  **Step 3: Workflow Design**
+  For each metal:
+  1. Get bulk structure from Materials Project
+  2. Create (111) surface slab (4+ layers, vacuum gap)
+  3. Optimize clean surface
+  4. Add H atom to favorable site (fcc hollow, hcp hollow, or top)
+  5. Optimize H-surface system
+  6. Calculate: ΔE_ads = E(slab+H) - E(slab) - 0.5×E(H₂)
+
+  **Step 4: Parallel Execution**
+  All 10 metals can run independently:
+  - Create job array with 10 tasks
+  - OR submit 10 separate jobs
+  - Each job handles one metal completely
+
+  **Step 5: Result Collection**
+  Collect results for all metals:
+  - Adsorption energy
+  - Adsorption site
+  - H-surface distance
+  - Any convergence issues
+
+  **Step 6: Ranking and Analysis**
+  - Rank metals by ΔE_ads
+  - Compare to literature/DFT values
+  - Identify candidates for storage vs catalysis
+  - Discuss force field limitations
+
+  **Step 7: Report**
+  Create a screening report:
+  - Table of ΔE_ads for all metals
+  - Ranking from strongest to weakest binding
+  - Comparison to literature
+  - Recommendations for applications
+  - Discussion of methodology limitations
+
+  **BEFORE FINISHING - VERIFY ALL DELIVERABLES EXIST:**
+  - [ ] structures/ directory with metal surface slabs
+  - [ ] inputs/ directory with LAMMPS files
+  - [ ] results/*.csv with adsorption energies
+  - [ ] analysis/ranking.png showing metal comparison
+  - [ ] report.md with full screening results
+
+  If any are missing, GO BACK and complete them. Do not finish until done.
+
+  Work in: workspaces/benchmarks/BENCH-T6-004/
+
+skills_required:
+  - hpc-cluster
+  - lammps-simulation
+  - materials-database
+  - data-analysis
+
+time_limit_minutes: 180
+
+expected_outputs:
+  files:
+    - name: "screening_design.md"
+      description: "Workflow design document"
+    - name: "inputs/metal_*.lmp"
+      description: "LAMMPS inputs for each metal"
+    - name: "jobs/screening_array.slurm"
+      description: "Job array for parallel screening"
+    - name: "results/adsorption_energies.csv"
+      description: "Table of results for all metals"
+    - name: "analysis/ranking_plot.png"
+      description: "Bar chart of adsorption energies"
+    - name: "report.md"
+      description: "Screening report with recommendations"
+
+grading:
+  categories:
+    - name: workflow_design
+      weight: 20
+      criteria:
+        - Clear methodology for all metals
+        - Consistent approach across materials
+        - Appropriate surface model
+        - H adsorption protocol defined
+
+    - name: materials_handling
+      weight: 20
+      criteria:
+        - Structures obtained from database
+        - Surface slabs created correctly
+        - H positioned appropriately
+        - Potentials selected with justification
+
+    - name: parallel_execution
+      weight: 25
+      criteria:
+        - All 10 metals submitted
+        - Parallel execution used
+        - Jobs completed successfully
+        - Results collected systematically
+
+    - name: analysis_quality
+      weight: 25
+      criteria:
+        - Adsorption energies calculated correctly
+        - Meaningful ranking produced
+        - Comparison to literature
+        - Trends explained physically
+
+    - name: scientific_insight
+      weight: 10
+      criteria:
+        - Application-relevant recommendations
+        - Limitations acknowledged
+        - Report is actionable
+
+metadata:
+  difficulty: expert
+  estimated_time_minutes: 180
+  async_completion: true
+  hpc_resources:
+    partition: atesting  # For testing
+    cores_per_job: 4
+    num_jobs: 10
+    time_per_job: "00:30:00"
+  skills_tested:
+    - high_throughput_workflow
+    - materials_screening
+    - parallel_job_management
+    - result_aggregation
+  notes: |
+    This benchmark tests high-throughput computational materials science.
+    The agent must handle multiple materials systematically, run them in
+    parallel, and synthesize results into actionable insights. Real
+    screening studies often cover 100s-1000s of materials using similar workflows.

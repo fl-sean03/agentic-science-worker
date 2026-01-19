@@ -1,0 +1,114 @@
+# Tier 1 Benchmark: LJ Energy Minimization
+# Single-skill task testing LAMMPS simulation ability
+
+id: BENCH-T1-001
+name: Lennard-Jones Energy Minimization
+tier: 1
+category: lammps-simulation
+
+description: |
+  Basic energy minimization of a Lennard-Jones system.
+  Tests the agent's ability to create and run a simple LAMMPS simulation.
+
+prompt: |
+  Create and run a LAMMPS energy minimization simulation for a
+  Lennard-Jones system with the following specifications:
+
+  - 108 atoms in a 3D periodic box
+  - Initial FCC lattice with lattice constant 5.26 Angstroms
+  - LJ parameters: epsilon = 0.238 kcal/mol, sigma = 3.405 Angstroms
+  - Cutoff: 10.0 Angstroms
+  - Use conjugate gradient minimization
+  - Convergence: energy tolerance 1e-6, force tolerance 1e-8
+
+  Report the initial and final total energies.
+
+  Work in: workspaces/benchmarks/t1-001-lj-min/
+
+skills_required:
+  - lammps-simulation
+
+time_limit_minutes: 10
+
+expected_outputs:
+  files:
+    - input.lmp
+    - log.lammps
+  values:
+    initial_energy:
+      description: "Initial total energy before minimization"
+      expected_range: [-300, 0]  # kcal/mol, for FCC lattice
+      unit: "kcal/mol"
+    final_energy:
+      description: "Final total energy after minimization"
+      expected_range: [-700, -150]  # kcal/mol - range depends on lattice constant
+      # Note: Perfect FCC at 5.26 Å gives ~-213 kcal/mol (already near equilibrium)
+      # Denser configs would minimize to ~-600 kcal/mol
+      unit: "kcal/mol"
+
+grading:
+  total_points: 100
+
+  categories:
+    setup_correctness:
+      weight: 30
+      checks:
+        - name: "LJ parameters correct"
+          points: 10
+          validation: |
+            Input file contains: pair_coeff * * 0.238 3.405
+        - name: "Correct atom count"
+          points: 10
+          validation: |
+            System has approximately 108 atoms (±10%)
+        - name: "Periodic boundaries"
+          points: 5
+          validation: |
+            boundary p p p
+        - name: "Minimization settings"
+          points: 5
+          validation: |
+            min_style cg AND minimize command present
+
+    execution_success:
+      weight: 30
+      checks:
+        - name: "Simulation completed"
+          points: 15
+          validation: |
+            log.lammps exists AND contains "Loop time"
+        - name: "No errors"
+          points: 15
+          validation: |
+            No ERROR or FATAL in output
+
+    result_quality:
+      weight: 40
+      checks:
+        - name: "Energy decreased or stable"
+          points: 20
+          validation: |
+            final_energy <= initial_energy (may be equal for perfect lattice)
+        - name: "Final energy reasonable"
+          points: 20
+          validation: |
+            final_energy in range [-700, -150] kcal/mol
+
+reference_solution:
+  location: reference/solutions/t1-001-lj-min/
+  notes: |
+    For 108 LJ argon atoms starting from perfect FCC at 5.26 Å:
+    - Already near equilibrium, so E ≈ -213 kcal/mol
+    - Minimization may not change energy significantly
+    For denser/random starting configs: E → -600 kcal/mol
+
+metadata:
+  author: "benchmark-system"
+  created: "2025-01-16"
+  difficulty: "easy"
+  estimated_tokens: 2000
+  tags:
+    - lammps
+    - minimization
+    - lennard-jones
+    - basic

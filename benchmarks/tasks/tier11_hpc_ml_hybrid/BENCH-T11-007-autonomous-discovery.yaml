@@ -1,0 +1,377 @@
+# Tier 11 Benchmark: Autonomous Discovery Campaign
+# HPC + ML Hybrid - Full autonomous research loop with HPC resources
+
+id: BENCH-T11-007
+name: Autonomous Discovery Campaign
+tier: 11
+category: hpc-ml-hybrid
+
+description: |
+  Execute a complete autonomous materials discovery campaign that combines
+  literature research, ML screening, HPC validation, and iterative refinement.
+  This is the capstone benchmark testing full autonomous research capabilities:
+  1. Define a scientific question from literature
+  2. Design and execute a screening campaign
+  3. Coordinate local ML with HPC DFT validation
+  4. Iterate based on results
+  5. Produce a discovery report
+
+  Key insight: Real materials discovery is iterative and multi-modal.
+  An autonomous agent must coordinate literature knowledge, ML predictions,
+  and HPC calculations to make discoveries.
+
+prompt: |
+  **Grand Challenge: Discover New Solid-State Battery Electrolyte**
+
+  You are tasked with identifying promising new solid-state electrolyte
+  materials. This is an open-ended discovery challenge that requires:
+  - Understanding what makes a good solid electrolyte
+  - Searching chemical space intelligently
+  - Validating candidates computationally
+  - Iterating based on what you learn
+
+  **Your Mission: Autonomous Discovery Campaign**
+
+  This benchmark simulates a multi-day research campaign. You have
+  access to local ML resources and HPC for expensive calculations.
+
+  **Phase 1: Research and Hypothesis (Simulated Day 1)**
+
+  1. **Literature Survey**
+     - Search for: "solid state electrolyte materials discovery"
+     - Identify key material classes: LISICON, NASICON, garnet, sulfide, etc.
+     - Extract design principles: what makes Li-ion conductivity high?
+     - Note: ionic radius matching, lattice softness, vacancy concentration
+
+  2. **Define Search Space**
+     - Based on literature, choose a material family to explore
+     - Example: Li-containing sulfides (Li-M-S where M = various)
+     - Define 500+ candidate compositions
+     - Justify your choices scientifically
+
+  **Phase 2: Initial ML Screening (Simulated Day 1-2)**
+
+  3. **Generate Candidate Structures**
+     - Create structures for your candidate compositions
+     - Use prototype structures from known electrolytes
+     - 500 minimum candidates
+
+  4. **MLIP Stability Screening (Local or HPC)**
+     - Calculate formation energies with MLIP
+     - Filter: remove unstable (E_form > 0.2 eV/atom)
+     - Rank by stability
+     - Select top 100 for further screening
+
+  5. **Quick MLIP MD for Li Mobility (Local GPU)**
+     - Run short MD (10 ps) at 600K for top 100
+     - Calculate Li MSD to estimate mobility
+     - Rank by Li mobility
+     - Select top 30 for DFT validation
+
+  **Phase 3: HPC Validation (Simulated Day 2-3)**
+
+  6. **Submit DFT Calculations to HPC**
+     - Prepare QE inputs for 30 candidates
+     - Full geometry relaxation with PBE
+     - Submit as job array to HPC
+     - Wait for completion (or simulate with subset)
+
+  7. **Analyze DFT Results**
+     - Compare DFT vs MLIP energies
+     - Identify any false positives (unstable by DFT)
+     - Calculate electronic structure if time permits
+     - Select top 10 most promising
+
+  **Phase 4: Iteration and Refinement (Simulated Day 3-4)**
+
+  8. **Learn from Results**
+     - Analyze: which compositions are stable? which are not?
+     - Identify patterns: certain elements favorable/unfavorable?
+     - Refine hypothesis: what makes good candidates?
+
+  9. **Second Round Screening**
+     - Generate new candidates based on learnings
+     - Focus on promising subspace identified
+     - Additional 100 MLIP calculations
+     - Select best for final validation
+
+  **Phase 5: Final Report (Simulated Day 4-5)**
+
+  10. **Compile Discovery Report**
+      Include:
+      - Literature background and design principles
+      - Search strategy and justification
+      - Screening results at each stage
+      - Top 5 discovered candidates with properties
+      - Comparison with known solid electrolytes
+      - Recommendations for experimental synthesis
+      - Limitations and future work
+
+  **Technical Requirements:**
+  - Must use both local ML and HPC DFT
+  - Iterative refinement required (at least 2 rounds)
+  - Final report must be comprehensive
+  - Scientific reasoning documented throughout
+
+  **Success Criteria:**
+  - Identified known good electrolytes if in search space
+  - Found at least 3 promising new candidates
+  - Demonstrated learning from iteration
+  - Produced publication-quality report
+
+  Work in: workspaces/benchmarks/BENCH-T11-007/
+
+skills_required:
+  - literature-search
+  - mlip-simulation
+  - quantum-espresso
+  - hpc-cluster
+  - data-analysis
+
+time_limit_minutes: 240
+
+setup_files: []
+
+expected_outputs:
+  files:
+    - name: "literature_review.md"
+      description: "Survey of solid electrolyte literature"
+    - name: "search_space_definition.md"
+      description: "Justification for chosen chemical space"
+    - name: "round1_candidates/"
+      description: "First round candidate structures"
+    - name: "round1_mlip_results.csv"
+      description: "MLIP screening results"
+    - name: "round1_md_results.csv"
+      description: "Li mobility screening results"
+    - name: "dft_validation.slurm"
+      description: "HPC job for DFT validation"
+    - name: "dft_results/"
+      description: "DFT calculation outputs"
+    - name: "round2_candidates/"
+      description: "Refined candidate structures"
+    - name: "round2_results.csv"
+      description: "Second round results"
+    - name: "discovery_report.md"
+      description: "Comprehensive final report"
+    - name: "top_candidates.md"
+      description: "Detailed analysis of best materials"
+
+grading:
+  categories:
+    - name: literature_research
+      weight: 15
+      criteria:
+        - description: "Conducted meaningful literature search"
+          points: 5
+          grader_looks_for: |
+            - Searched relevant terms (solid electrolyte, Li-ion conductor)
+            - Found and cited real papers
+            - Identified major material classes
+        - description: "Extracted design principles"
+          points: 5
+          grader_looks_for: |
+            - Ionic conductivity factors identified
+            - Understanding of structure-property relationships
+            - Scientific basis for search strategy
+        - description: "Justified search space choice"
+          points: 5
+          grader_looks_for: |
+            - Clear reasoning for chosen material family
+            - Based on literature findings
+            - Specific and achievable scope
+
+    - name: initial_screening
+      weight: 20
+      criteria:
+        - description: "Generated diverse candidates"
+          points: 5
+          grader_looks_for: |
+            - 200+ candidate structures minimum
+            - Systematic enumeration
+            - Appropriate structure types
+        - description: "MLIP screening completed"
+          points: 5
+          grader_looks_for: |
+            - Formation energies calculated
+            - Stability ranking produced
+            - Clear filtering criteria
+        - description: "Li mobility estimation attempted"
+          points: 5
+          grader_looks_for: |
+            - Short MD runs performed
+            - Li MSD calculated
+            - Mobility-based ranking
+        - description: "Intelligent selection for DFT"
+          points: 5
+          grader_looks_for: |
+            - Combined stability and mobility
+            - Reasonable number selected (20-50)
+            - Scientific justification
+
+    - name: hpc_validation
+      weight: 25
+      criteria:
+        - description: "DFT calculations prepared correctly"
+          points: 7
+          grader_looks_for: |
+            - Valid QE inputs
+            - Appropriate pseudopotentials
+            - Reasonable parameters
+        - description: "Jobs submitted to HPC"
+          points: 6
+          grader_looks_for: |
+            - Job array or batch submission
+            - Jobs ran on HPC
+            - Results obtained
+        - description: "Results parsed and analyzed"
+          points: 6
+          grader_looks_for: |
+            - DFT energies extracted
+            - Compared with MLIP predictions
+            - False positives identified
+        - description: "Meaningful validation completed"
+          points: 6
+          grader_looks_for: |
+            - At least 10 DFT calculations
+            - Results inform further search
+            - Failures handled gracefully
+
+    - name: iterative_refinement
+      weight: 15
+      criteria:
+        - description: "Learned from first round"
+          points: 8
+          grader_looks_for: |
+            - Analysis of what worked/didn't work
+            - Patterns identified in stable materials
+            - Hypothesis refined
+        - description: "Second round executed"
+          points: 7
+          grader_looks_for: |
+            - New candidates generated
+            - Based on learnings
+            - Additional screening performed
+
+    - name: final_report
+      weight: 20
+      criteria:
+        - description: "Comprehensive discovery report"
+          points: 6
+          grader_looks_for: |
+            Report includes:
+            - Background and motivation
+            - Methods description
+            - Results at each stage
+            - Final candidates
+        - description: "Top candidates identified"
+          points: 6
+          grader_looks_for: |
+            - At least 3 promising candidates listed
+            - Properties tabulated
+            - Comparison with known materials
+        - description: "Scientific quality"
+          points: 4
+          grader_looks_for: |
+            - Proper citations
+            - Units and values correct
+            - Limitations discussed
+        - description: "Actionable recommendations"
+          points: 4
+          grader_looks_for: |
+            - Synthesis recommendations
+            - Future computational work
+            - Experimental validation needs
+
+    - name: autonomous_behavior
+      weight: 5
+      criteria:
+        - description: "Minimal human intervention"
+          points: 3
+          grader_looks_for: |
+            - Agent made decisions independently
+            - Recovered from failures
+            - Adapted strategy based on results
+        - description: "Documented decision-making"
+          points: 2
+          grader_looks_for: |
+            - Clear reasoning throughout
+            - Justified choices
+            - Explainable workflow
+
+metadata:
+  difficulty: frontier
+  estimated_time_minutes: 200
+
+  hpc_resources:
+    partition: amilan
+    array_size: 30
+    time_per_job: "02:00:00"
+    total_dft_calculations: "30-50"
+
+  ml_requirements:
+    model: "MACE-MP-0 or CHGNet"
+    tasks:
+      - "Formation energy screening"
+      - "Short MD for Li mobility"
+
+  dft_requirements:
+    code: "Quantum ESPRESSO"
+    functional: "PBE"
+    calculation: "Full relaxation"
+
+  scientific_context:
+    goal: "Discover new solid-state electrolyte"
+    target_property: "Li-ion conductivity"
+    material_classes:
+      - "Sulfides (Li-M-S)"
+      - "NASICON-type"
+      - "Garnet-type"
+      - "Thiophosphates"
+    success_metric: "Identify stable Li conductors"
+
+  skills_tested:
+    - autonomous_research
+    - literature_integration
+    - hypothesis_generation
+    - iterative_discovery
+    - multi_resource_coordination
+    - scientific_writing
+
+  key_challenge: |
+    This is the most open-ended benchmark. The agent must:
+    - Define its own search strategy
+    - Coordinate multiple resources
+    - Learn and adapt from results
+    - Produce a coherent research narrative
+
+  common_failures:
+    - "No literature foundation (random search)"
+    - "No iteration (single-pass screening)"
+    - "Not using HPC when appropriate"
+    - "No final coherent report"
+    - "Candidates without proper validation"
+    - "Ignoring physics (unphysical candidates)"
+
+notes: |
+  This is the capstone Tier 11 benchmark, testing the full autonomous
+  research capability. It's intentionally open-ended to see how the
+  agent approaches a real discovery problem.
+
+  Grading is more holistic than other benchmarks. Partial credit is
+  given for:
+  - Good scientific reasoning even with incomplete execution
+  - Learning from failures
+  - Clear documentation of process
+  - Creative approaches to the problem
+
+  The solid electrolyte application is chosen because:
+  1. High scientific and industrial interest
+  2. Clear target property (Li conductivity)
+  3. Well-studied literature to draw from
+  4. Multiple material classes to explore
+  5. Computational screening is proven effective
+
+  This benchmark may take several hours to complete fully, including
+  HPC job wait times. Partial completion with good methodology can
+  still receive significant credit.

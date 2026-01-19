@@ -1,0 +1,163 @@
+# Tier 5 Benchmark: Multi-Job Parameter Sweep
+# Test submitting and managing multiple related jobs
+
+id: BENCH-T5-007
+name: Multi-Job Parameter Sweep
+tier: 5
+category: hpc-fundamentals
+
+description: |
+  Submit multiple jobs exploring different parameter values. This tests the
+  agent's ability to organize multi-job studies, use job arrays or batch
+  submission, and track multiple concurrent jobs.
+
+prompt: |
+  Conduct a parameter sweep studying the effect of temperature on the
+  self-diffusion coefficient of liquid argon. Submit multiple independent
+  jobs, each at a different temperature.
+
+  **The Study:**
+  Run simulations at 5 temperatures: 85K, 95K, 105K, 115K, 125K
+  Each simulation:
+  - 864 atoms (6×6×6 FCC unit cells)
+  - NVT equilibration: 50,000 steps
+  - NVE production: 100,000 steps
+  - Calculate MSD for diffusion coefficient
+  - Estimated runtime per job: ~20-30 minutes
+
+  **Step 1: Design the Sweep**
+  Plan the parameter sweep:
+  - Create a template input file with temperature as variable
+  - Design directory structure for organizing outputs
+  - Decide: separate jobs OR SLURM job array?
+
+  **Step 2: Create Directory Structure on HPC**
+  Set up organized workspace:
+  ```
+  /scratch/alpine/$USER/Agent_Runs/temp-sweep-YYYYMMDD/
+  ├── T085/
+  │   ├── input.lmp
+  │   └── job.slurm
+  ├── T095/
+  │   ├── input.lmp
+  │   └── job.slurm
+  ... (etc for each temperature)
+  └── analysis/
+  ```
+
+  **Step 3: Generate Input Files**
+  Create input files for each temperature:
+  - Either generate 5 separate files
+  - Or use LAMMPS variables with job array index
+  - Ensure each job writes to its own directory
+
+  **Step 4: Submit All Jobs**
+  Choose one approach:
+
+  **Option A: Separate Jobs**
+  - Submit 5 independent jobs
+  - Track each job ID separately
+
+  **Option B: SLURM Job Array (preferred)**
+  ```bash
+  #SBATCH --array=0-4
+  ```
+  - Single submission creates 5 jobs
+  - Use $SLURM_ARRAY_TASK_ID to select temperature
+
+  **Step 5: Track All Jobs**
+  Create a tracking file that includes:
+  - All job IDs
+  - Temperature for each job
+  - Status of each job
+  - Directory where results will be written
+
+  **Step 6: Provide Result Collection Plan**
+  Document how to:
+  - Check status of all sweep jobs
+  - Collect results when all complete
+  - Aggregate diffusion coefficients from all temperatures
+
+  **Note:** This benchmark does NOT require waiting for completion.
+  Focus is on proper multi-job submission and organization.
+
+  Work in: workspaces/benchmarks/BENCH-T5-007/
+
+skills_required:
+  - hpc-cluster
+  - lammps-simulation
+
+time_limit_minutes: 45
+
+expected_outputs:
+  files:
+    - name: "sweep_design.md"
+      description: "Design document for parameter sweep"
+    - name: "input_template.lmp"
+      description: "Template LAMMPS input (or 5 separate files)"
+    - name: "job_array.slurm OR job_T*.slurm"
+      description: "Job script(s) for the sweep"
+    - name: "sweep_tracking.json"
+      description: "Tracking file for all jobs"
+    - name: "result_collection.md"
+      description: "Instructions for collecting results"
+
+grading:
+  categories:
+    - name: sweep_design
+      weight: 20
+      criteria:
+        - Clear plan for parameter sweep
+        - Logical temperature range
+        - Organized directory structure
+        - Approach documented (arrays vs separate)
+
+    - name: input_generation
+      weight: 25
+      criteria:
+        - Valid LAMMPS inputs for each temperature
+        - Temperature correctly parameterized
+        - Each job outputs to correct location
+        - Consistent methodology across temperatures
+
+    - name: job_submission
+      weight: 30
+      criteria:
+        - All 5 jobs submitted (or array submitted)
+        - Correct partition (atesting for testing)
+        - Proper resource requests
+        - Jobs are independent
+
+    - name: tracking_system
+      weight: 15
+      criteria:
+        - All job IDs recorded
+        - Temperature mapped to each job
+        - Can check status of all jobs
+        - Results location documented
+
+    - name: result_collection_plan
+      weight: 10
+      criteria:
+        - Clear instructions for gathering results
+        - Analysis approach outlined
+        - Handles case where some jobs may fail
+
+metadata:
+  difficulty: medium-hard
+  estimated_time_minutes: 40
+  hpc_resources:
+    partition: atesting
+    nodes: 1
+    cores: 4
+    time_limit: "01:00:00"
+    num_jobs: 5
+  skills_tested:
+    - multi_job_management
+    - job_arrays
+    - parameter_sweeps
+    - result_organization
+  notes: |
+    Job arrays are a powerful SLURM feature for parameter sweeps. The
+    agent should demonstrate awareness of this feature, though separate
+    job submission is also acceptable if properly organized.

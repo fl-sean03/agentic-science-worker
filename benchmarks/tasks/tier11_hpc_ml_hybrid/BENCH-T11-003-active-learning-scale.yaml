@@ -1,0 +1,311 @@
+# Tier 11 Benchmark: Active Learning at Scale
+# HPC + ML Hybrid - Iterative MLIP improvement with HPC-scale DFT
+
+id: BENCH-T11-003
+name: Active Learning at Scale
+tier: 11
+category: hpc-ml-hybrid
+
+description: |
+  Implement an active learning workflow for MLIP improvement using HPC
+  resources for parallel DFT calculations. This tests:
+  1. Identifying high-uncertainty configurations from MLIP
+  2. Submitting batch DFT calculations to HPC
+  3. Collecting DFT results and retraining/evaluating MLIP
+  4. Iterating the improve cycle
+
+  Key insight: Active learning needs many DFT calculations to generate
+  training data for regions where the MLIP is uncertain. Local resources
+  limit this to ~50 calcs; HPC enables 200+ parallel DFT jobs.
+
+prompt: |
+  **Scientific Challenge: Improving MLIP for High-Entropy Alloy**
+
+  High-entropy alloys (HEAs) with 5+ elements are challenging for universal MLIPs
+  because the chemical space is vast. You need to improve MLIP accuracy for a
+  specific HEA system through active learning.
+
+  **Target System: CoCrFeNiMn (Cantor Alloy)**
+  - 5-element equiatomic HEA
+  - FCC crystal structure
+  - Universal MLIPs have ~50-100 meV/atom errors on HEAs
+  - Goal: Generate DFT data to assess/improve accuracy
+
+  **Your Task: Active Learning Campaign**
+
+  **Iteration 1: Initial Assessment**
+
+  1. **Generate Diverse Configurations**
+     - Create 200 configurations of CoCrFeNiMn
+     - Include: random solid solutions, different cell sizes
+     - Add: strained structures (±2%, ±5%)
+     - Add: configurations from short MD at 300K
+     - Save all structures
+
+  2. **Evaluate with Universal MLIP**
+     - Calculate energies with MACE-MP-0 (or CHGNet)
+     - Calculate forces on all atoms
+     - Identify uncertainty (if available) or force variance
+     - Select top 50 "most uncertain" configurations
+
+  3. **Submit DFT Calculations to HPC**
+     - Prepare QE inputs for 50 selected structures
+     - Write SLURM job array for parallel DFT
+     - Submit to HPC (amilan CPU partition)
+     - Each calculation: SCF only (single point)
+     - DFT settings: PBE, reasonable cutoff, spin-polarized
+
+  4. **Collect DFT Results**
+     - Wait for job completion
+     - Parse QE outputs for energies and forces
+     - Compare DFT vs MLIP predictions
+     - Calculate error statistics (MAE, RMSE)
+
+  **Iteration 2: (If time permits)**
+
+  5. **Refined Selection**
+     - Based on Iteration 1 errors, identify systematic issues
+     - Generate more configurations in high-error regions
+     - Submit another batch of DFT calculations
+
+  **Final Analysis**
+
+  6. **Report Results**
+     - Initial MLIP error on HEA configurations
+     - Breakdown by configuration type (random, strained, MD)
+     - Comparison with literature MLIP errors on HEAs
+     - Recommendations for full training dataset
+
+  **Technical Requirements:**
+  - At least 50 DFT calculations via HPC job array
+  - DFT must be spin-polarized (magnetic elements)
+  - Compare energies AND forces between MLIP and DFT
+  - Document the active learning workflow
+
+  **Expected Results:**
+  - Universal MLIP errors: 30-100 meV/atom on HEA
+  - DFT energies should be self-consistent
+  - Force errors often larger than energy errors
+  - Strained structures typically have higher errors
+
+  Work in: workspaces/benchmarks/BENCH-T11-003/
+
+skills_required:
+  - mlip-simulation
+  - quantum-espresso
+  - hpc-cluster
+  - data-analysis
+
+time_limit_minutes: 150
+
+setup_files: []
+
+expected_outputs:
+  files:
+    - name: "structures/"
+      description: "Generated HEA configurations"
+    - name: "mlip_evaluation/"
+      description: "MLIP predictions for all structures"
+    - name: "dft_inputs/"
+      description: "QE input files for selected structures"
+    - name: "dft_calculations.slurm"
+      description: "SLURM job array for DFT"
+    - name: "dft_outputs/"
+      description: "QE output files"
+    - name: "comparison_analysis.py"
+      description: "Script comparing MLIP vs DFT"
+    - name: "active_learning_report.md"
+      description: "Full analysis and recommendations"
+
+grading:
+  categories:
+    - name: configuration_generation
+      weight: 15
+      criteria:
+        - description: "Generated diverse HEA configurations"
+          points: 5
+          grader_looks_for: |
+            Structures should include:
+            - Random solid solutions (different atom arrangements)
+            - Multiple cell sizes if possible
+            - Different strains applied
+            - MD snapshots (thermal disorder)
+        - description: "Correct composition (equiatomic 5-element)"
+          points: 5
+          grader_looks_for: |
+            - Contains Co, Cr, Fe, Ni, Mn
+            - Approximately equiatomic (20% each ±5%)
+            - FCC-based structure
+        - description: "Appropriate number of configurations"
+          points: 5
+          grader_looks_for: |
+            - At least 100 configurations generated
+            - Diverse enough to probe chemical space
+            - Saved in parseable format
+
+    - name: mlip_assessment
+      weight: 20
+      criteria:
+        - description: "Evaluated all configurations with MLIP"
+          points: 6
+          grader_looks_for: |
+            - Energy calculated for each structure
+            - Forces calculated for each structure
+            - Results saved systematically
+        - description: "Uncertainty or variance estimation"
+          points: 7
+          grader_looks_for: |
+            Attempted to identify uncertain configurations via:
+            - MACE uncertainty (if using committee)
+            - Force magnitude variance
+            - Energy spread across similar configs
+            - Or explicit discussion of selection criteria
+        - description: "Selected subset for DFT validation"
+          points: 7
+          grader_looks_for: |
+            - Selected 50 structures for DFT
+            - Selection based on some rational criteria
+            - Not just random selection
+            - Documented why these were chosen
+
+    - name: hpc_dft_execution
+      weight: 30
+      criteria:
+        - description: "Valid QE input files for HEA"
+          points: 7
+          grader_looks_for: |
+            QE inputs must have:
+            - All 5 elements with pseudopotentials
+            - nspin=2 for magnetic elements
+            - Reasonable ecutwfc (40-60 Ry typical)
+            - Appropriate k-point sampling
+            - SCF calculation type
+        - description: "Correct SLURM job array for DFT"
+          points: 8
+          grader_looks_for: |
+            - Job array for all 50 structures
+            - Appropriate partition (amilan for CPU)
+            - Reasonable time per job (30-60 min for SCF)
+            - Correct indexing to select structures
+        - description: "Jobs submitted and executed"
+          points: 8
+          grader_looks_for: |
+            - sbatch command executed
+            - Jobs ran on HPC
+            - At least 40/50 jobs completed
+            - Outputs exist
+        - description: "DFT results parsed correctly"
+          points: 7
+          grader_looks_for: |
+            - Extracted total energy from each output
+            - Extracted forces if computed
+            - Handled any failed calculations
+            - Data in usable format
+
+    - name: comparison_analysis
+      weight: 25
+      criteria:
+        - description: "Calculated MLIP vs DFT errors"
+          points: 8
+          grader_looks_for: |
+            - Energy difference: E_MLIP - E_DFT for each
+            - Per-atom energy errors
+            - MAE and RMSE statistics
+            - Force errors if forces computed
+        - description: "Identified error patterns"
+          points: 8
+          grader_looks_for: |
+            Analysis should show:
+            - Which configurations have highest errors
+            - Correlation with strain, disorder, etc.
+            - Systematic vs random errors
+        - description: "Comparison with literature"
+          points: 5
+          grader_looks_for: |
+            - Cited MLIP benchmark studies on HEAs
+            - Typical errors: 30-100 meV/atom
+            - Discussion if results match expectations
+        - description: "Actionable recommendations"
+          points: 4
+          grader_looks_for: |
+            Report should recommend:
+            - How many more DFT points needed
+            - Which configuration types to add
+            - Whether retraining is worthwhile
+
+    - name: workflow_quality
+      weight: 10
+      criteria:
+        - description: "Clear active learning methodology"
+          points: 5
+          grader_looks_for: |
+            Documentation of:
+            - How uncertainty was estimated
+            - Selection criteria for DFT
+            - Iteration strategy (even if only one round)
+        - description: "Reproducible workflow"
+          points: 5
+          grader_looks_for: |
+            - Scripts can be re-run
+            - Clear file organization
+            - Comments explaining steps
+
+metadata:
+  difficulty: very_hard
+  estimated_time_minutes: 120
+
+  hpc_resources:
+    partition: amilan
+    cores_per_job: 4
+    time_per_job: "01:00:00"
+    array_size: 50
+    total_dft_calculations: 50
+
+  ml_requirements:
+    model: "MACE-MP-0 or CHGNet"
+    task: "Energy and force prediction"
+    uncertainty_estimation: "Preferred but optional"
+
+  dft_requirements:
+    code: "Quantum ESPRESSO"
+    functional: "PBE"
+    spin_polarization: true
+    k_points: "Automatic, reasonable density"
+
+  scientific_context:
+    material: "CoCrFeNiMn (Cantor alloy)"
+    structure: "FCC high-entropy alloy"
+    challenge: "Chemical complexity, magnetic elements"
+    goal: "Assess MLIP accuracy, generate training data"
+
+  skills_tested:
+    - active_learning_workflow
+    - mlip_uncertainty
+    - dft_calculations
+    - hpc_job_arrays
+    - error_analysis
+
+  key_challenge: |
+    Coordinating ML predictions with DFT validation at scale.
+    The agent must understand both MLIP evaluation and DFT setup,
+    and manage the HPC submission pipeline.
+
+  common_failures:
+    - "Forgetting spin polarization for magnetic HEA"
+    - "Wrong pseudopotentials (missing elements)"
+    - "Not enough k-points for metals"
+    - "Selecting structures randomly instead of by uncertainty"
+    - "Not parsing DFT outputs correctly"
+    - "Comparing energies without per-atom normalization"
+
+notes: |
+  This benchmark represents a core workflow in MLIP development:
+  using DFT to validate and improve ML models. The 50-structure
+  scale is a realistic "mini-campaign" that tests all the pieces
+  without requiring massive compute time.
+
+  The Cantor alloy is specifically chosen because:
+  1. It's a real material of scientific interest
+  2. Universal MLIPs struggle with HEAs
+  3. The 5-element composition tests pseudopotential management
+  4. Magnetic elements require spin-polarized DFT

@@ -1,0 +1,194 @@
+# Tier 2 Benchmark: Water Simulation with TIP4P
+# Multi-skill task: Literature search + LAMMPS simulation
+
+id: BENCH-T2-003
+name: Water Density with TIP4P Model
+tier: 2
+category: literature-informed-simulation
+
+description: |
+  Simulate liquid water using the TIP4P model and calculate density.
+  Requires finding model parameters from literature, then running NPT simulation.
+
+prompt: |
+  Calculate the density of liquid water at 300K and 1 atm using
+  the TIP4P water model in LAMMPS.
+
+  Steps:
+  1. Search the literature to find the TIP4P model parameters:
+     - LJ parameters for oxygen (epsilon, sigma)
+     - O-H bond length
+     - H-O-H angle
+     - Position of the M site (virtual charge site)
+     - Partial charges on atoms/sites
+     - Original paper reference
+
+  2. Set up a LAMMPS simulation:
+     - At least 256 water molecules (768 atoms)
+     - NPT ensemble at 300K and 1 atm
+     - Equilibrate for at least 50 ps
+     - Production run for at least 100 ps
+     - Calculate average density
+
+  3. Compare to experimental water density at 300K (0.996 g/cm³)
+
+  Deliverables:
+  - Literature summary with TIP4P parameters (report.md)
+  - LAMMPS input files
+  - Calculated density with statistical uncertainty
+  - Comparison to experiment
+
+  Work in: workspaces/benchmarks/t2-003-water-tip4p/
+
+skills_required:
+  - literature-search
+  - lammps-simulation
+
+time_limit_minutes: 45
+
+milestones:
+  - id: M1
+    description: "TIP4P parameters found"
+    weight: 0.25
+    validation: |
+      Jorgensen et al. 1983 cited
+      ε(O) = 0.1550 kcal/mol
+      σ(O) = 3.15365 Å
+      Geometry: O-H = 0.9572 Å, ∠HOH = 104.52°
+
+  - id: M2
+    description: "LAMMPS input created"
+    weight: 0.25
+    validation: |
+      TIP4P atom style used
+      Correct LJ and Coulomb params
+      NPT ensemble at 300K, 1 atm
+
+  - id: M3
+    description: "Simulation completed"
+    weight: 0.25
+    validation: |
+      NPT run completed
+      Volume/density data saved
+
+  - id: M4
+    description: "Density analysis"
+    weight: 0.25
+    validation: |
+      Average density calculated
+      Uncertainty estimated
+      Comparison to 0.996 g/cm³
+
+expected_outputs:
+  files:
+    - workspaces/benchmarks/t2-003-water-tip4p/report.md
+    - workspaces/benchmarks/t2-003-water-tip4p/input.lmp
+    - workspaces/benchmarks/t2-003-water-tip4p/data.water
+    - workspaces/benchmarks/t2-003-water-tip4p/log.lammps
+
+  values:
+    water_density:
+      description: "Average density at 300K, 1 atm"
+      expected_range: [0.95, 1.02]  # g/cm³
+      unit: "g/cm³"
+    density_error:
+      description: "Statistical uncertainty"
+      expected_range: [0, 0.02]  # g/cm³
+
+grading:
+  total_points: 100
+
+  categories:
+    literature_quality:
+      weight: 25
+      checks:
+        - name: "Original paper cited"
+          points: 8
+          validation: |
+            Jorgensen et al., J. Chem. Phys. 79, 926 (1983)
+        - name: "LJ parameters correct"
+          points: 8
+          validation: |
+            ε = 0.1550 kcal/mol, σ = 3.15365 Å
+        - name: "Geometry correct"
+          points: 9
+          validation: |
+            Bond/angle values match publication
+
+    simulation_setup:
+      weight: 30
+      checks:
+        - name: "Correct water model"
+          points: 10
+          validation: |
+            TIP4P implemented correctly
+        - name: "System size adequate"
+          points: 8
+          validation: |
+            >= 256 molecules
+        - name: "NPT ensemble correct"
+          points: 7
+          validation: |
+            T = 300K, P = 1 atm
+        - name: "Run length sufficient"
+          points: 5
+          validation: |
+            >= 100 ps production
+
+    analysis_quality:
+      weight: 25
+      checks:
+        - name: "Density calculated"
+          points: 15
+          validation: |
+            Average density from equilibrated portion
+        - name: "Uncertainty estimated"
+          points: 10
+          validation: |
+            Statistical error reported
+
+    result_quality:
+      weight: 20
+      checks:
+        - name: "Density reasonable"
+          points: 12
+          validation: |
+            0.95-1.02 g/cm³
+        - name: "Comparison made"
+          points: 8
+          validation: |
+            Comparison to 0.996 g/cm³ experimental
+
+clear_metrics:
+  cost:
+    max_tokens: 35000
+    max_simulation_time: 1200
+    max_api_calls: 20
+
+  latency:
+    target_completion: 2700
+
+  assurance:
+    parameters_must_be_cited: true
+    original_paper_required: true
+
+reference_solution:
+  location: reference/solutions/t2-003-water-tip4p/
+  notes: |
+    TIP4P at 300K, 1 atm gives density ≈ 0.99-1.00 g/cm³
+    Original paper: Jorgensen et al., J. Chem. Phys. 79, 926 (1983)
+    TIP4P is known to be slightly less accurate than TIP4P/2005
+
+metadata:
+  author: "benchmark-system"
+  created: "2025-01-16"
+  difficulty: "medium"
+  estimated_tokens: 10000
+  scientific_domain: "liquids"
+  tags:
+    - lammps
+    - water
+    - tip4p
+    - literature
+    - npt
+    - density
