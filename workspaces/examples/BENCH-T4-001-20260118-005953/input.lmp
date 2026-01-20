@@ -1,0 +1,175 @@
+# =============================================================================
+# LAMMPS Input Script: Reproduction of Rahman 1964 Liquid Argon MD Simulation
+# =============================================================================
+#
+# Reference: Rahman, A. (1964). "Correlations in the Motion of Atoms in
+#            Liquid Argon" Physical Review, 136(2A), A405-A411.
+#
+# This script reproduces the foundational MD simulation of liquid argon.
+#
+# =============================================================================
+# SIMULATION PARAMETERS (from Rahman 1964)
+# =============================================================================
+#
+# System size:     864 atoms (Rahman's original system)
+# Temperature:     94.4 K (liquid argon near triple point)
+# Density:         1.374 g/cm³ (experimental liquid density)
+#
+# Lennard-Jones parameters for argon:
+#   sigma (σ):     3.4 Å (collision diameter)
+#   epsilon (ε):   0.238 kcal/mol (= 120 K × k_B)
+#   Source: Wikipedia - Lennard-Jones potential; widely used standard values
+#
+# Box size calculation:
+#   V = N × M / (ρ × N_A) = 864 × 39.948 / (1.374 × 6.022e23)
+#   V = 41,700 Å³ → L = 34.68 Å
+#
+# Cutoff radius: 2.5σ = 8.5 Å (standard LJ cutoff)
+#
+# Expected result: D ≈ 2.43 × 10⁻⁵ cm²/s (Rahman's value)
+#
+# =============================================================================
+# MODERN DEVIATIONS FROM ORIGINAL
+# =============================================================================
+#
+# 1. Integrator: Velocity Verlet (instead of predictor-corrector)
+#    - Reason: Better energy conservation, standard modern practice
+#
+# 2. Timestep: 2 fs (instead of Rahman's 10 fs)
+#    - Reason: Better numerical stability and energy conservation
+#
+# 3. Equilibration: NVT with Nosé-Hoover thermostat
+#    - Reason: Proper temperature control during equilibration
+#
+# 4. Production: NVE (microcanonical ensemble)
+#    - Reason: Consistent with Rahman's approach, proper dynamics for MSD
+#
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Initialization
+# -----------------------------------------------------------------------------
+units           real                    # kcal/mol, Å, fs, K
+atom_style      atomic                  # Simple atomic system (noble gas)
+boundary        p p p                   # Periodic boundary conditions (3D)
+
+# -----------------------------------------------------------------------------
+# Lattice and simulation box
+# -----------------------------------------------------------------------------
+# Create FCC lattice of argon atoms
+# Rahman started with FCC lattice arrangement
+#
+# Box size: 34.68 Å (from density calculation)
+# FCC with 4 atoms/unit cell: 864/4 = 216 = 6³ unit cells
+# Lattice constant: a = 34.68/6 = 5.78 Å
+
+variable        box_length equal 34.68  # Å, calculated from density
+variable        n_cells equal 6         # 6×6×6 = 216 unit cells
+variable        lattice_const equal ${box_length}/${n_cells}
+
+lattice         fcc ${lattice_const}
+region          box block 0 ${n_cells} 0 ${n_cells} 0 ${n_cells}
+create_box      1 box
+create_atoms    1 box
+
+# Set atomic mass (argon)
+mass            1 39.948                # g/mol (argon atomic mass)
+
+# -----------------------------------------------------------------------------
+# Interatomic potential
+# -----------------------------------------------------------------------------
+# Lennard-Jones potential: V(r) = 4ε[(σ/r)¹² - (σ/r)⁶]
+#
+# Parameters for argon (from literature, standard values):
+#   ε/k_B = 120 K → ε = 0.238 kcal/mol
+#   σ = 3.4 Å
+#
+# Cutoff: 2.5σ = 8.5 Å (standard practice)
+# Shift potential to zero at cutoff for energy conservation
+
+pair_style      lj/cut 8.5              # LJ with 8.5 Å cutoff
+pair_coeff      1 1 0.238 3.4           # ε = 0.238 kcal/mol, σ = 3.4 Å
+pair_modify     shift yes               # Shift potential to zero at cutoff
+
+# -----------------------------------------------------------------------------
+# Neighbor list settings
+# -----------------------------------------------------------------------------
+neighbor        0.5 bin                 # Skin distance 0.5 Å
+neigh_modify    every 10 delay 0 check yes
+
+# -----------------------------------------------------------------------------
+# Initial velocities
+# -----------------------------------------------------------------------------
+# Initialize velocities at target temperature with random seed
+velocity        all create 94.4 12345 mom yes rot yes dist gaussian
+
+# -----------------------------------------------------------------------------
+# Output settings
+# -----------------------------------------------------------------------------
+# Thermodynamic output every 1000 steps
+thermo_style    custom step temp pe ke etotal press density
+thermo          1000
+
+# -----------------------------------------------------------------------------
+# PHASE 1: Equilibration (NVT ensemble)
+# -----------------------------------------------------------------------------
+# Use Nosé-Hoover thermostat to equilibrate at 94.4 K
+# Duration: 100 ps (50,000 steps at 2 fs timestep)
+
+fix             1 all nvt temp 94.4 94.4 100.0
+timestep        2.0                     # 2 fs timestep (modern best practice)
+
+# Run equilibration
+print           "========================================"
+print           "PHASE 1: NVT Equilibration (100 ps)"
+print           "========================================"
+run             50000
+
+# Remove thermostat
+unfix           1
+
+# -----------------------------------------------------------------------------
+# PHASE 2: Production run (NVE ensemble)
+# -----------------------------------------------------------------------------
+# Microcanonical ensemble for proper dynamics and MSD calculation
+# Duration: 100 ps (50,000 steps at 2 fs timestep)
+# This is 10× longer than Rahman's original 10 ps for better statistics
+
+fix             2 all nve
+reset_timestep  0
+
+# Trajectory output for MSD analysis
+# Dump positions every 100 steps (0.2 ps) for MSD calculation
+dump            1 all custom 100 trajectory.lammpstrj id type x y z vx vy vz
+
+# Compute and output MSD (Mean Square Displacement)
+# This is the key quantity for calculating diffusion coefficient
+compute         msd all msd com yes     # MSD with center-of-mass correction
+
+# Custom fix to output MSD data
+fix             msd_out all ave/time 100 1 100 c_msd[4] file msd.dat
+
+# Also output temperature to verify NVE is working
+fix             temp_out all ave/time 100 1 100 c_thermo_temp file temperature.dat
+
+print           "========================================"
+print           "PHASE 2: NVE Production Run (100 ps)"
+print           "========================================"
+print           "Calculating MSD for diffusion coefficient"
+print           "========================================"
+
+# Run production
+run             50000
+
+# -----------------------------------------------------------------------------
+# Final output
+# -----------------------------------------------------------------------------
+print           "========================================"
+print           "Simulation Complete"
+print           "========================================"
+print           "Check msd.dat for diffusion analysis"
+print           "Expected D ≈ 2.43 × 10⁻⁵ cm²/s (Rahman 1964)"
+print           "========================================"
+
+# Write final configuration
+write_data      final.data

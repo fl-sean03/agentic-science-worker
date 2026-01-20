@@ -1,0 +1,15 @@
+DIFFUSION COEFFICIENT ANALYSIS RESULTS
+==================================================
+
+System: 864 Argon atoms at 94.4 K, ρ = 1.374 g/cm³
+Reference: Rahman, A. (1964). Phys. Rev. 136, A405.
+
+RESULTS:
+Diffusion coefficient: D = (2.3519 ± 0.0052) × 10⁻⁵ cm²/s
+R² of linear fit: 0.997642
+
+COMPARISON:
+Rahman (1964): D = 2.43 × 10⁻⁵ cm²/s
+Experimental:  D = 2.86 × 10⁻⁵ cm²/s
+Deviation from Rahman: -3.2%
+Deviation from exp:    -17.8%

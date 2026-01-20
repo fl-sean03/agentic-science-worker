@@ -5,12 +5,13 @@
 # -----------------------------------------------------------------------------
 # Generated benchmark outputs (large, regenerable)
 # -----------------------------------------------------------------------------
-workspaces/
+workspaces/benchmarks/
 benchmarks/results/runs/
 
-# Keep results summary structure but ignore individual runs
-!benchmarks/results/
-benchmarks/results/*.md
+# Keep example workspaces and results
+!workspaces/examples/
+!benchmarks/results/examples/
+!benchmarks/results/BENCHMARK_RESULTS.md
 
 # -----------------------------------------------------------------------------
 # Python
@@ -108,3 +109,4 @@ log.lammps
 *.eam.fs
 *.tersoff
 *.UPF
+workspaces/phase0-tests/
