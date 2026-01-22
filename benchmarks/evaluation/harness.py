@@ -2,14 +2,17 @@
 """
 Benchmark Harness for Agentic Science Worker
 
-Spawns a real Claude Code agent (via subscription) to execute benchmarks.
-Uses ~/.claude credentials automatically.
+Spawns coding agents to execute benchmarks. Supports multiple backends:
+- Claude Code (default)
+- OpenAI Codex (planned)
+- Aider (planned)
 
 Usage:
     python harness.py BENCH-T1-001           # Run single benchmark
     python harness.py --tier 1               # Run all Tier 1
     python harness.py --list                 # List benchmarks
     python harness.py --verify               # Verify infrastructure
+    python harness.py --backend claude       # Use specific backend
 """
 
 import json
@@ -28,6 +31,15 @@ from typing import Optional, Dict, List, Any
 # Import graders
 from grader import BenchmarkGrader, GradingResult
 from llm_grader import grade_with_llm, LLMGradeResult
+
+# Import backends
+try:
+    from backends import get_backend, BACKENDS
+except ImportError:
+    # Fallback if backends not available
+    BACKENDS = {'claude': None}
+    def get_backend(name='claude'):
+        return None
 
 
 # ============================================================================
@@ -253,7 +265,8 @@ def run_agent(
 def run_benchmark(
     benchmark_id: str,
     verbose: bool = False,
-    save_results: bool = True
+    save_results: bool = True,
+    backend_name: str = "claude"
 ) -> BenchmarkResult:
     """Run a single benchmark."""
 
@@ -308,17 +321,29 @@ IMPORTANT REQUIREMENTS:
     timeout_minutes = benchmark.get('time_limit_minutes', 30)
     timeout_seconds = timeout_minutes * 60
 
-    print(f"\nExecuting (timeout: {timeout_minutes} min)...")
+    print(f"\nExecuting with {backend_name} backend (timeout: {timeout_minutes} min)...")
     print("-" * 40)
 
-    # Run agent
-    exec_result = run_agent(
-        prompt=prompt,
-        workspace=workspace,
-        max_turns=benchmark.get('max_turns', DEFAULT_MAX_TURNS),
-        timeout=timeout_seconds,
-        verbose=verbose
-    )
+    # Get backend and run agent
+    backend = get_backend(backend_name)
+    if backend is None:
+        # Fall back to legacy run_agent for Claude
+        exec_result = run_agent(
+            prompt=prompt,
+            workspace=workspace,
+            max_turns=benchmark.get('max_turns', DEFAULT_MAX_TURNS),
+            timeout=timeout_seconds,
+            verbose=verbose
+        )
+    else:
+        exec_result = backend.run(
+            prompt=prompt,
+            workspace=workspace,
+            max_turns=benchmark.get('max_turns', DEFAULT_MAX_TURNS),
+            timeout=timeout_seconds,
+            allowed_tools=ALLOWED_TOOLS,
+            verbose=verbose
+        )
 
     print("-" * 40)
     print(f"Execution: {exec_result['status']}")
@@ -460,7 +485,7 @@ def save_benchmark_result(result: BenchmarkResult, benchmark: Dict):
     print(f"Results saved: {result_dir}")
 
 
-def run_tier(tier: int, verbose: bool = False) -> List[BenchmarkResult]:
+def run_tier(tier: int, verbose: bool = False, backend_name: str = "claude") -> List[BenchmarkResult]:
     """Run all benchmarks in a tier."""
     benchmarks = list_benchmarks(tier=tier)
     results = []
@@ -470,7 +495,7 @@ def run_tier(tier: int, verbose: bool = False) -> List[BenchmarkResult]:
     print(f"{'#'*60}")
 
     for bench in benchmarks:
-        result = run_benchmark(bench['id'], verbose=verbose)
+        result = run_benchmark(bench['id'], verbose=verbose, backend_name=backend_name)
         results.append(result)
 
     # Print summary
@@ -762,7 +787,7 @@ def generate_summary_report(all_results: Dict[int, List[BenchmarkResult]]) -> st
 
 def run_all_tiers(verbose: bool = False, save_report: bool = True,
                   include_hpc: bool = False, include_ml: bool = False,
-                  include_hpc_ml: bool = False):
+                  include_hpc_ml: bool = False, backend_name: str = "claude"):
     """Run all benchmarks across all tiers.
 
     Args:
@@ -771,6 +796,7 @@ def run_all_tiers(verbose: bool = False, save_report: bool = True,
         include_hpc: Include HPC tiers (5, 6, 7) - requires HPC access
         include_ml: Include ML tiers (8, 9, 10) - requires MLIP packages
         include_hpc_ml: Include HPC+ML hybrid tier (11) - requires both
+        backend_name: Agent backend to use (default: claude)
     """
     all_results = {}
 
@@ -790,7 +816,7 @@ def run_all_tiers(verbose: bool = False, save_report: bool = True,
         tiers.append(11)
 
     for tier in tiers:
-        results = run_tier(tier, verbose=verbose)
+        results = run_tier(tier, verbose=verbose, backend_name=backend_name)
         all_results[tier] = results
 
     # Print overall summary
@@ -907,8 +933,31 @@ def main():
         action="store_true",
         help="Enable async mode for HPC benchmarks (check job status, don't wait)"
     )
+    parser.add_argument(
+        "--backend",
+        type=str,
+        default="claude",
+        choices=list(BACKENDS.keys()),
+        help="Agent backend to use (default: claude)"
+    )
+    parser.add_argument(
+        "--list-backends",
+        action="store_true",
+        help="List available agent backends"
+    )
 
     args = parser.parse_args()
+
+    if args.list_backends:
+        print("\nAvailable backends:")
+        for name, backend_cls in BACKENDS.items():
+            if backend_cls:
+                backend = backend_cls()
+                status = "ready" if backend.verify() else "not configured"
+                print(f"  {name}: {backend.description} ({status})")
+            else:
+                print(f"  {name}: not implemented")
+        return
 
     if args.verify:
         success = verify_infrastructure()
@@ -930,11 +979,12 @@ def main():
 
     if args.all:
         run_all_tiers(verbose=args.verbose, include_hpc=args.include_hpc,
-                      include_ml=args.include_ml, include_hpc_ml=args.include_hpc_ml)
+                      include_ml=args.include_ml, include_hpc_ml=args.include_hpc_ml,
+                      backend_name=args.backend)
     elif args.tier:
-        run_tier(args.tier, verbose=args.verbose)
+        run_tier(args.tier, verbose=args.verbose, backend_name=args.backend)
     elif args.benchmark_id:
-        result = run_benchmark(args.benchmark_id, verbose=args.verbose)
+        result = run_benchmark(args.benchmark_id, verbose=args.verbose, backend_name=args.backend)
         print(f"\nFinal status: {result.status}")
         if result.error_message:
             print(f"Error: {result.error_message}")

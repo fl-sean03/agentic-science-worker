@@ -104,6 +104,9 @@ Total: 42/58 benchmarks (72%)
 - [ ] Add more water models (SPC/E, TIP3P)
 - [ ] Add polymer simulation examples
 - [ ] Add surface/interface benchmarks
+- [x] ~~Multi-agent support (AGENTS.md standard)~~ **DONE 2026-01-22**
+- [ ] Add OpenAI Codex backend
+- [ ] Add Aider backend (integration ready, needs testing)
 
 ---
 
@@ -129,12 +132,13 @@ Total: 42/58 benchmarks (72%)
 
 ### Infrastructure
 
-| Item | Description | Priority |
-|------|-------------|----------|
-| CI/CD | Auto-run benchmarks on PR | Medium |
-| Dashboard | Visualize benchmark results over time | Low |
-| Cost tracking | Track API costs per benchmark | Low |
-| Multi-model support | Test with different models | Low |
+| Item | Description | Priority | Status |
+|------|-------------|----------|--------|
+| Multi-agent support | AGENTS.md, backend abstraction | High | **DONE** |
+| CI/CD | Auto-run benchmarks on PR | Medium | TODO |
+| Dashboard | Visualize benchmark results over time | Low | TODO |
+| Cost tracking | Track API costs per benchmark | Low | TODO |
+| Multi-model support | Test with different models | Low | TODO |
 
 ---
 
@@ -200,6 +204,15 @@ See `benchmarks/AUTHORING_GUIDE.md` for how to write new benchmarks.
 ---
 
 ## Changelog
+
+### 2026-01-22
+- **Multi-agent generalization**
+  - Adopted AGENTS.md as primary context (industry standard)
+  - Created backend abstraction for benchmark harness
+  - Added `--backend` flag to harness.py
+  - Moved skills/ to project root (symlinked for Claude Code)
+  - Added configs/ for agent-specific settings (claude, aider, cursor, codex)
+  - Updated README for multi-agent usage
 
 ### 2026-01-19
 - Published to GitHub

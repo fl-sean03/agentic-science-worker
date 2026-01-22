@@ -1,6 +1,6 @@
 # Agentic Science Worker
 
-An autonomous AI agent for computational materials science research. Built on [Claude Code](https://claude.com/claude-code), this system enables AI agents to conduct scientific research like a PhD-level computational scientist.
+An autonomous AI agent system for computational materials science research. Designed to work with multiple coding agents ([Claude Code](https://claude.com/claude-code), [Aider](https://aider.chat), [OpenAI Codex](https://openai.com/codex), [Cursor](https://cursor.com)), this system enables AI to conduct scientific research like a PhD-level computational scientist.
 
 ## Overview
 
@@ -19,8 +19,9 @@ The agent operates autonomously: given a scientific question, it researches the 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Claude Code Agent                        │
-│  (CLAUDE.md defines researcher behavior and methodology)    │
+│                     Coding Agent                            │
+│    Claude Code │ Aider │ OpenAI Codex │ Cursor              │
+│     (AGENTS.md defines researcher behavior and methodology) │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -43,11 +44,25 @@ The agent operates autonomously: given a scientific question, it researches the 
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Supported Agents
+
+| Agent | Status | Configuration |
+|-------|--------|---------------|
+| [Claude Code](https://claude.com/claude-code) | Full Support | `AGENTS.md`, `.claude/` |
+| [Aider](https://aider.chat) | Full Support | `AGENTS.md`, `configs/aider/` |
+| [OpenAI Codex](https://openai.com/codex) | Planned | `AGENTS.md` |
+| [Cursor](https://cursor.com) | Full Support | `AGENTS.md`, `.cursorrules` |
+
+All agents read `AGENTS.md` (the [industry standard](https://github.com/AgenticAI-Foundation/AGENTS.md)) as their primary context file.
+
 ## Quick Start
 
 ### Prerequisites
 
-- [Claude Code CLI](https://claude.com/claude-code) with active subscription
+- A supported coding agent:
+  - [Claude Code CLI](https://claude.com/claude-code) with subscription, OR
+  - [Aider](https://aider.chat) with API key, OR
+  - [Cursor](https://cursor.com)
 - Python 3.10+
 - LAMMPS (with GPU support recommended)
 - Quantum ESPRESSO (optional, for DFT)
@@ -87,13 +102,25 @@ python harness.py --verify
 
 ### Running the Agent
 
-Start Claude Code in the project directory:
+**With Claude Code:**
 ```bash
 cd /path/to/agentic-science-worker
 claude
 ```
 
-Example prompts:
+**With Aider:**
+```bash
+cd /path/to/agentic-science-worker
+aider --read AGENTS.md
+```
+
+**With Cursor:**
+```bash
+cursor .
+# Uses AGENTS.md and .cursorrules automatically
+```
+
+Example prompts (any agent):
 ```
 Calculate the self-diffusion coefficient of liquid argon at 94K
 Find the lattice constant of copper using the Mishin EAM potential
@@ -122,8 +149,15 @@ cd benchmarks/evaluation
 # List available benchmarks
 python harness.py --list
 
+# List available agent backends
+python harness.py --list-backends
+
 # Run a single benchmark
 python harness.py BENCH-T1-001
+
+# Run with a specific backend
+python harness.py BENCH-T1-001 --backend claude
+python harness.py BENCH-T1-001 --backend aider  # when implemented
 
 # Run all benchmarks in a tier
 python harness.py --tier 1
@@ -156,9 +190,11 @@ Results are saved to `benchmarks/results/runs/` with:
 
 | File | Purpose |
 |------|---------|
-| `CLAUDE.md` | Agent behavior and methodology |
-| `.claude/settings.json` | Permissions, env vars, hooks |
-| `.claude/skills/` | Skill definitions (LAMMPS, QE, HPC, etc.) |
+| `AGENTS.md` | **Primary** agent context (industry standard) |
+| `CLAUDE.md` | Claude Code-specific wrapper |
+| `skills/` | Skill definitions (LAMMPS, QE, HPC, etc.) |
+| `configs/` | Agent-specific configurations |
+| `.claude/settings.json` | Claude Code permissions |
 | `.mcp.json` | MCP server configuration |
 | `config.yaml` | User-specific configuration |
 
@@ -166,17 +202,26 @@ Results are saved to `benchmarks/results/runs/` with:
 
 ```
 agentic-science-worker/
-├── CLAUDE.md                 # Agent instructions
+├── AGENTS.md                 # Primary agent context (industry standard)
+├── CLAUDE.md                 # Claude Code-specific wrapper
 ├── config.example.yaml       # Configuration template
+├── skills/                   # Skill definitions (portable)
+│   ├── lammps-simulation/
+│   ├── quantum-espresso/
+│   ├── hpc-cluster/
+│   ├── literature-search/
+│   ├── materials-database/
+│   ├── data-analysis/
+│   ├── mlip-simulation/
+│   └── resource-acquisition/
+├── configs/                  # Agent-specific configurations
+│   ├── claude/               # Claude Code settings
+│   ├── aider/                # Aider configuration
+│   ├── codex/                # OpenAI Codex settings
+│   └── cursor/               # Cursor rules
 ├── .claude/
 │   ├── settings.json.example # Settings template
-│   ├── skills/               # Skill definitions
-│   │   ├── lammps-simulation/
-│   │   ├── quantum-espresso/
-│   │   ├── hpc-cluster/
-│   │   ├── literature-search/
-│   │   ├── materials-database/
-│   │   └── data-analysis/
+│   ├── skills -> ../skills   # Symlink for compatibility
 │   └── hooks/                # Pre/post tool hooks
 ├── benchmarks/
 │   ├── tasks/                # Benchmark definitions (YAML)
@@ -186,8 +231,9 @@ agentic-science-worker/
 │   ├── evaluation/           # Harness and graders
 │   │   ├── harness.py
 │   │   ├── grader.py
-│   │   └── llm_grader.py
-│   └── docs/                 # Benchmark documentation
+│   │   ├── llm_grader.py
+│   │   └── backends/         # Agent backend abstraction
+│   └── results/              # Benchmark results
 ├── docs/                     # Project documentation
 ├── scripts/                  # Utility scripts
 └── workspaces/               # Agent work directories (gitignored)
@@ -238,8 +284,11 @@ The agent can then use universal ML interatomic potentials (MACE, M3GNet, CHGNet
 Contributions welcome! Areas of interest:
 - New benchmark tasks
 - Additional skills (VASP, CP2K, etc.)
+- **New agent backends** (OpenAI Codex, etc.)
 - Improved grading rubrics
 - Documentation
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for developer tips and [ROADMAP.md](ROADMAP.md) for planned features.
 
 ## License
 
