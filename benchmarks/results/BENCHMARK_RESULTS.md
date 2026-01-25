@@ -185,5 +185,3 @@ During the campaign, several benchmarks required prompt improvements:
 | Agent stops after research | T6-003, T6-004, T9-004 | Added CRITICAL INSTRUCTIONS + checklists |
 | Agent runs locally instead of HPC | T7-002 | Added explicit HPC requirement |
 | Agent uses simplified approach | T6-005 | Specified coexistence method |
-
-See `IMPROVEMENT_LOG.md` for detailed fix documentation.

@@ -316,8 +316,6 @@ grading:
 python benchmarks/evaluation/harness.py BENCH-T1-NEW --verbose
 ```
 
-4. **Document fixes in IMPROVEMENT_LOG.md**
-
 ### Benchmark Design Principles
 
 1. **Test one thing well** - Don't combine HPC + ML + literature in one benchmark
@@ -358,16 +356,14 @@ Results are saved to `benchmarks/results/runs/BENCH-XXX-TIMESTAMP/`:
 ### Before Submitting a PR
 
 1. Run affected benchmarks
-2. Update `IMPROVEMENT_LOG.md` if you fixed something
-3. Update `ROADMAP.md` if you completed a roadmap item
-4. Ensure no hardcoded paths leaked in
+2. Update `ROADMAP.md` if you completed a roadmap item
+3. Ensure no hardcoded paths leaked in
 
 ---
 
 ## Questions?
 
 - Check `docs/` for detailed guides
-- See `IMPROVEMENT_LOG.md` for past fixes and patterns
 - See `ROADMAP.md` for what we're building toward
 
 Welcome to the project!

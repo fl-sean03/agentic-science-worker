@@ -6,6 +6,24 @@ Run molecular dynamics and materials calculations using Machine Learning Interat
 
 ---
 
+## When to Use This vs torch-sim
+
+This skill uses **ASE** (Atomic Simulation Environment) as the backend. For **high-throughput screening** (10+ structures), consider using the **torch-sim** skill instead:
+
+| Scenario | Recommended | Why |
+|----------|-------------|-----|
+| 1-5 structures | This skill (ASE) | Simpler setup |
+| 10+ structures | torch-sim | 100x faster batching |
+| Quick single test | This skill (ASE) | Less overhead |
+| Large-scale screening | torch-sim | GPU batching, memory management |
+| Learning/prototyping | This skill (ASE) | More examples, familiar |
+
+**Rule of thumb**: For batch operations on many structures, use torch-sim. For single structures or learning, use this ASE-based approach.
+
+See the `torch-sim` skill for high-throughput patterns.
+
+---
+
 ## Available Universal Potentials
 
 ### MACE-MP-0 (Recommended for General Use)
@@ -386,6 +404,7 @@ print(f"GPU memory: {torch.cuda.memory_allocated()/1e9:.2f} GB")
 2. **Use appropriate model size**: "small" for screening, "large" for accuracy
 3. **GPU memory**: Large systems may need memory management
 4. **Parallel MD**: Consider LAMMPS for large-scale GPU MD
+5. **High-throughput**: For 10+ structures, use `torch-sim` skill (100x faster)
 
 ---
 

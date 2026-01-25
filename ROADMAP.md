@@ -1,22 +1,48 @@
 # Roadmap
 
-**Last Updated:** 2026-01-19
+**Last Updated:** 2026-01-23
 
 This document tracks what we're building, what's done, and what's next.
 
 ---
 
-## Grand Vision
+## Vision
 
 ### The Goal
 
-Build an autonomous AI agent that can conduct computational materials science research at PhD level - finding parameters from literature, running simulations, verifying results, and iterating until correct.
+Build an **AI-powered computational science assistant** that can autonomously run simulations, search literature, analyze data, and help researchers be more productive.
+
+Starting with computational materials science, with potential expansion to other domains.
+
+### The Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    INTELLIGENT AGENT                             │
+│              (Claude Code / Coding Agent)                        │
+│   Reasons about science, decides what tools to use, executes    │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    CAPABILITY TOOLKIT                            │
+│   Each capability = a skill file the agent reads                 │
+│   No orchestration. No abstractions. Just documentation.        │
+│                                                                 │
+│   Simulation │ Analysis │ Knowledge │ Compute │ (Future: Labs) │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### The Principle
+
+> **Expand the toolkit, not the complexity.**
 
 ### Why This Matters
 
 - **Democratize computational science** - Not everyone has access to trained experts
 - **Accelerate discovery** - Agents can run 24/7, explore more parameter space
 - **Reduce human bottleneck** - The limit isn't compute, it's expertise
+- **Compound value** - Each tool, partner, and success builds on the last
 
 ### Success Criteria
 
@@ -27,6 +53,8 @@ An agent that can:
 4. Verify results against published values
 5. Iterate if results don't match
 6. Produce a report a scientist would accept
+
+And eventually: discover something genuinely new.
 
 ---
 
@@ -147,29 +175,54 @@ Total: 42/58 benchmarks (72%)
 - [ ] Some benchmarks have duplicate runs in results/ (cleanup needed)
 - [ ] `phase0-tests/` directory still has test artifacts
 - [ ] Some skill files have outdated examples
-- [ ] IMPROVEMENT_LOG.md could use better indexing
 
 ---
 
 ## Research Directions
 
-### Near-term (1-3 months)
+### Near-term
 
-1. **Complete all benchmarks** - Get to 100% pass rate across all tiers
+1. **Complete all benchmarks** - Improve pass rate across all tiers
 2. **Real research tasks** - Have agent tackle actual research questions
-3. **Paper writing** - Can the agent draft a methods section?
+3. **Documentation** - Improve skill files based on usage
 
-### Medium-term (3-6 months)
+### Medium-term
 
-1. **Multi-agent collaboration** - Specialist agents (literature, simulation, analysis)
-2. **Long-running campaigns** - Research projects spanning days/weeks
+1. **Workflow improvements** - Better handling of multi-step tasks
+2. **Error recovery** - More robust handling of simulation failures
 3. **Human-in-the-loop** - Agent proposes, human approves, agent executes
 
-### Long-term (6-12 months)
+### Long-term
 
-1. **Novel discovery** - Agent finds something genuinely new
-2. **Publication-ready output** - Full paper draft from agent
-3. **Other domains** - Biology, chemistry, engineering
+1. **Expanded capabilities** - Support for more simulation codes
+2. **Community contributions** - Skills from external contributors
+3. **Other domains** - Potential expansion beyond materials
+
+---
+
+## Integrations
+
+The agent supports various external tools through skill files.
+
+### Current Integrations
+
+| Tool | Purpose | Status |
+|------|---------|--------|
+| ggen | Structure generation | Skill + showcase |
+| torch-sim | High-throughput ML sims | Skill + showcase |
+
+### Integration Pattern
+
+Every new capability follows the same pattern:
+1. Add a skill file explaining the tool
+2. Document when/why to use it
+3. Let the agent decide
+
+No special infrastructure. Just skills.
+
+### Showcases
+
+Demonstrations of tool integrations: `showcases/`
 
 ---
 
@@ -189,8 +242,6 @@ python benchmarks/evaluation/harness.py --list
 
 # Run one
 python benchmarks/evaluation/harness.py BENCH-T7-001 --verbose
-
-# If it fails, document in IMPROVEMENT_LOG.md
 ```
 
 ### Fix a Benchmark
@@ -204,6 +255,14 @@ See `benchmarks/AUTHORING_GUIDE.md` for how to write new benchmarks.
 ---
 
 ## Changelog
+
+### 2026-01-23
+- **New Integrations**
+  - Created `showcases/` directory for tool demonstrations
+  - Added ggen integration (structure generation)
+  - Added torch-sim integration (high-throughput ML sims)
+  - Added `skills/ggen/` and `skills/torch-sim/`
+  - Updated `skills/mlip-simulation/` to reference torch-sim for scale
 
 ### 2026-01-22
 - **Multi-agent generalization**
@@ -238,4 +297,3 @@ Questions? Issues? Ideas?
 
 - Open an issue on GitHub
 - Check existing docs in `docs/`
-- See `IMPROVEMENT_LOG.md` for how past issues were solved
