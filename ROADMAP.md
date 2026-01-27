@@ -42,7 +42,7 @@ Starting with computational materials science, with potential expansion to other
 - **Democratize computational science** - Not everyone has access to trained experts
 - **Accelerate discovery** - Agents can run 24/7, explore more parameter space
 - **Reduce human bottleneck** - The limit isn't compute, it's expertise
-- **Compound value** - Each tool, partner, and success builds on the last
+- **Compound value** - Each tool, integration, and success builds on the last
 
 ### Success Criteria
 

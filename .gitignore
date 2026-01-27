@@ -123,3 +123,4 @@ log.lammps
 *.tersoff
 *.UPF
 workspaces/phase0-tests/
+workspaces/projects/
