@@ -124,3 +124,7 @@ log.lammps
 *.UPF
 workspaces/phase0-tests/
 workspaces/projects/
+
+# Hide from public repo
+showcases/
+docs/
