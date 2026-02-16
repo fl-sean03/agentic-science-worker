@@ -1,0 +1,150 @@
+# Tier 13 Benchmark: Seemingly Impossible Task
+# Test that agent doesn't give up on tasks that SEEM impossible but aren't
+
+id: BENCH-T13-008
+name: Seemingly Impossible Task
+tier: 13
+category: robustness
+
+description: |
+  Test that the agent doesn't give up too easily on tasks that seem
+  impossible but actually have solutions. This is the inverse of T13-007.
+  We want agents that know when to persist vs when to stop.
+
+prompt: |
+  **Task: Calculate Properties Without Standard Tools**
+
+  Your LAMMPS installation is broken and won't be fixed today.
+  Your Quantum ESPRESSO installation is also unavailable.
+  You do NOT have access to any traditional simulation software.
+
+  But your collaborator urgently needs the bulk modulus of gold (Au).
+
+  **Constraints:**
+  - No LAMMPS
+  - No Quantum ESPRESSO
+  - No VASP, CP2K, or other simulation codes
+  - Must get a numerical answer today
+
+  **Your Task:**
+  Find a way to provide the bulk modulus of gold despite these constraints.
+
+  ---
+
+  **What We're Testing:**
+
+  This task SEEMS impossible but ISN'T because:
+
+  1. **Literature lookup** - The bulk modulus of gold is well-known
+     - Experimental value: ~180 GPa
+     - Extensively measured and tabulated
+
+  2. **Materials Project** - Database has this value
+     - Can query MP for elastic properties
+
+  3. **ML Potentials** - MACE/CHGNet work without LAMMPS
+     - Can calculate bulk modulus with ASE + MLIP
+     - Doesn't require LAMMPS at all
+
+  **Good Agent Behavior:**
+
+  1. ASSESS what's actually needed
+     - Do I need to CALCULATE or just FIND the value?
+     - What resources do I actually have?
+
+  2. IDENTIFY alternatives
+     - Literature values exist
+     - Database values exist
+     - MLIP + ASE is a complete solution
+
+  3. EXECUTE a working solution
+     - Not just say "I could do X" - actually do it
+     - Provide the numerical answer
+
+  4. DO NOT
+     - Give up immediately claiming impossible
+     - Only suggest alternatives without executing
+     - Miss obvious solutions (literature lookup)
+
+  **Success Criteria:**
+  - Provide bulk modulus of Au (should be ~170-180 GPa)
+  - Explain your approach
+  - Complete the task despite constraints
+
+  Work in: workspaces/benchmarks/BENCH-T13-008/
+
+skills_required:
+  - mlip-simulation
+  - materials-database
+  - literature-search
+  - data-analysis
+
+time_limit_minutes: 45
+
+expected_outputs:
+  files:
+    - name: "approach.md"
+      description: "How agent approached the constraint"
+    - name: "solution/"
+      description: "Whatever method was used"
+    - name: "result.md"
+      description: "Final bulk modulus value with source"
+
+  values:
+    bulk_modulus:
+      description: "Reported bulk modulus of Au"
+      expected_range: [160, 190]
+      unit: "GPa"
+    task_completed:
+      description: "Task was completed despite constraints"
+      expected_range: [0.9, 1.0]
+      unit: "boolean"
+
+grading:
+  categories:
+    - name: problem_reframing
+      weight: 25
+      criteria:
+        - Recognized simulation isn't the only way
+        - Identified multiple possible approaches
+        - Chose efficient approach
+        - Did not claim impossible
+
+    - name: solution_execution
+      weight: 40
+      criteria:
+        - Actually obtained the value
+        - Value is physically reasonable
+        - Method is valid
+        - Work is documented
+
+    - name: resourcefulness
+      weight: 20
+      criteria:
+        - Used available tools creatively
+        - Did not fixate on unavailable tools
+        - Considered multiple approaches
+        - Efficient problem solving
+
+    - name: persistence
+      weight: 15
+      criteria:
+        - Did not give up prematurely
+        - Tried alternative approaches
+        - Completed the task
+        - Professional attitude
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 45
+  task_type: seemingly_impossible
+  skills_tested:
+    - creative_problem_solving
+    - resource_identification
+    - persistence
+    - tool_flexibility
+  notes: |
+    This is the inverse of T13-007. That test checks if agents know
+    when to STOP. This test checks if agents know when to PERSIST.
+    Good agents should be calibrated: not giving up too easily,
+    but also not spinning on truly impossible tasks.

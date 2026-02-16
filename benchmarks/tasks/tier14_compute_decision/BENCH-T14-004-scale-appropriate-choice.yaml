@@ -1,0 +1,157 @@
+# Tier 14 Benchmark: Scale-Appropriate Choice
+# Test agent's ability to match compute resources to job scale
+
+id: BENCH-T14-004
+name: Scale-Appropriate Compute Choice
+tier: 14
+category: compute-decision
+
+description: |
+  Test the agent's ability to recognize when a job requires more
+  resources than local compute can efficiently provide, and to
+  choose appropriate large-scale compute.
+
+prompt: |
+  **Task: Large-Scale Stability Screening**
+
+  Screen 500 candidate structures for thermodynamic stability using
+  MACE-MP. Each structure needs:
+  - Relaxation (geometry optimization)
+  - Energy calculation
+  - Formation energy estimation
+
+  **Scale Assessment:**
+  - 500 structures
+  - ~2-3 minutes per structure on GPU
+  - Total: ~15-25 hours of GPU time
+
+  **Compute Situation:**
+  - Local: Single RTX 5080 (would take 15-25 hours straight)
+  - VAST AI: Can rent multiple GPUs (~$0.25/hr each)
+  - HPC: aa100 partition has 3 GPUs per node, queue ~2 hours
+
+  **Deadline:** Results needed within 8 hours
+
+  **Your Task:**
+
+  1. **Assess the scale**
+     - How many GPU-hours total?
+     - Can local handle it in time?
+     - What parallelization is possible?
+
+  2. **Evaluate options**
+     - Local: Possible but slow, won't meet deadline
+     - VAST: Rent 3-4 GPUs, finish in ~5-6 hours, cost ~$5-8
+     - HPC: If queue is short, free and parallel
+
+  3. **Make scale-appropriate choice**
+     - This is NOT a small job
+     - Deadline requires parallelization
+     - Document your scaling strategy
+
+  4. **Execute (simulated)**
+     - Since we can't actually screen 500 structures:
+     - Demonstrate workflow on 10 structures
+     - Extrapolate timing and cost for full 500
+     - Provide scaling analysis
+
+  Work in: workspaces/benchmarks/BENCH-T14-004/
+
+constraints:
+  deadline_hours: 8
+  structures_count: 500
+  hpc_available: false  # Simulated unavailable
+  vast_available: true
+  local_available: true
+
+expected_behavior:
+  decision: vast_parallel
+  rationale: |
+    - 15-25 hours on single GPU exceeds 8-hour deadline
+    - Local alone cannot meet deadline
+    - HPC unavailable
+    - VAST with 3-4 GPUs: ~6 hours, ~$6-8 cost
+    - Cost is justified by deadline requirement
+
+skills_required:
+  - mlip-simulation
+  - vast-cloud
+  - data-analysis
+
+time_limit_minutes: 90
+
+expected_outputs:
+  files:
+    - name: "scale_analysis.md"
+      description: "Analysis of job scale and requirements"
+    - name: "compute_strategy.md"
+      description: "Parallelization strategy"
+    - name: "cost_estimate.md"
+      description: "Cost estimate for full run"
+    - name: "scripts/screen_structures.py"
+      description: "Screening script"
+    - name: "demo_results/"
+      description: "Results from 10-structure demo"
+    - name: "scaling_analysis.md"
+      description: "Extrapolation to 500 structures"
+    - name: "report.md"
+      description: "Full report"
+
+  values:
+    estimated_total_time_hours:
+      description: "Estimated time with chosen strategy"
+      expected_range: [4, 8]
+      unit: "hours"
+    estimated_cost:
+      description: "Estimated cloud cost"
+      expected_range: [4, 12]
+      unit: "dollars"
+    meets_deadline:
+      description: "Strategy meets 8-hour deadline"
+      expected: true
+
+grading:
+  categories:
+    - name: scale_recognition
+      weight: 25
+      criteria:
+        - Correctly estimated total GPU-hours
+        - Recognized local insufficient for deadline
+        - Identified need for parallelization
+        - Assessed timeline accurately
+
+    - name: strategy_quality
+      weight: 30
+      criteria:
+        - Appropriate parallelization approach
+        - Cost-effective GPU selection
+        - Reasonable scaling plan
+        - Considered failure modes
+
+    - name: deadline_awareness
+      weight: 25
+      criteria:
+        - Strategy meets 8-hour deadline
+        - Buffer time included
+        - Realistic timeline
+        - Prioritization clear
+
+    - name: execution_demo
+      weight: 20
+      criteria:
+        - Demo runs successfully
+        - Extrapolation reasonable
+        - Workflow would scale
+        - Documentation clear
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 75
+  skills_tested:
+    - scale_assessment
+    - parallelization_planning
+    - deadline_management
+  notes: |
+    This tests whether the agent recognizes that some jobs are too big
+    for local compute. The correct answer is to use cloud/HPC with
+    parallelization, not to try running locally.

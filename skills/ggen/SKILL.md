@@ -37,6 +37,20 @@ WARNING: `pip install ggen` installs a different package (grid mesh generator).
 
 Requires GPU for efficient relaxation.
 
+### Verification
+
+```bash
+python -c "from ggen import GGen; print('ggen:', GGen)"
+```
+
+### Model Cache
+
+ORB models cached in: `~/.cache/science-agent/ggen/`
+
+### Showcase Demo
+
+See: `showcases/ggen-integration/workspace/demo_ggen.py`
+
 ## Core Concepts
 
 ### ChemistryExplorer

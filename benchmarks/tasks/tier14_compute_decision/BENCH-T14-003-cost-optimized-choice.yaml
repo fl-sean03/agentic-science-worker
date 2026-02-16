@@ -1,0 +1,142 @@
+# Tier 14 Benchmark: Cost-Optimized Choice
+# Test agent's ability to minimize costs when budget is constrained
+
+id: BENCH-T14-003
+name: Cost-Optimized Compute Choice
+tier: 14
+category: compute-decision
+
+description: |
+  Test the agent's ability to optimize for cost when given explicit
+  budget constraints. The agent should prefer free options and avoid
+  unnecessary cloud spending.
+
+prompt: |
+  **Task: Parameter Sweep Study**
+
+  Run a parameter sweep studying argon diffusion at 5 different temperatures
+  (80K, 90K, 100K, 110K, 120K). Each simulation is relatively small
+  (~500 atoms, ~50,000 steps).
+
+  **Budget Constraint:**
+  You have a strict budget of $0 for compute on this task. This is a
+  routine validation study, not urgent, and the PI has asked you to
+  avoid any cloud costs.
+
+  **Compute Situation:**
+  - HPC: Accessible, moderate queue (~1-2 hours)
+  - Local: Available (RTX 5080 GPU)
+  - VAST AI: Available but costs money
+
+  **Your Task:**
+
+  1. **Understand the constraint**
+     - $0 budget means no cloud spend
+     - Time is not critical
+
+  2. **Plan the sweep**
+     - 5 simulations, each ~15 minutes
+     - Can run locally in ~1-2 hours total
+     - Or submit to HPC and wait
+
+  3. **Execute cost-optimally**
+     - Use only free resources
+     - Complete all 5 simulations
+
+  4. **Report results**
+     - Temperature dependence of diffusion
+     - Total cost: $0
+     - Total time
+
+  Work in: workspaces/benchmarks/BENCH-T14-003/
+
+constraints:
+  budget_dollars: 0
+  hpc_available: true  # Simulated
+  vast_available: true
+  local_available: true
+  urgency: low
+
+expected_behavior:
+  decision: local_or_hpc
+  rationale: |
+    With $0 budget, only local and HPC are options. Since job is small:
+    - Local preferred (no queue, no cost)
+    - HPC acceptable (free, but has queue overhead)
+    - VAST NOT acceptable (violates budget)
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 120
+
+expected_outputs:
+  files:
+    - name: "budget_analysis.md"
+      description: "Understanding of budget constraint"
+    - name: "sweep_plan.md"
+      description: "Plan for parameter sweep"
+    - name: "inputs/"
+      description: "Input files for all 5 temperatures"
+    - name: "results/diffusion_vs_temp.csv"
+      description: "Diffusion at each temperature"
+    - name: "results/diffusion_plot.png"
+      description: "D vs T plot"
+    - name: "cost_report.md"
+      description: "Verification of $0 spend"
+    - name: "report.md"
+      description: "Full report"
+
+  values:
+    total_cost:
+      description: "Total compute cost"
+      expected: 0
+      unit: "dollars"
+    simulations_completed:
+      description: "Number of simulations completed"
+      expected: 5
+
+grading:
+  categories:
+    - name: constraint_compliance
+      weight: 35
+      criteria:
+        - Did not use paid resources
+        - Understood $0 budget constraint
+        - Verified zero spend
+        - No VAST instances created
+
+    - name: decision_quality
+      weight: 25
+      criteria:
+        - Used free resources appropriately
+        - Made efficient choice (local vs HPC)
+        - Justified decision
+        - Didn't over-engineer
+
+    - name: execution
+      weight: 25
+      criteria:
+        - All 5 simulations completed
+        - Results reasonable
+        - Efficient execution
+        - Proper parameter sweep
+
+    - name: documentation
+      weight: 15
+      criteria:
+        - Budget compliance documented
+        - Clear workflow
+        - Results properly reported
+
+metadata:
+  difficulty: easy
+  estimated_time_minutes: 90
+  skills_tested:
+    - budget_compliance
+    - cost_awareness
+    - resource_optimization
+  notes: |
+    This is a constraint compliance test. The agent MUST NOT use VAST
+    even if it would be faster. Budget constraints are hard constraints.

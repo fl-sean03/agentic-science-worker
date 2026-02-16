@@ -1,0 +1,130 @@
+# Tier 15 Benchmark: Resource Planning
+# Test agent's ability to estimate resources before starting
+
+id: BENCH-T15-007
+name: Resource Planning
+tier: 15
+category: agent-cognition
+
+description: |
+  Test whether the agent can estimate time and compute requirements
+  BEFORE starting a task, avoiding wasted resources on infeasible plans.
+
+prompt: |
+  **Task: Plan Resources for Al₂O₃ Phase Study**
+
+  You're asked to calculate energies for ALL known Al₂O₃ polymorphs:
+  - Corundum (α-Al₂O₃)
+  - Kappa (κ-Al₂O₃)
+  - Theta (θ-Al₂O₃)
+  - Gamma (γ-Al₂O₃)
+  - Delta (δ-Al₂O₃)
+  - Eta (η-Al₂O₃)
+
+  **Your Task:**
+
+  1. **BEFORE running any calculations**, estimate:
+     - How long each calculation will take
+     - What computational resources are needed
+     - Total time for all phases
+     - Whether this is feasible in the time available
+
+  2. **Consider constraints:**
+     - You have 2 hours of compute time
+     - Local machine only (no HPC for this task)
+     - Must use DFT for accuracy
+
+  3. **Make a resource plan:**
+     - Which phases to prioritize?
+     - Can all be completed?
+     - If not, what's a realistic subset?
+
+  4. **Execute your plan**
+     - Only after planning, start calculations
+     - Track actual vs estimated time
+
+  **Good Planning:**
+  "Estimated 30 mins per phase × 6 phases = 3 hours. This exceeds our
+  2-hour budget. I'll prioritize: corundum (most stable), gamma
+  (technologically important), theta (intermediate). These 3 phases
+  should complete in ~1.5 hours with margin."
+
+  **Bad Planning:**
+  "Let me just start calculating all of them..." (no estimation)
+
+  Work in: workspaces/benchmarks/BENCH-T15-007/
+
+skills_required:
+  - quantum-espresso
+  - data-analysis
+
+time_limit_minutes: 120
+
+expected_outputs:
+  files:
+    - name: "resource_plan.md"
+      description: "Upfront resource estimation"
+    - name: "prioritization.md"
+      description: "Which phases and why"
+    - name: "calculations/"
+      description: "Actual calculations run"
+    - name: "actual_vs_estimated.md"
+      description: "Time tracking comparison"
+
+  values:
+    estimated_before_running:
+      description: "Time estimated before starting"
+      expected: true
+    prioritization_justified:
+      description: "Priorities were explained"
+      expected: true
+    stayed_within_budget:
+      description: "Didn't exceed time limit"
+      expected: true
+
+grading:
+  categories:
+    - name: upfront_estimation
+      weight: 35
+      criteria:
+        - Time estimated before starting
+        - Per-phase estimates given
+        - Total time calculated
+        - Realistic (not wildly off)
+
+    - name: constraint_awareness
+      weight: 25
+      criteria:
+        - Time budget acknowledged
+        - Resource limits considered
+        - Feasibility assessed
+        - Trade-offs identified
+
+    - name: prioritization
+      weight: 20
+      criteria:
+        - Priorities stated
+        - Justification given
+        - Scientific reasoning
+        - Practical considerations
+
+    - name: execution_tracking
+      weight: 20
+      criteria:
+        - Actual times recorded
+        - Compared to estimates
+        - Lessons noted
+        - Plan adapted if needed
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 90
+  skills_tested:
+    - resource_estimation
+    - planning
+    - time_management
+    - constraint_reasoning
+  notes: |
+    This tests whether the agent thinks before acting. Starting
+    calculations without resource estimation is a common failure mode.
+    Good agents plan, estimate, and adapt.

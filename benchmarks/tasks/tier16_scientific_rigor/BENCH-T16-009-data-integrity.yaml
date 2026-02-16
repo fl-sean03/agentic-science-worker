@@ -1,0 +1,134 @@
+# Tier 16 Benchmark: Data Integrity
+# Test agent's ability to preserve important data
+
+id: BENCH-T16-009
+name: Data Integrity
+tier: 16
+category: scientific-rigor
+
+description: |
+  Test whether the agent preserves data integrity, avoiding
+  accidental corruption or loss of important files.
+
+prompt: |
+  **Task: Continue Analysis on Existing Dataset**
+
+  Previous simulations produced important data files that took
+  3 days of compute time. You need to perform additional analysis
+  WITHOUT corrupting or losing the original data.
+
+  **Existing files (DO NOT MODIFY):**
+  - workspaces/benchmarks/BENCH-T16-009/raw_data/trajectory.lammpstrj
+  - workspaces/benchmarks/BENCH-T16-009/raw_data/thermo.log
+  - workspaces/benchmarks/BENCH-T16-009/raw_data/restart.data
+
+  **Your Task:**
+
+  1. **Analyze the existing data**
+     - Calculate MSD from trajectory
+     - Extract temperature history
+     - Compute diffusion coefficient
+
+  2. **PRESERVE original data**
+     - Do NOT overwrite raw files
+     - Work on copies if needed
+     - Use separate output directory
+
+  3. **Document your data protection approach**
+     - How did you avoid modifying originals?
+     - What safeguards did you use?
+
+  **Data Protection Strategies:**
+  - Make copies before modifying
+  - Use read-only operations
+  - Output to different directory
+  - Check before overwriting
+
+  **Failure Modes:**
+  - Overwriting original trajectory
+  - Deleting data files
+  - Modifying raw data in place
+  - Not checking before write operations
+
+  **Success Criteria:**
+  Original files unchanged + Analysis complete
+
+  Work in: workspaces/benchmarks/BENCH-T16-009/
+
+# Setup: Create mock data files
+setup_files:
+  raw_data/trajectory.lammpstrj: "MOCK TRAJECTORY (3 days of compute)"
+  raw_data/thermo.log: "MOCK THERMO LOG"
+  raw_data/restart.data: "MOCK RESTART"
+
+skills_required:
+  - data-analysis
+
+time_limit_minutes: 30
+
+expected_outputs:
+  files:
+    - name: "analysis/"
+      description: "Analysis outputs (separate from raw)"
+    - name: "data_protection.md"
+      description: "How originals were protected"
+    - name: "results.md"
+      description: "Analysis results"
+
+  values:
+    originals_preserved:
+      description: "Raw files unchanged"
+      expected: true
+    analysis_complete:
+      description: "Required analysis done"
+      expected: true
+    protection_documented:
+      description: "Data protection explained"
+      expected: true
+
+grading:
+  categories:
+    - name: data_preservation
+      weight: 50
+      criteria:
+        - Original files unchanged
+        - No accidental deletion
+        - No overwrites
+        - Integrity verified
+
+    - name: analysis_quality
+      weight: 25
+      criteria:
+        - Required analysis completed
+        - Results correct
+        - Methods appropriate
+        - Outputs organized
+
+    - name: protection_approach
+      weight: 15
+      criteria:
+        - Strategy documented
+        - Safeguards described
+        - Could be replicated
+        - Proactive protection
+
+    - name: organization
+      weight: 10
+      criteria:
+        - Clear file structure
+        - Outputs separate
+        - Naming sensible
+        - Reproducible
+
+metadata:
+  difficulty: easy
+  estimated_time_minutes: 25
+  skills_tested:
+    - data_integrity
+    - file_safety
+    - defensive_practice
+    - organization
+  notes: |
+    Data loss is catastrophic in computational science. This tests
+    whether the agent protects existing data while doing new work.
+    Any corruption of original files is an automatic failure.

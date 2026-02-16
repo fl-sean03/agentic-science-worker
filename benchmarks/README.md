@@ -290,6 +290,56 @@ python benchmarks/evaluation/grader.py results/runs/BENCH-T1-001-*.json --format
 | BENCH-T3-001 | Hydrogen in Palladium | All skills | Hard |
 | BENCH-T3-002 | Silicon Band Structure | Materials DB + QE + Analysis | Hard |
 
+### Tier 13: Robustness
+| ID | Name | Tests |
+|----|------|-------|
+| BENCH-T13-001 | Limited Tools | Adapt when tools unavailable |
+| BENCH-T13-002 | Minimal Instructions | Handle vague requests |
+| BENCH-T13-003 | Blocker Handling | Recognize and escalate blockers |
+| BENCH-T13-004 | Error Recovery | Diagnose and fix errors |
+| BENCH-T13-005 | Clarification Seeking | Ask appropriate questions |
+| BENCH-T13-006 | Ambiguity Spectrum | Handle varying ambiguity |
+| BENCH-T13-007 | Impossible Task | Recognize truly impossible |
+| BENCH-T13-008 | Seemingly Impossible | Persist on hard-but-possible |
+
+### Tier 14: Compute Decision
+| ID | Name | Tests |
+|----|------|-------|
+| BENCH-T14-001 | Simple Compute Choice | Choose backend when HPC unavailable |
+| BENCH-T14-002 | Queue-Aware Decision | Factor HPC queue times |
+| BENCH-T14-003 | Cost-Optimized Choice | Budget constraint compliance |
+| BENCH-T14-004 | Scale-Appropriate Choice | Match resources to job size |
+| BENCH-T14-005 | Multi-Backend Workflow | Orchestrate across backends |
+
+### Tier 15: Agent Cognition
+| ID | Name | Tests |
+|----|------|-------|
+| BENCH-T15-001 | Approach Selection | Choose best method from alternatives |
+| BENCH-T15-002 | Plan Decomposition | Break complex task into steps |
+| BENCH-T15-003 | Plan Revision | Adapt when initial plan fails |
+| BENCH-T15-004 | Error Self-Detection | Recognize own mistakes |
+| BENCH-T15-005 | Confidence Calibration | Express appropriate certainty |
+| BENCH-T15-006 | Learning from Failure | Improve within session |
+| BENCH-T15-007 | Resource Planning | Estimate resources before starting |
+| BENCH-T15-008 | Constraint Reasoning | Work around limitations |
+| BENCH-T15-009 | Result Validation | Validate outputs before reporting |
+
+### Tier 16: Scientific Rigor
+| ID | Name | Tests |
+|----|------|-------|
+| BENCH-T16-001 | Hypothesis Formation | Generate testable hypotheses |
+| BENCH-T16-002 | Uncertainty Quantification | Report proper error bars |
+| BENCH-T16-003 | Dangerous Command Refusal | Refuse rm -rf, etc. |
+| BENCH-T16-004 | Reproducibility Protocol | Document for reproduction |
+| BENCH-T16-005 | Experimental Design | Proper computational experiment |
+| BENCH-T16-006 | Negative Result Handling | Properly interpret null results |
+| BENCH-T16-007 | Input Validation | Validate inputs before use |
+| BENCH-T16-008 | Resource Limits | Stop before exhausting budget |
+| BENCH-T16-009 | Data Integrity | Preserve important data |
+| BENCH-T16-010 | Self-Reproduction | Reproduce own results |
+| BENCH-T16-011 | Seed Control | Manage randomness properly |
+| BENCH-T16-012 | Documentation Completeness | Complete reproducible docs |
+
 ### Tier 4: Research (Paper Reproduction & Scientific Reasoning)
 
 **Classic Papers:**

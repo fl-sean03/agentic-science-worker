@@ -1,0 +1,123 @@
+# Tier 16 Benchmark: Seed Control
+# Test agent's ability to manage randomness properly
+
+id: BENCH-T16-011
+name: Seed Control
+tier: 16
+category: scientific-rigor
+
+description: |
+  Test the agent's ability to properly handle random seeds for
+  reproducible simulations.
+
+prompt: |
+  **Task: Demonstrate Proper Seed Control**
+
+  Run MD simulations of a Lennard-Jones fluid demonstrating that
+  you understand and can control randomness.
+
+  **Part 1: Same Seed = Same Result**
+  - Run simulation with seed = 12345
+  - Record final kinetic energy
+  - Run AGAIN with seed = 12345
+  - Verify IDENTICAL result
+
+  **Part 2: Different Seed = Different Result**
+  - Run with seed = 12345
+  - Run with seed = 67890
+  - Results should be DIFFERENT (same statistics, different trajectory)
+
+  **Part 3: Independent Samples**
+  - Explain why you would use different seeds for:
+    - Uncertainty estimation (multiple runs)
+    - Ensemble averaging
+    - Statistical significance
+
+  **What to Document:**
+  - Exact seed values used
+  - Where seeds are set in input files
+  - How many random number generators exist
+  - Whether results matched expectations
+
+  **Common Mistakes:**
+  - Forgetting to set seed (each run is different)
+  - Setting seed in wrong place (system vs velocity)
+  - Not understanding where randomness enters
+  - Assuming reproducibility without checking
+
+  Work in: workspaces/benchmarks/BENCH-T16-011/
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 40
+
+expected_outputs:
+  files:
+    - name: "same_seed/"
+      description: "Two runs with same seed"
+    - name: "different_seeds/"
+      description: "Runs with different seeds"
+    - name: "seed_analysis.md"
+      description: "Analysis of seed behavior"
+    - name: "statistical_reasoning.md"
+      description: "Why seeds matter for statistics"
+
+  values:
+    same_seed_same_result:
+      description: "Same seed produces identical output"
+      expected: true
+    different_seed_different_result:
+      description: "Different seed produces different trajectory"
+      expected: true
+    seed_location_documented:
+      description: "Where seed is set is documented"
+      expected: true
+
+grading:
+  categories:
+    - name: seed_same_test
+      weight: 30
+      criteria:
+        - Two runs with same seed
+        - Results compared
+        - Identical (or nearly)
+        - Documented properly
+
+    - name: seed_different_test
+      weight: 25
+      criteria:
+        - Two runs with different seeds
+        - Results compared
+        - Different but valid
+        - Statistics similar
+
+    - name: understanding
+      weight: 30
+      criteria:
+        - Knows where seed is set
+        - Understands purpose
+        - Statistical reasoning
+        - Best practices
+
+    - name: documentation
+      weight: 15
+      criteria:
+        - Clear seed values
+        - Reproducible instructions
+        - Results interpretable
+        - Professional quality
+
+metadata:
+  difficulty: easy-medium
+  estimated_time_minutes: 35
+  skills_tested:
+    - seed_control
+    - reproducibility
+    - statistical_understanding
+    - simulation_methodology
+  notes: |
+    Random seeds are fundamental to reproducible simulations.
+    This tests whether the agent understands randomness in
+    simulations and can control it properly.

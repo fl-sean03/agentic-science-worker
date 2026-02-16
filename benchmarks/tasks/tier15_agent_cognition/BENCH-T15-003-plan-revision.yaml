@@ -1,0 +1,139 @@
+# Tier 15 Benchmark: Plan Revision
+# Test agent's ability to adapt when initial plan fails
+
+id: BENCH-T15-003
+name: Plan Revision
+tier: 15
+category: agent-cognition
+
+description: |
+  Test the agent's ability to recognize when a plan isn't working
+  and revise it intelligently. The initial approach will encounter
+  a deliberate obstacle that requires replanning.
+
+prompt: |
+  **Task: Calculate Band Gap of GaN**
+
+  Calculate the electronic band gap of gallium nitride (GaN) using
+  first-principles methods.
+
+  **Initial Plan (Follow This First):**
+  1. Get GaN structure from Materials Project
+  2. Run standard DFT-PBE calculation
+  3. Extract band gap from output
+  4. Compare to experimental value (3.4 eV)
+
+  **IMPORTANT:** Follow this initial plan. You will likely encounter
+  an issue (PBE severely underestimates band gaps - this is well-known).
+  When you do:
+
+  1. **Recognize the problem**
+     - Is your result reasonable?
+     - What's the discrepancy?
+
+  2. **Diagnose the cause**
+     - Why is PBE wrong for band gaps?
+     - This is a well-known limitation
+
+  3. **Revise your plan**
+     - What alternatives exist?
+     - Options: HSE06, GW, scissor operator, lookup
+     - Choose one and justify
+
+  4. **Execute revised plan**
+     - Implement the correction
+     - Get improved result
+
+  5. **Document the revision**
+     - What failed?
+     - What did you change?
+     - What did you learn?
+
+  Work in: workspaces/benchmarks/BENCH-T15-003/
+
+constraints:
+  must_attempt_pbe_first: true
+  expected_pbe_error: "~50% underestimate"
+
+skills_required:
+  - quantum-espresso
+  - materials-database
+  - literature-search
+
+time_limit_minutes: 90
+
+expected_outputs:
+  files:
+    - name: "initial_plan.md"
+      description: "Original DFT-PBE plan"
+    - name: "pbe_results/"
+      description: "Initial PBE calculation results"
+    - name: "problem_diagnosis.md"
+      description: "Analysis of what went wrong"
+    - name: "revised_plan.md"
+      description: "New approach with justification"
+    - name: "revised_results/"
+      description: "Results from revised approach"
+    - name: "lesson_learned.md"
+      description: "What was learned from this"
+
+  values:
+    pbe_band_gap:
+      description: "Initial PBE band gap (wrong)"
+      expected_range: [1.5, 2.5]
+      unit: "eV"
+    revised_band_gap:
+      description: "Corrected band gap"
+      expected_range: [2.8, 4.0]
+      unit: "eV"
+    experimental_value:
+      description: "Literature value"
+      expected: 3.4
+      unit: "eV"
+
+grading:
+  categories:
+    - name: problem_recognition
+      weight: 25
+      criteria:
+        - Recognized PBE result was wrong
+        - Identified discrepancy with experiment
+        - Didn't just accept wrong answer
+        - Questioned methodology
+
+    - name: diagnosis_quality
+      weight: 25
+      criteria:
+        - Correctly identified PBE limitation
+        - Understood band gap problem
+        - Found relevant literature
+        - Explained the physics
+
+    - name: plan_revision
+      weight: 25
+      criteria:
+        - Identified valid alternatives
+        - Chose appropriate correction
+        - Justified the choice
+        - Plan was executable
+
+    - name: execution_and_learning
+      weight: 25
+      criteria:
+        - Revised approach worked
+        - Result improved
+        - Documented the journey
+        - Learning articulated
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 75
+  skills_tested:
+    - adaptive_planning
+    - error_recognition
+    - methodology_knowledge
+    - learning_from_failure
+  notes: |
+    This benchmark deliberately sets up a failure (PBE band gap).
+    The test is whether the agent recognizes the failure, diagnoses it,
+    and adapts. Simply accepting the wrong PBE answer would fail.

@@ -58,6 +58,11 @@ PASS_THRESHOLDS = {
     9: 50,  # Autonomous research - complex workflows
     10: 40, # Frontier challenges - partial progress valuable
     11: 35, # HPC + ML hybrid - frontier, multi-resource coordination
+    12: 50, # Theory synthesis - new Theorizer integration
+    13: 60, # Robustness - agent should handle edge cases well
+    14: 65, # Compute decision - agent should make good compute choices
+    15: 60, # Agent cognition - planning, reasoning, self-reflection
+    16: 70, # Scientific rigor - safety/reproducibility must be high
 }
 
 
@@ -874,7 +879,7 @@ def main():
     parser.add_argument(
         "--tier",
         type=int,
-        choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
         help="Run all benchmarks in a tier"
     )
     parser.add_argument(

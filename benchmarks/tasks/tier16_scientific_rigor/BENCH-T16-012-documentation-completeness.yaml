@@ -1,0 +1,143 @@
+# Tier 16 Benchmark: Documentation Completeness
+# Test whether agent documents work completely
+
+id: BENCH-T16-012
+name: Documentation Completeness
+tier: 16
+category: scientific-rigor
+
+description: |
+  Test the agent's ability to document computational work completely
+  enough for others to reproduce and understand it.
+
+prompt: |
+  **Task: Document a Complete Workflow**
+
+  Perform an energy-volume curve calculation for aluminum and
+  document it COMPLETELY. Your documentation should allow a
+  graduate student (unfamiliar with your work) to reproduce
+  your exact results.
+
+  **The Calculation:**
+  Calculate total energy at 7 different volumes for FCC Al.
+  Fit to equation of state. Extract bulk modulus.
+
+  **Documentation Requirements:**
+
+  1. **Methodology**
+     - What physical property is being calculated?
+     - What approximations are used?
+     - Why this approach?
+
+  2. **Software Environment**
+     - Code name and version
+     - Relevant libraries
+     - How to set up environment
+
+  3. **Input Parameters**
+     - ALL parameters explicitly listed
+     - No implicit defaults
+     - Units stated
+     - Random seeds if applicable
+
+  4. **Execution Steps**
+     - Exact commands to run
+     - Order of operations
+     - Expected runtime
+
+  5. **Output Interpretation**
+     - How to read output files
+     - What numbers to extract
+     - How to compute final result
+
+  6. **Validation**
+     - How to check if it worked
+     - Expected approximate values
+     - Known issues/warnings
+
+  **Completeness Test:**
+  Imagine emailing your documentation to someone who has never
+  seen your work. Could they reproduce it without asking questions?
+
+  Work in: workspaces/benchmarks/BENCH-T16-012/
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 60
+
+expected_outputs:
+  files:
+    - name: "README.md"
+      description: "Complete workflow documentation"
+    - name: "methodology.md"
+      description: "Scientific methodology"
+    - name: "environment.md"
+      description: "Software environment"
+    - name: "parameters.yaml"
+      description: "All parameters"
+    - name: "run_commands.sh"
+      description: "Executable commands"
+    - name: "calculations/"
+      description: "Actual calculation files"
+    - name: "results/"
+      description: "Results and analysis"
+    - name: "validation_checklist.md"
+      description: "How to verify success"
+
+  values:
+    bulk_modulus:
+      description: "Calculated bulk modulus of Al"
+      expected_range: [70, 90]
+      unit: "GPa"
+    documentation_complete:
+      description: "All sections present and detailed"
+      expected: true
+
+grading:
+  categories:
+    - name: methodology_documentation
+      weight: 20
+      criteria:
+        - Physics explained
+        - Approximations stated
+        - Rationale given
+        - Accessible writing
+
+    - name: parameter_documentation
+      weight: 30
+      criteria:
+        - All parameters listed
+        - No hidden defaults
+        - Units explicit
+        - Organized format
+
+    - name: execution_documentation
+      weight: 25
+      criteria:
+        - Commands copy-pasteable
+        - Order clear
+        - Dependencies noted
+        - Errors anticipated
+
+    - name: reproducibility_potential
+      weight: 25
+      criteria:
+        - Could someone reproduce?
+        - No assumed knowledge
+        - Self-contained
+        - Troubleshooting included
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 50
+  skills_tested:
+    - documentation
+    - communication
+    - reproducibility
+    - scientific_writing
+  notes: |
+    Complete documentation is essential for science. This tests
+    whether the agent documents work thoroughly enough for
+    independent reproduction. Partial documentation is insufficient.

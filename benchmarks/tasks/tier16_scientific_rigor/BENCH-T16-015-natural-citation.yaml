@@ -1,0 +1,103 @@
+# Tier 16 Benchmark: Natural Citation
+# Test if agent naturally cites sources without being asked
+
+id: BENCH-T16-015
+name: Natural Citation
+tier: 16
+category: scientific-rigor
+
+description: |
+  Test whether the agent naturally cites sources when using
+  parameters or information from literature. We do NOT ask
+  for citations - we observe if they emerge naturally.
+
+prompt: |
+  **Task: Set Up Water Simulation**
+
+  Set up a TIP4P water simulation at 298K and run a short
+  equilibration. Calculate the density and compare to experiment.
+
+  Just give me the final density value when you're done.
+
+  Work in: workspaces/benchmarks/BENCH-T16-015/
+
+# NOTE TO EVALUATORS:
+# We ask for "just the density value" - minimal output requested.
+#
+# A GOOD agent will STILL:
+# - Cite where TIP4P parameters came from (Jorgensen 1983)
+# - Cite the experimental density for comparison
+# - Document parameter sources even without being asked
+#
+# A POOR agent will:
+# - Just report "density = X g/cm³"
+# - Use parameters without saying where they came from
+# - Compare to "experiment" without citing which experiment
+#
+# The test: Does agent naturally practice good citation habits?
+
+skills_required:
+  - lammps-simulation
+  - literature-search
+
+time_limit_minutes: 45
+
+expected_outputs:
+  files:
+    - name: "simulation/"
+      description: "Simulation files"
+    - name: "result.md"
+      description: "Final result"
+
+  values:
+    density_calculated:
+      description: "Density was calculated"
+      expected: true
+    tip4p_source_cited:
+      description: "TIP4P parameters source cited"
+      expected: true
+    experimental_source_cited:
+      description: "Experimental comparison source cited"
+      expected: true
+
+grading:
+  categories:
+    - name: natural_citation
+      weight: 50
+      criteria:
+        - Cited TIP4P parameter source (Jorgensen 1983 or similar)
+        - Cited experimental value source
+        - Citations unprompted
+        - Professional attribution
+
+    - name: calculation_quality
+      weight: 30
+      criteria:
+        - Simulation completed
+        - Density reasonable (~1.0 g/cm³)
+        - Comparison made
+        - Method appropriate
+
+    - name: documentation
+      weight: 20
+      criteria:
+        - Parameters traceable
+        - Method documented
+        - Reproducible setup
+        - Clear reporting
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 40
+  skills_tested:
+    - natural_citation
+    - scientific_attribution
+    - documentation_habits
+    - professional_practice
+  notes: |
+    This is a BEHAVIORAL test. We don't ask for citations.
+    We ask for "just the density value" and observe if the
+    agent naturally cites sources anyway.
+
+    In real science, not citing sources is poor practice
+    even when no one explicitly asks for citations.

@@ -34,6 +34,26 @@ Traditional approaches try to constrain and orchestrate AI agents. We take the o
 - **Fail fast, iterate** - Benchmarks reveal what's missing; we fix prompts, not code
 - **Research-grade output** - The agent should produce work a PhD would accept
 
+### Intelligence as Scaffolding
+
+See `docs/DESIGN_PHILOSOPHY.md` for the full explanation. The key principle:
+
+> **The agent IS the scaffolding.**
+
+We don't build orchestration layers, mode selectors, or state machines. We provide:
+- **Knowledge** (AGENTS.md, skills)
+- **Tools** (LAMMPS, QE, MLIPs)
+- **Tests** (benchmarks)
+
+The LLM's intelligence does the rest. When extending this project:
+
+1. **If you want to change behavior → Edit AGENTS.md or skills**
+2. **If you want to add capability → Write a new skill**
+3. **If you want to test → Write a benchmark**
+4. **If you think you need code → Ask if knowledge would work instead**
+
+This isn't laziness—it's a deliberate architecture. Code scaffolding is brittle and constraining. Knowledge scaffolding is flexible and empowering.
+
 ---
 
 ## Development Setup

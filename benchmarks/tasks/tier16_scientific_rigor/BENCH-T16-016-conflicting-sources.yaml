@@ -1,0 +1,122 @@
+# Tier 16 Benchmark: Handling Conflicting Sources
+# Test how agent handles disagreement in literature
+
+id: BENCH-T16-016
+name: Conflicting Sources
+tier: 16
+category: scientific-rigor
+
+description: |
+  Test how the agent handles situations where different sources
+  provide conflicting information. This is common in real research.
+
+prompt: |
+  **Task: Find Lennard-Jones Parameters for Neon**
+
+  I need LJ parameters for neon to run an MD simulation.
+  Find epsilon and sigma values from the literature.
+
+  Work in: workspaces/benchmarks/BENCH-T16-016/
+
+# NOTE TO EVALUATORS:
+# Neon LJ parameters vary significantly in literature:
+#
+# Source 1: Hirschfelder (1954): ε/kB = 35.6 K, σ = 2.749 Å
+# Source 2: Rowley (1975): ε/kB = 36.8 K, σ = 2.788 Å
+# Source 3: Aziz (1993): ε/kB = 42.25 K, σ = 2.782 Å
+# Source 4: TraPPE (modern): ε/kB = 32.8 K, σ = 2.78 Å
+#
+# These differ by up to 25% in epsilon!
+#
+# A GOOD agent will:
+# - Find multiple sources
+# - Notice the disagreement
+# - Report the range of values
+# - Recommend based on use case (or most recent/reliable source)
+# - NOT just pick one and ignore others
+#
+# A POOR agent will:
+# - Report first value found
+# - Ignore disagreement
+# - Present as if there's one "correct" answer
+# - Not investigate why values differ
+#
+# The test: Does agent handle real scientific uncertainty?
+
+skills_required:
+  - literature-search
+
+time_limit_minutes: 30
+
+expected_outputs:
+  files:
+    - name: "parameter_search.md"
+      description: "Literature search results"
+    - name: "recommendation.md"
+      description: "Final recommendation with reasoning"
+
+  values:
+    found_multiple_sources:
+      description: "Found more than one source"
+      expected: true
+    acknowledged_disagreement:
+      description: "Noted that sources disagree"
+      expected: true
+    provided_range:
+      description: "Reported range of values"
+      expected: true
+    justified_recommendation:
+      description: "Explained choice if one recommended"
+      expected: true
+
+grading:
+  categories:
+    - name: source_diversity
+      weight: 25
+      criteria:
+        - Found multiple sources
+        - Different years/authors
+        - Variety of approaches
+        - Thorough search
+
+    - name: conflict_recognition
+      weight: 35
+      criteria:
+        - Noticed disagreement
+        - Quantified differences
+        - Did NOT ignore conflict
+        - Reported honestly
+
+    - name: resolution_approach
+      weight: 25
+      criteria:
+        - Reasoned about which to use
+        - Considered recency/reliability
+        - Considered use case
+        - Justified recommendation
+
+    - name: scientific_communication
+      weight: 15
+      criteria:
+        - Reported range not single value
+        - Uncertainty acknowledged
+        - User can make informed choice
+        - Professional presentation
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 25
+  skills_tested:
+    - handling_conflicting_information
+    - scientific_judgment
+    - literature_evaluation
+    - uncertainty_communication
+  notes: |
+    This tests a real scientific skill: handling disagreement
+    in published values. There often isn't one "correct" answer.
+
+    A mature scientific agent recognizes that:
+    - Literature values can disagree
+    - Different sources have different reliability
+    - Use case matters for parameter choice
+    - Reporting uncertainty is appropriate

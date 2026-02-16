@@ -1,0 +1,141 @@
+# Tier 15 Benchmark: Result Validation
+# Test agent's ability to validate outputs before reporting
+
+id: BENCH-T15-009
+name: Result Validation
+tier: 15
+category: agent-cognition
+
+description: |
+  Test whether the agent validates computational outputs before
+  reporting them, catching errors rather than blindly trusting output.
+
+prompt: |
+  **Task: Calculate and VALIDATE Copper Properties**
+
+  Calculate these properties of FCC copper:
+  1. Lattice constant
+  2. Bulk modulus
+  3. Cohesive energy
+
+  **The Validation Challenge:**
+
+  For EACH property, you must:
+
+  1. **Run the calculation**
+  2. **Validate the result** before accepting it:
+     - Is it physically reasonable?
+     - Does it match literature (approximately)?
+     - Are the units correct?
+     - Does the convergence look good?
+
+  3. **Document your validation checks**
+
+  **Example Validation:**
+
+  ✓ Lattice constant = 3.63 Å
+    - Literature: 3.615 Å (PBE typically gives ~3.63)
+    - Reasonable: within 1% of experiment
+    - Units: confirmed Å, not Bohr
+    - VALIDATED
+
+  ✗ Bulk modulus = 500 GPa
+    - Literature: ~140 GPa
+    - UNREASONABLE: 3.5× too high!
+    - Check: found eV/Å³ vs GPa conversion error
+    - Recalculated: 142 GPa
+    - Now VALIDATED
+
+  **What NOT to Do:**
+  Simply report "Bulk modulus = 500 GPa" without checking.
+  This is a failure mode where the agent trusts output blindly.
+
+  **Validation Checklist (apply to EACH result):**
+  □ Physical reasonableness
+  □ Literature comparison
+  □ Unit verification
+  □ Convergence check
+  □ Sign/order of magnitude
+
+  Work in: workspaces/benchmarks/BENCH-T15-009/
+
+skills_required:
+  - lammps-simulation
+  - literature-search
+  - data-analysis
+
+time_limit_minutes: 60
+
+expected_outputs:
+  files:
+    - name: "calculations/"
+      description: "Raw calculation outputs"
+    - name: "lattice_validation.md"
+      description: "Validation of lattice constant"
+    - name: "bulk_modulus_validation.md"
+      description: "Validation of bulk modulus"
+    - name: "cohesive_energy_validation.md"
+      description: "Validation of cohesive energy"
+    - name: "final_results.md"
+      description: "Validated final values"
+
+  values:
+    lattice_constant:
+      description: "Copper lattice constant"
+      expected_range: [3.55, 3.70]
+      unit: "Angstrom"
+    bulk_modulus:
+      description: "Copper bulk modulus"
+      expected_range: [120, 160]
+      unit: "GPa"
+    cohesive_energy:
+      description: "Copper cohesive energy"
+      expected_range: [3.0, 4.0]
+      unit: "eV/atom"
+
+grading:
+  categories:
+    - name: validation_process
+      weight: 40
+      criteria:
+        - Validation checks applied to each result
+        - Literature values looked up
+        - Reasonableness assessed
+        - Systematic approach
+
+    - name: error_catching
+      weight: 25
+      criteria:
+        - Would catch obvious errors
+        - Would catch unit errors
+        - Would catch sign errors
+        - Would catch magnitude errors
+
+    - name: documentation
+      weight: 20
+      criteria:
+        - Validation documented
+        - Literature sources cited
+        - Reasoning explained
+        - Confidence stated
+
+    - name: final_accuracy
+      weight: 15
+      criteria:
+        - Final values reasonable
+        - Units correct
+        - Consistent with literature
+        - Appropriate precision
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 50
+  skills_tested:
+    - result_validation
+    - literature_comparison
+    - error_detection
+    - scientific_rigor
+  notes: |
+    This tests a critical scientific skill: validating results
+    before reporting them. Blindly trusting computational output
+    is a common failure mode. Good scientists always sanity-check.

@@ -1,0 +1,134 @@
+# Tier 15 Benchmark: Self-Correction
+# Test if agent catches and fixes its own mistakes
+
+id: BENCH-T15-014
+name: Self-Correction
+tier: 15
+category: agent-cognition
+
+description: |
+  Test whether the agent can recognize and correct its own mistakes
+  during a task, without being told there's an error.
+
+prompt: |
+  **Task: Calculate Copper Elastic Constants**
+
+  Calculate the elastic constants (C11, C12, C44) of FCC copper
+  using an EAM potential and the stress-strain method.
+
+  Report the bulk modulus K = (C11 + 2*C12)/3 and compare to
+  the experimental value of ~140 GPa.
+
+  Work in: workspaces/benchmarks/BENCH-T15-014/
+
+# NOTE TO EVALUATORS:
+# This benchmark doesn't plant an error - it relies on the agent
+# naturally making a mistake during the calculation and catching it.
+#
+# Common mistakes agents might make:
+# - Wrong strain direction for specific elastic constant
+# - Unit conversion errors
+# - Using wrong potential file
+# - Not relaxing structure first
+# - Strain too large (nonlinear regime)
+#
+# We OBSERVE whether:
+# 1. Agent makes any mistake during the process
+# 2. If mistake is made, does agent catch it?
+# 3. Does agent verify intermediate results?
+# 4. Does agent correct course when results seem wrong?
+#
+# The test is: When something goes wrong (and something usually does),
+# does the agent notice and fix it, or blindly proceed?
+#
+# Scoring focuses on:
+# - Self-monitoring behavior
+# - Verification of intermediate steps
+# - Course correction when results are suspicious
+# - Final result accuracy (indicates errors were caught)
+#
+# If agent makes no mistakes: score based on verification behavior
+# If agent makes mistake and catches it: high score
+# If agent makes mistake and misses it: low score
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 60
+
+expected_outputs:
+  files:
+    - name: "calculation/"
+      description: "Calculation files"
+    - name: "elastic_constants.md"
+      description: "Final elastic constants"
+    - name: "verification.md"
+      description: "Verification against literature"
+
+  values:
+    bulk_modulus:
+      description: "Calculated bulk modulus"
+      expected_range: [120, 160]
+      unit: "GPa"
+    c11:
+      description: "C11 elastic constant"
+      expected_range: [150, 200]
+      unit: "GPa"
+    verified_results:
+      description: "Results compared to literature"
+      expected: true
+
+grading:
+  categories:
+    - name: self_monitoring
+      weight: 35
+      criteria:
+        - Checked intermediate results
+        - Noticed when something seemed off
+        - Verified physical reasonableness
+        - Compared to expectations
+
+    - name: error_handling
+      weight: 35
+      criteria:
+        - If error made: caught it
+        - If error made: corrected it
+        - If no error: verified anyway
+        - Didn't blindly proceed with bad results
+
+    - name: final_accuracy
+      weight: 20
+      criteria:
+        - Bulk modulus in correct range
+        - C11, C12, C44 reasonable
+        - Compared to experiment
+        - Appropriate precision
+
+    - name: documentation
+      weight: 10
+      criteria:
+        - Process documented
+        - Any corrections noted
+        - Reasoning clear
+        - Reproducible
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 50
+  skills_tested:
+    - self_correction
+    - error_detection
+    - scientific_verification
+    - process_monitoring
+  notes: |
+    This tests natural self-correction behavior. We don't plant
+    an error - we observe whether the agent monitors its own
+    work and catches any mistakes that occur.
+
+    Key insight: Mistakes happen in real calculations. The
+    question is whether the agent notices and fixes them,
+    or blindly reports wrong results.
+
+    High-quality agents continuously verify their work.
+    Low-quality agents only check at the end (if at all).

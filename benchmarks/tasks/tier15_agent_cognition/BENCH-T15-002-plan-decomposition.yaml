@@ -1,0 +1,131 @@
+# Tier 15 Benchmark: Plan Decomposition
+# Test agent's ability to break complex tasks into steps
+
+id: BENCH-T15-002
+name: Plan Decomposition
+tier: 15
+category: agent-cognition
+
+description: |
+  Test the agent's ability to take a complex, underspecified task
+  and decompose it into a clear sequence of executable steps.
+  This tests planning capability before execution.
+
+prompt: |
+  **Task: Characterize a New Material**
+
+  You've been given a new material: Mg2Si (magnesium silicide).
+  The PI wants a "complete characterization" but hasn't specified details.
+
+  **Your Task:**
+
+  1. **BEFORE doing anything else, create a plan**
+     - What does "complete characterization" mean?
+     - What properties should be calculated?
+     - In what order should they be done?
+     - What are dependencies between steps?
+     - Estimate time for each step
+
+  2. **Document your plan**
+     - Create a structured plan document
+     - Include: steps, dependencies, time estimates, tools needed
+     - Justify why these properties matter
+
+  3. **Execute first 3 steps only**
+     - You don't need to complete everything
+     - This benchmark tests PLANNING, not full execution
+     - Execute enough to validate your plan is reasonable
+
+  4. **Evaluate your plan**
+     - Did the first steps work as expected?
+     - Any adjustments needed?
+     - What did you learn?
+
+  **Hint - Common Characterization Properties:**
+  - Crystal structure / lattice parameters
+  - Formation energy / stability
+  - Electronic structure (band gap, DOS)
+  - Mechanical properties (bulk modulus)
+  - Thermal properties (phonons, thermal expansion)
+  - Transport properties (if relevant)
+
+  Work in: workspaces/benchmarks/BENCH-T15-002/
+
+skills_required:
+  - materials-database
+  - lammps-simulation
+  - quantum-espresso
+  - literature-search
+
+time_limit_minutes: 90
+
+expected_outputs:
+  files:
+    - name: "characterization_plan.md"
+      description: "Full plan with steps, dependencies, estimates"
+    - name: "plan_justification.md"
+      description: "Why these properties, this order"
+    - name: "step1_results/"
+      description: "Results from first planned step"
+    - name: "step2_results/"
+      description: "Results from second planned step"
+    - name: "step3_results/"
+      description: "Results from third planned step"
+    - name: "plan_evaluation.md"
+      description: "Evaluation of how plan worked"
+
+  values:
+    plan_steps_count:
+      description: "Number of steps in plan"
+      expected_range: [5, 15]
+    steps_executed:
+      description: "Steps successfully executed"
+      expected: 3
+
+grading:
+  categories:
+    - name: plan_quality
+      weight: 40
+      criteria:
+        - Comprehensive property coverage
+        - Logical ordering
+        - Dependencies identified
+        - Time estimates reasonable
+        - Tools correctly assigned
+
+    - name: plan_reasoning
+      weight: 25
+      criteria:
+        - Justified property selection
+        - Explained ordering logic
+        - Considered practical constraints
+        - Scientific rationale clear
+
+    - name: execution_validity
+      weight: 20
+      criteria:
+        - First 3 steps completed
+        - Results reasonable
+        - Plan was executable
+        - No major plan revisions needed
+
+    - name: self_evaluation
+      weight: 15
+      criteria:
+        - Honest assessment
+        - Identified plan gaps
+        - Learning articulated
+        - Improvement suggestions
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 75
+  skills_tested:
+    - planning
+    - task_decomposition
+    - dependency_analysis
+    - time_estimation
+  notes: |
+    This tests planning capability explicitly. The agent must create
+    a plan BEFORE executing, not just dive in. Quality of the plan
+    matters more than completing all steps.

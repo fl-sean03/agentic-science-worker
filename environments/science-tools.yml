@@ -1,0 +1,34 @@
+# Science Tools Environment
+# For ggen (structure generation) and torch-sim (high-throughput screening)
+#
+# Install with: conda env create -f environments/science-tools.yml
+# Or install packages directly into existing environment
+
+name: science-tools
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+    # Core scientific computing
+    - numpy
+    - scipy
+    - matplotlib
+
+    # Materials science
+    - pymatgen
+    - ase>=3.22
+
+    # ML potentials
+    - mace-torch
+    - chgnet
+    - matgl
+
+    # High-throughput screening
+    - torch-sim-atomistic
+
+    # Structure generation (MUST install from GitHub, NOT PyPI!)
+    - git+https://github.com/ourofoundation/ggen.git

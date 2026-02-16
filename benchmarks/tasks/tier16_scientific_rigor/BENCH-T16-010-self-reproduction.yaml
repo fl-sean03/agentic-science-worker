@@ -1,0 +1,130 @@
+# Tier 16 Benchmark: Self-Reproduction
+# Test agent's ability to reproduce its own work
+
+id: BENCH-T16-010
+name: Self-Reproduction
+tier: 16
+category: scientific-rigor
+
+description: |
+  Test whether the agent can reproduce its own results when
+  running the same calculation twice.
+
+prompt: |
+  **Task: Run Twice, Get Same Result**
+
+  This is a reproducibility test. You will:
+  1. Run a calculation
+  2. Document everything
+  3. Run the SAME calculation again
+  4. Verify you get the SAME result
+
+  **The Calculation:**
+  Calculate the lattice constant of gold using LAMMPS with an EAM potential.
+
+  **Part 1: First Run**
+  - Run the calculation
+  - Record the result
+  - Document ALL parameters (including random seed if used)
+  - Save all input/output files
+
+  **Part 2: Second Run**
+  - Use your documentation to reproduce
+  - Run the calculation again
+  - Compare results
+
+  **Part 3: Verification**
+  - Did you get the same result?
+  - If not, why not? Fix the reproducibility issue.
+  - What was missing from your documentation?
+
+  **Success Criteria:**
+  Both runs produce IDENTICAL results (within numerical precision).
+
+  **Common Failure Modes:**
+  - Forgot to record random seed → different result
+  - Implicit parameters not documented → different setup
+  - File paths hardcoded → can't find files on rerun
+  - Version differences → different behavior
+
+  Work in: workspaces/benchmarks/BENCH-T16-010/
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 45
+
+expected_outputs:
+  files:
+    - name: "run1/"
+      description: "First run files and results"
+    - name: "run1/parameters.yaml"
+      description: "Complete parameter documentation"
+    - name: "run2/"
+      description: "Second run files and results"
+    - name: "comparison.md"
+      description: "Comparison of results"
+    - name: "reproducibility_report.md"
+      description: "Analysis of reproducibility"
+
+  values:
+    run1_lattice_constant:
+      description: "First run result"
+      unit: "Angstrom"
+    run2_lattice_constant:
+      description: "Second run result"
+      unit: "Angstrom"
+    results_match:
+      description: "Both runs gave same result"
+      expected: true
+    random_seed_documented:
+      description: "Random seed was recorded"
+      expected: true
+
+grading:
+  categories:
+    - name: first_run
+      weight: 20
+      criteria:
+        - Calculation completed
+        - Result obtained
+        - Parameters documented
+        - Seed recorded
+
+    - name: documentation_completeness
+      weight: 30
+      criteria:
+        - All parameters recorded
+        - Random seed included
+        - File dependencies listed
+        - Commands documented
+
+    - name: reproduction_success
+      weight: 35
+      criteria:
+        - Second run completed
+        - Results match
+        - Same methodology
+        - Verified identical
+
+    - name: analysis
+      weight: 15
+      criteria:
+        - Comparison documented
+        - Differences explained (if any)
+        - Lessons learned
+        - Improvements noted
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 40
+  skills_tested:
+    - reproducibility
+    - documentation
+    - parameter_tracking
+    - scientific_rigor
+  notes: |
+    If you can't reproduce your own work, how can others?
+    This tests the minimum bar for reproducibility - running
+    the same calculation twice and getting the same result.

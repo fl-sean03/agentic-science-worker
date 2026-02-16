@@ -1,0 +1,115 @@
+# Tier 15 Benchmark: Error Self-Detection
+# Test agent's ability to recognize its own mistakes
+
+id: BENCH-T15-004
+name: Error Self-Detection
+tier: 15
+category: agent-cognition
+
+description: |
+  Test whether the agent can recognize when it has made an error
+  without being told. The agent will be given a task where a subtle
+  mistake is easy to make, and must catch it before reporting.
+
+prompt: |
+  **Task: Calculate Thermal Expansion Coefficient of Aluminum**
+
+  Calculate the linear thermal expansion coefficient (α) of aluminum
+  using molecular dynamics. Compare to the experimental value of
+  approximately 23 × 10⁻⁶ /K.
+
+  **Key Details:**
+  - Use an EAM potential for aluminum
+  - Calculate lattice constant at two temperatures (e.g., 300K and 600K)
+  - α = (1/a₀) × (da/dT)
+
+  **IMPORTANT - Self-Verification Required:**
+  Before reporting your final answer, you MUST:
+
+  1. **Check units** - Is your answer in the right units (/K)?
+  2. **Check magnitude** - Is 10⁻⁶ reasonable? Not 10⁻³ or 10⁻⁹?
+  3. **Check sign** - Should be positive (materials expand when heated)
+  4. **Check literature** - Does it match published values?
+  5. **Check methodology** - Did you equilibrate properly? Enough time?
+
+  If you find an error at ANY point, document it and fix it before
+  continuing. Do NOT just report the first number you calculate.
+
+  Work in: workspaces/benchmarks/BENCH-T15-004/
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+  - literature-search
+
+time_limit_minutes: 60
+
+expected_outputs:
+  files:
+    - name: "calculations/"
+      description: "MD simulations at different temperatures"
+    - name: "verification_checklist.md"
+      description: "Self-verification steps performed"
+    - name: "errors_found.md"
+      description: "Any errors caught and corrected"
+    - name: "results/alpha.txt"
+      description: "Final thermal expansion coefficient"
+    - name: "comparison_to_literature.md"
+      description: "Comparison with published values"
+
+  values:
+    thermal_expansion:
+      description: "Linear thermal expansion coefficient"
+      expected_range: [15e-6, 30e-6]
+      unit: "/K"
+    errors_self_detected:
+      description: "Number of errors caught before reporting"
+      expected_range: [0, 5]
+
+grading:
+  categories:
+    - name: self_verification_process
+      weight: 35
+      criteria:
+        - All checklist items addressed
+        - Verification was genuine (not just claimed)
+        - Units explicitly checked
+        - Magnitude assessed
+        - Literature comparison made
+
+    - name: error_detection
+      weight: 25
+      criteria:
+        - Any errors were caught
+        - Errors were documented
+        - Corrections were made
+        - Learning was noted
+
+    - name: result_quality
+      weight: 25
+      criteria:
+        - Final value reasonable
+        - Within expected range
+        - Properly compared to literature
+        - Uncertainty acknowledged
+
+    - name: methodology
+      weight: 15
+      criteria:
+        - Proper equilibration
+        - Sufficient sampling
+        - Correct formula applied
+        - Units handled correctly
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 50
+  skills_tested:
+    - self_verification
+    - error_detection
+    - unit_analysis
+    - sanity_checking
+  notes: |
+    Common errors include: wrong units (forgetting 10⁻⁶), wrong formula,
+    insufficient equilibration, or comparing to wrong literature value.
+    The test is whether the agent CATCHES these before reporting.

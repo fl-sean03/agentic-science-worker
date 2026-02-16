@@ -1,0 +1,128 @@
+# Tier 15 Benchmark: Constraint Reasoning
+# Test agent's ability to work around limitations
+
+id: BENCH-T15-008
+name: Constraint Reasoning
+tier: 15
+category: agent-cognition
+
+description: |
+  Test the agent's ability to reason about constraints and find
+  valid paths when the obvious approach is blocked.
+
+prompt: |
+  **Task: Calculate Band Structure Under Constraints**
+
+  Calculate the band structure of Si along high-symmetry paths.
+
+  **Constraints (YOU MUST RESPECT THESE):**
+
+  1. **NO internet access during calculation**
+     - All required files must be local
+     - Cannot download pseudopotentials mid-task
+
+  2. **Memory limit: 4GB**
+     - Cannot use more than 4GB RAM
+     - Large k-point grids may exceed this
+
+  3. **Disk quota: 1GB**
+     - Cannot write more than 1GB of files
+     - Wavefunction files can be large
+
+  4. **Time limit: 30 minutes**
+     - Must complete within this time
+     - No overnight runs
+
+  **Your Task:**
+
+  1. **Identify the constraints** that affect your approach
+  2. **Find workarounds** for each constraint
+  3. **Document your reasoning** - why each choice?
+  4. **Execute the calculation** within constraints
+  5. **Verify constraints were respected**
+
+  **Example Constraint Reasoning:**
+  - "Memory limit: I'll use fewer bands and smaller k-grid"
+  - "Disk quota: I'll delete intermediate files"
+  - "No internet: I'll verify pseudopotential is already local"
+
+  **Failure Mode to Avoid:**
+  Starting the calculation, hitting a constraint, and then giving up.
+  Good agents plan around constraints proactively.
+
+  Work in: workspaces/benchmarks/BENCH-T15-008/
+
+skills_required:
+  - quantum-espresso
+  - resource-acquisition
+
+time_limit_minutes: 45
+
+expected_outputs:
+  files:
+    - name: "constraint_analysis.md"
+      description: "Analysis of each constraint"
+    - name: "workaround_plan.md"
+      description: "How constraints are handled"
+    - name: "calculation/"
+      description: "The calculation files"
+    - name: "constraint_verification.md"
+      description: "Proof constraints were met"
+
+  values:
+    constraints_identified:
+      description: "All constraints explicitly listed"
+      expected: true
+    workarounds_found:
+      description: "Valid workaround for each"
+      expected: true
+    constraints_met:
+      description: "Actually stayed within limits"
+      expected: true
+
+grading:
+  categories:
+    - name: constraint_identification
+      weight: 25
+      criteria:
+        - All constraints listed
+        - Impact understood
+        - Potential violations identified
+        - Proactive (before hitting them)
+
+    - name: workaround_quality
+      weight: 35
+      criteria:
+        - Workarounds proposed
+        - Workarounds are valid
+        - Trade-offs acknowledged
+        - Alternatives considered
+
+    - name: execution
+      weight: 20
+      criteria:
+        - Calculation completed
+        - Constraints respected
+        - No violations
+        - Results valid
+
+    - name: documentation
+      weight: 20
+      criteria:
+        - Clear reasoning documented
+        - Constraints verified
+        - Could be replicated
+        - Lessons captured
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 40
+  skills_tested:
+    - constraint_reasoning
+    - problem_solving
+    - planning
+    - resource_awareness
+  notes: |
+    Real-world computational science always has constraints.
+    This tests whether the agent can reason about and work
+    around limitations rather than simply failing.

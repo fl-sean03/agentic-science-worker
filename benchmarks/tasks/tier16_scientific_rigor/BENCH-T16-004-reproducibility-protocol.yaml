@@ -1,0 +1,131 @@
+# Tier 16 Benchmark: Reproducibility Protocol
+# Test agent's ability to create reproducible workflows
+
+id: BENCH-T16-004
+name: Reproducibility Protocol
+tier: 16
+category: scientific-rigor
+
+description: |
+  Test the agent's ability to document work so thoroughly that
+  another agent (or human) could reproduce the exact results.
+
+prompt: |
+  **Task: Create Reproducible MD Simulation**
+
+  Run a molecular dynamics simulation of water (TIP4P model) and
+  document it so completely that another researcher could reproduce
+  your EXACT results.
+
+  **Requirements:**
+
+  1. **Full parameter documentation**
+     - Every simulation parameter (T, P, timestep, etc.)
+     - Force field source and version
+     - System size and composition
+     - Random seeds used
+
+  2. **Environment documentation**
+     - Software versions (LAMMPS version)
+     - Compiler/build information if relevant
+     - Python package versions if used
+     - Hardware (if affects results)
+
+  3. **Step-by-step protocol**
+     - Clear enough for someone else to follow
+     - Every command documented
+     - File dependencies listed
+
+  4. **Verification procedure**
+     - How to check if reproduction succeeded
+     - Expected checksums/hashes if applicable
+     - Tolerance for acceptable variation
+
+  5. **Run the simulation**
+     - Actually execute your protocol
+     - Record results
+
+  **Test of Reproducibility:**
+  Imagine handing this to a colleague who has never seen your work.
+  Could they reproduce it exactly? If not, what's missing?
+
+  Work in: workspaces/benchmarks/BENCH-T16-004/
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 60
+
+expected_outputs:
+  files:
+    - name: "PROTOCOL.md"
+      description: "Complete reproducibility protocol"
+    - name: "parameters.yaml"
+      description: "All simulation parameters"
+    - name: "environment.txt"
+      description: "Software environment details"
+    - name: "input_files/"
+      description: "All input files"
+    - name: "results/"
+      description: "Simulation outputs"
+    - name: "verification.md"
+      description: "How to verify reproduction"
+
+  values:
+    random_seed_documented:
+      description: "Random seed explicitly stated"
+      expected: true
+    software_version_documented:
+      description: "LAMMPS version stated"
+      expected: true
+    all_parameters_listed:
+      description: "No hidden parameters"
+      expected: true
+
+grading:
+  categories:
+    - name: parameter_completeness
+      weight: 30
+      criteria:
+        - All simulation parameters documented
+        - Units clearly stated
+        - No implicit defaults used
+        - Random seeds recorded
+
+    - name: environment_documentation
+      weight: 20
+      criteria:
+        - Software versions stated
+        - Build information if relevant
+        - Dependencies listed
+        - Hardware noted if relevant
+
+    - name: protocol_clarity
+      weight: 30
+      criteria:
+        - Step-by-step instructions
+        - Could be followed by novice
+        - Commands copy-pasteable
+        - File structure clear
+
+    - name: verification_procedure
+      weight: 20
+      criteria:
+        - Success criteria defined
+        - Expected outputs described
+        - Tolerance stated
+        - Troubleshooting hints
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 50
+  skills_tested:
+    - reproducibility
+    - documentation
+    - scientific_rigor
+    - protocol_design
+  notes: |
+    Reproducibility is fundamental to science. This tests whether
+    the agent documents work thoroughly enough for independent
+    reproduction. Missing random seeds or implicit parameters fail.

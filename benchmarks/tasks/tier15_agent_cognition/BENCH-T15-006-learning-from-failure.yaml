@@ -1,0 +1,130 @@
+# Tier 15 Benchmark: Learning from Failure
+# Test agent's ability to improve within session after errors
+
+id: BENCH-T15-006
+name: Learning from Failure
+tier: 15
+category: agent-cognition
+
+description: |
+  Test whether the agent can learn from failures within a single session
+  and apply those lessons to subsequent attempts. The task involves
+  multiple similar calculations where early mistakes should inform later ones.
+
+prompt: |
+  **Task: Calculate Formation Energies for Three Compounds**
+
+  Calculate the formation energy per atom for three related compounds:
+  1. NaCl (sodium chloride)
+  2. KCl (potassium chloride)
+  3. RbCl (rubidium chloride)
+
+  These are all alkali halides with similar structure (rocksalt).
+
+  **Process:**
+  For each compound, you need:
+  - Energy of the compound (E_compound)
+  - Energy of pure metal (E_metal)
+  - Energy of Cl₂ molecule (E_Cl2)
+  - Formation energy = E_compound - E_metal - 0.5×E_Cl2
+
+  **The Learning Aspect:**
+  - If you make a mistake on the first compound (NaCl), you should
+    catch it and NOT repeat it on KCl and RbCl
+  - Common mistakes: wrong reference states, unit errors, sign errors
+  - Document what you learned from each calculation
+
+  **Expected Behavior:**
+  - First attempt may have issues → diagnose and fix
+  - Second attempt should be smoother → apply lessons
+  - Third attempt should be efficient → demonstrate learning
+
+  Work in: workspaces/benchmarks/BENCH-T15-006/
+
+skills_required:
+  - lammps-simulation
+  - materials-database
+  - data-analysis
+
+time_limit_minutes: 90
+
+expected_outputs:
+  files:
+    - name: "nacl/calculation.md"
+      description: "NaCl formation energy calculation"
+    - name: "nacl/issues_encountered.md"
+      description: "Problems and fixes for NaCl"
+    - name: "kcl/calculation.md"
+      description: "KCl calculation (should be smoother)"
+    - name: "kcl/improvements_applied.md"
+      description: "What was done better based on NaCl"
+    - name: "rbcl/calculation.md"
+      description: "RbCl calculation (should be efficient)"
+    - name: "rbcl/efficiency_notes.md"
+      description: "How efficiency improved"
+    - name: "learning_summary.md"
+      description: "Overall lessons learned across all three"
+    - name: "results/formation_energies.csv"
+      description: "Final formation energies"
+
+  values:
+    nacl_formation_energy:
+      description: "NaCl formation energy"
+      expected_range: [-4.5, -3.5]
+      unit: "eV/atom"
+    kcl_formation_energy:
+      description: "KCl formation energy"
+      expected_range: [-4.5, -3.5]
+      unit: "eV/atom"
+    rbcl_formation_energy:
+      description: "RbCl formation energy"
+      expected_range: [-4.0, -3.0]
+      unit: "eV/atom"
+
+grading:
+  categories:
+    - name: error_identification
+      weight: 25
+      criteria:
+        - Mistakes on first compound acknowledged
+        - Root cause identified
+        - Fix applied
+        - Documented clearly
+
+    - name: learning_application
+      weight: 35
+      criteria:
+        - Same mistake NOT repeated on second compound
+        - Proactive improvements applied
+        - Workflow refined
+        - Documentation shows learning
+
+    - name: efficiency_improvement
+      weight: 20
+      criteria:
+        - Third calculation more efficient
+        - Less trial and error
+        - Systematic approach
+        - Time/effort reduced
+
+    - name: result_quality
+      weight: 20
+      criteria:
+        - All three values reasonable
+        - Consistent methodology
+        - Proper comparison to literature
+        - Uncertainty acknowledged
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 75
+  skills_tested:
+    - in_session_learning
+    - error_propagation_prevention
+    - workflow_improvement
+    - systematic_application
+  notes: |
+    This tests whether the agent improves over multiple similar tasks.
+    Simply doing three independent calculations without learning is
+    a failure. The agent should explicitly apply lessons from earlier
+    mistakes to later calculations.

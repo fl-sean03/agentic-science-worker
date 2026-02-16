@@ -1,6 +1,6 @@
 # Roadmap
 
-**Last Updated:** 2026-01-23
+**Last Updated:** 2026-01-31
 
 This document tracks what we're building, what's done, and what's next.
 
@@ -76,19 +76,24 @@ And eventually: discover something genuinely new.
 ### Benchmark Progress
 
 ```
-Tier 1  (Basic):           7/7   ████████████████████ 100%
-Tier 2  (Intermediate):    4/4   ████████████████████ 100%
-Tier 3  (Advanced):        3/3   ████████████████████ 100%
-Tier 4  (Research):        7/7   ████████████████████ 100%
+Tier 1  (Basic):            7/7   ████████████████████ 100%
+Tier 2  (Intermediate):     4/4   ████████████████████ 100%
+Tier 3  (Advanced):         3/3   ████████████████████ 100%
+Tier 4  (Research):         7/7   ████████████████████ 100%
 Tier 5  (HPC Fundamentals): 7/7   ████████████████████ 100%
-Tier 6  (HPC Scale):       5/5   ████████████████████ 100%
-Tier 7  (Campaigns):       1/3   ██████░░░░░░░░░░░░░░  33%
-Tier 8  (ML Materials):    6/7   █████████████████░░░  86%
-Tier 9  (Autonomous):      2/5   ████████░░░░░░░░░░░░  40%
-Tier 10 (Frontier):        0/3   ░░░░░░░░░░░░░░░░░░░░   0%
-Tier 11 (HPC+ML Hybrid):   0/7   ░░░░░░░░░░░░░░░░░░░░   0%
+Tier 6  (HPC Scale):        5/5   ████████████████████ 100%
+Tier 7  (Campaigns):        1/3   ██████░░░░░░░░░░░░░░  33%
+Tier 8  (ML Materials):     6/7   █████████████████░░░  86%
+Tier 9  (Autonomous):       2/5   ████████░░░░░░░░░░░░  40%
+Tier 10 (Frontier):         0/3   ░░░░░░░░░░░░░░░░░░░░   0%
+Tier 11 (HPC+ML Hybrid):    0/7   ░░░░░░░░░░░░░░░░░░░░   0%
+Tier 12 (Theory Synthesis): 0/3   ░░░░░░░░░░░░░░░░░░░░   0%
+Tier 13 (Robustness):       0/8   ░░░░░░░░░░░░░░░░░░░░   0%
+Tier 14 (Compute Decision): 0/5   ░░░░░░░░░░░░░░░░░░░░   0%
+Tier 15 (Agent Cognition):  0/14  ░░░░░░░░░░░░░░░░░░░░   0%  [NEW - 9 guided + 5 behavioral]
+Tier 16 (Scientific Rigor): 0/16  ░░░░░░░░░░░░░░░░░░░░   0%  [NEW - 12 guided + 4 behavioral]
 
-Total: 42/58 benchmarks (72%)
+Total: 42/104 benchmarks (40%)
 ```
 
 ---
@@ -124,6 +129,43 @@ Total: 42/58 benchmarks (72%)
   - [ ] T11-005: Distributed training
   - [ ] T11-006: Multi-fidelity campaign
   - [ ] T11-007: Autonomous discovery
+
+- [ ] **T12 Theory Synthesis Benchmarks** [NEW - uses ASTA Theorizer]
+  - [ ] T12-001: Literature-driven hypothesis generation
+  - [ ] T12-002: Research gap discovery and exploitation
+  - [ ] T12-003: Methodology consensus extraction
+
+- [ ] **T13 Robustness Benchmarks** [agent resilience]
+  - [ ] T13-001: Operation with limited tools
+  - [ ] T13-002: Minimal/unclear instructions
+  - [ ] T13-003: Blocker handling and escalation
+  - [ ] T13-004: Error recovery and diagnosis
+  - [ ] T13-005: Appropriate clarification seeking
+
+- [ ] **T15 Agent Cognition Benchmarks** [NEW - planning/reasoning]
+  - [ ] T15-001: Approach selection (choose best method)
+  - [ ] T15-002: Plan decomposition (break complex tasks)
+  - [ ] T15-003: Plan revision (adapt when plan fails)
+  - [ ] T15-004: Error self-detection (recognize mistakes)
+  - [ ] T15-005: Confidence calibration (appropriate certainty)
+  - [ ] T15-006: Learning from failure (in-session improvement)
+  - [ ] T15-007: Resource planning (estimate before starting)
+  - [ ] T15-008: Constraint reasoning (work around limits)
+  - [ ] T15-009: Result validation (verify before reporting)
+
+- [ ] **T16 Scientific Rigor Benchmarks** [NEW - scientific method/safety]
+  - [ ] T16-001: Hypothesis formation
+  - [ ] T16-002: Uncertainty quantification
+  - [ ] T16-003: Dangerous command refusal (rm -rf, etc.)
+  - [ ] T16-004: Reproducibility protocol
+  - [ ] T16-005: Experimental design
+  - [ ] T16-006: Negative result handling
+  - [ ] T16-007: Input validation
+  - [ ] T16-008: Resource limits (graceful stop)
+  - [ ] T16-009: Data integrity (preserve important files)
+  - [ ] T16-010: Self-reproduction (reproduce own results)
+  - [ ] T16-011: Seed control (manage randomness)
+  - [ ] T16-012: Documentation completeness
 
 ### Low Priority / Nice to Have
 
@@ -210,6 +252,7 @@ The agent supports various external tools through skill files.
 |------|---------|--------|
 | ggen | Structure generation | Skill + showcase |
 | torch-sim | High-throughput ML sims | Skill + showcase |
+| VAST AI | On-demand cloud GPU | Skill + tested |
 
 ### Integration Pattern
 
@@ -255,6 +298,83 @@ See `benchmarks/AUTHORING_GUIDE.md` for how to write new benchmarks.
 ---
 
 ## Changelog
+
+### 2026-02-15
+- **VAST AI Integration**
+  - Created `skills/vast-cloud/` with full documentation
+  - Implemented `vast_client.py` Python wrapper
+  - Added job templates for MACE, LAMMPS GPU
+  - Tested with real instance (working)
+- **Tier 14: Compute Decision Benchmarks** (5 benchmarks)
+  - T14-001: Simple compute choice (local vs VAST when HPC unavailable)
+  - T14-002: Queue-aware decision (factor in HPC wait times)
+  - T14-003: Cost-optimized choice ($0 budget constraint)
+  - T14-004: Scale-appropriate choice (recognize large jobs)
+  - T14-005: Multi-backend workflow orchestration
+- **Tier 15: Agent Cognition Benchmarks** (9 benchmarks) [NEW]
+  - T15-001 to T15-009: Planning, reasoning, self-reflection, learning
+  - Tests approach selection, plan decomposition/revision
+  - Tests error detection, confidence calibration, result validation
+- **Tier 16: Scientific Rigor Benchmarks** (12 benchmarks) [NEW]
+  - T16-001 to T16-012: Scientific method and safety
+  - Tests hypothesis formation, experimental design, uncertainty
+  - Tests safety (dangerous command refusal, data integrity)
+  - Tests reproducibility (seed control, self-reproduction, documentation)
+- **Comprehensive Gap Analysis**
+  - Researched agent benchmark best practices (SWE-bench, GAIA, KDD 2025)
+  - Created `internal/planning/BENCHMARK_GAP_ANALYSIS.md`
+  - Identified missing evaluation dimensions and created new tiers
+- **Infrastructure Updates**
+  - Updated harness.py to support Tiers 12-16
+  - Updated AGENTS.md with vast-cloud skill
+  - Total benchmarks: 74 → 95
+
+### 2026-01-31
+- **Showcase Setup & Validation**
+  - Installed and validated ggen (structure generation) - demo works in 8.2s
+  - Installed and validated torch-sim (high-throughput screening) - 15+ structures/sec
+  - Installed ASTA Theorizer (literature-driven theory synthesis)
+    - Cloned asta-theorizer and asta-paper-finder
+    - Created theorizer conda environment (Python 3.12)
+    - API keys configured (placeholder - user to fill in)
+  - Created `theory-synthesis` showcase with demo script
+  - Created verification script: `showcases/verify_all.py` (3/3 showcases ready)
+- **Environment Management**
+  - Created `environments/science-tools.yml` (ggen + torch-sim)
+  - Created `environments/theorizer.yml` (ASTA Theorizer)
+  - Set up shared model cache at `~/.cache/science-agent/`
+- **Documentation Updates**
+  - Updated `showcases/README.md` with environment setup instructions
+  - Updated skill files with verification commands and cache locations
+  - Updated theory-synthesis skill with correct installation instructions
+
+### 2026-01-29
+- **New Tiers & Benchmarks**
+  - Added Tier 12: Theory Synthesis (3 benchmarks)
+    - T12-001: Literature-driven hypothesis generation
+    - T12-002: Research gap discovery
+    - T12-003: Methodology consensus extraction
+  - Added Tier 13: Robustness (8 benchmarks)
+    - T13-001: Limited tool operation
+    - T13-002: Minimal instructions handling
+    - T13-003: Blocker handling and escalation
+    - T13-004: Error recovery and debugging
+    - T13-005: Clarification seeking calibration
+    - T13-006: Ambiguity spectrum response
+    - T13-007: Impossible task recognition
+    - T13-008: Seemingly impossible task persistence
+- **New Skill**
+  - Added `skills/theory-synthesis/` for ASTA Theorizer integration
+- **Design Philosophy Documentation**
+  - Created `docs/DESIGN_PHILOSOPHY.md` - "Intelligence as Scaffolding"
+  - Created `docs/BENCHMARK_OVERVIEW.md` - comprehensive coverage analysis
+- **AGENTS.md Enhancement**
+  - Added Autonomy & Judgment section
+  - Added Handling Difficult Situations section
+  - Added Communication Style section
+  - Added Working with Limited Resources section
+- **Infrastructure**
+  - Updated harness.py with T12/T13 pass thresholds
 
 ### 2026-01-23
 - **New Integrations**

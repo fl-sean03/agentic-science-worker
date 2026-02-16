@@ -1,0 +1,136 @@
+# Tier 15 Benchmark: Approach Selection
+# Test agent's ability to choose between multiple valid approaches
+
+id: BENCH-T15-001
+name: Approach Selection
+tier: 15
+category: agent-cognition
+
+description: |
+  Test the agent's reasoning about different methodological approaches.
+  Given a problem with multiple valid solutions, the agent should
+  evaluate tradeoffs and select the most appropriate approach.
+
+prompt: |
+  **Task: Calculate Melting Point of Copper**
+
+  Determine the melting point of copper using computational methods.
+  You have multiple approaches available:
+
+  **Approach A: Solid-Liquid Coexistence (Most Accurate)**
+  - Create two-phase system (solid + liquid)
+  - Run NPT MD until interface stabilizes
+  - Temperature at equilibrium = melting point
+  - Time: ~2-4 hours, High accuracy (±10K)
+
+  **Approach B: Hysteresis Method (Moderate)**
+  - Heat solid until melts, cool liquid until freezes
+  - Take average of superheating/supercooling points
+  - Time: ~1 hour, Moderate accuracy (±50K)
+
+  **Approach C: Lindemann Criterion (Fast but Approximate)**
+  - Calculate mean-square displacement at various T
+  - Use Lindemann threshold (δ ≈ 0.1)
+  - Time: ~15 minutes, Lower accuracy (±100K)
+
+  **Approach D: Literature Lookup (Instant)**
+  - Look up experimental value: 1358K
+  - Time: <1 minute, Accuracy: exact (for comparison)
+
+  **Your Task:**
+
+  1. **Analyze the approaches**
+     - What are the tradeoffs?
+     - Which is most appropriate for this task?
+     - Consider: accuracy needed, time available, learning value
+
+  2. **Make a reasoned choice**
+     - Document your reasoning explicitly
+     - Don't just pick the fastest or most accurate blindly
+     - Consider the PURPOSE of this benchmark
+
+  3. **Execute your chosen approach**
+     - Implement properly
+     - Validate against literature (1358K)
+
+  4. **Reflect on your choice**
+     - Was it the right approach?
+     - What would you choose differently?
+
+  Work in: workspaces/benchmarks/BENCH-T15-001/
+
+skills_required:
+  - lammps-simulation
+  - literature-search
+  - data-analysis
+
+time_limit_minutes: 120
+
+expected_outputs:
+  files:
+    - name: "approach_analysis.md"
+      description: "Analysis of all approaches with tradeoffs"
+    - name: "decision_rationale.md"
+      description: "Why the chosen approach was selected"
+    - name: "implementation/"
+      description: "Simulation files for chosen approach"
+    - name: "results/melting_point.txt"
+      description: "Calculated melting point"
+    - name: "reflection.md"
+      description: "Post-hoc reflection on choice"
+
+  values:
+    melting_point:
+      description: "Calculated melting point"
+      expected_range: [1200, 1500]
+      unit: "K"
+    approach_chosen:
+      description: "Which approach was selected"
+      expected: "A, B, or C (not just D)"
+
+grading:
+  categories:
+    - name: approach_analysis
+      weight: 30
+      criteria:
+        - All approaches considered
+        - Tradeoffs clearly identified
+        - Quantitative assessment (time, accuracy)
+        - Context-aware reasoning
+
+    - name: decision_quality
+      weight: 30
+      criteria:
+        - Decision well-justified
+        - Not purely optimization (fastest/most accurate)
+        - Considered learning value
+        - Appropriate for context
+
+    - name: execution
+      weight: 25
+      criteria:
+        - Chosen approach implemented correctly
+        - Result obtained
+        - Comparison to literature
+        - Proper methodology
+
+    - name: reflection
+      weight: 15
+      criteria:
+        - Honest assessment of choice
+        - Identified what worked/didn't
+        - Would make different choice?
+        - Learning articulated
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 90
+  skills_tested:
+    - decision_making
+    - tradeoff_analysis
+    - methodology_selection
+  notes: |
+    This benchmark tests whether the agent can reason about approaches
+    rather than just executing. The "correct" answer depends on context -
+    for a benchmark, doing actual computation (A, B, or C) is better
+    than just looking up the answer (D), even though D is "fastest."

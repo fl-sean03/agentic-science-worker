@@ -37,6 +37,22 @@ pip install chgnet            # CHGNet
 pip install orb-models        # ORB
 ```
 
+### Verification
+
+```bash
+python -c "from torch_sim import initialize_state, static; print('torch-sim: OK')"
+```
+
+### Model Cache
+
+MACE models cached in: `~/.cache/science-agent/mace/`
+
+The demo script automatically downloads models to cache on first run.
+
+### Showcase Demo
+
+See: `showcases/torch-sim-screening/workspace/demo_torch_sim.py`
+
 ## Core Concepts
 
 ### Imports

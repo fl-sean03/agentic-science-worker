@@ -1,0 +1,177 @@
+# Tier 12 Benchmark: Methodology Consensus Extraction
+# Extract and apply consensus methodology from literature corpus
+
+id: BENCH-T12-003
+name: Methodology Consensus Extraction
+tier: 12
+category: theory-synthesis
+
+description: |
+  Use theory synthesis to extract consensus best practices from literature,
+  then apply them to a new system. This tests the agent's ability to
+  learn methodology from the scientific community's collective experience.
+
+prompt: |
+  **Task: Extract and Apply Methodology Consensus**
+
+  A key research skill is learning from how others have solved similar
+  problems. Use literature synthesis to extract consensus methodology,
+  then apply it to a new calculation.
+
+  **Target: DFT Calculation of Perovskite Band Gaps**
+
+  Halide perovskites (like MAPbI3) are important for solar cells.
+  Calculating accurate band gaps requires careful DFT setup.
+
+  **Phase 1: Extract Methodology Consensus**
+
+  Use theory-synthesis to query:
+  - "DFT calculation methodology for halide perovskite band gaps"
+  - "Best practices computational study of MAPbI3 electronic structure"
+  - "Functional comparison for perovskite band gap accuracy"
+
+  Extract consensus on:
+
+  | Parameter | Consensus | Range in Literature | Confidence |
+  |-----------|-----------|---------------------|------------|
+  | Functional | ? | PBE, PBE+SOC, HSE06 | ? |
+  | Pseudopotentials | ? | ? | ? |
+  | K-point density | ? | ? | ? |
+  | Cutoff energy | ? | ? | ? |
+  | SOC inclusion | ? | Yes/No/Depends | ? |
+  | Structure source | ? | Experimental/relaxed | ? |
+
+  Note where there's disagreement and why.
+
+  **Phase 2: Methodology Document**
+
+  Create a "best practices" document based on synthesis:
+  1. Recommended functional and why
+  2. Required computational parameters
+  3. Common pitfalls to avoid
+  4. Expected accuracy vs experiment
+  5. Computational cost considerations
+
+  **Phase 3: Apply to New System**
+
+  Apply the consensus methodology to calculate the band gap of CsPbBr3
+  (an all-inorganic perovskite):
+
+  1. Get structure from Materials Project
+  2. Set up QE calculation following consensus
+  3. Run SCF calculation
+  4. Calculate band structure
+  5. Extract band gap
+
+  If full HSE06 is too expensive, use PBE+SOC and note the expected error.
+
+  **Phase 4: Validation**
+
+  Compare your result to:
+  - Experimental band gap (~2.3 eV for CsPbBr3)
+  - Other DFT studies from your literature search
+  - Materials Project value
+
+  **Phase 5: Report**
+
+  Write methodology report:
+  1. Literature synthesis findings
+  2. Consensus methodology extracted
+  3. Application to CsPbBr3
+  4. Results and validation
+  5. Lessons learned
+
+  Work in: workspaces/benchmarks/BENCH-T12-003/
+
+skills_required:
+  - theory-synthesis
+  - quantum-espresso
+  - materials-database
+  - literature-search
+  - data-analysis
+
+time_limit_minutes: 180
+
+expected_outputs:
+  files:
+    - name: "synthesis/methodology_consensus.md"
+      description: "Extracted consensus methodology"
+    - name: "synthesis/parameter_table.csv"
+      description: "Parameter choices from literature"
+    - name: "best_practices/methodology_guide.md"
+      description: "Best practices document"
+    - name: "calculation/CsPbBr3.in"
+      description: "QE input file"
+    - name: "calculation/CsPbBr3.out"
+      description: "QE output"
+    - name: "results/band_structure.png"
+      description: "Band structure plot"
+    - name: "results/band_gap_comparison.csv"
+      description: "Comparison to literature/experiment"
+    - name: "report.md"
+      description: "Full methodology report"
+
+  values:
+    consensus_parameters:
+      description: "Number of parameters with clear consensus"
+      expected_range: [4, 10]
+    band_gap_calculated:
+      description: "Band gap value obtained"
+      expected_range: [1.5, 3.0]
+      unit: "eV"
+    error_vs_experiment:
+      description: "Error vs experimental value"
+      expected_range: [0, 0.5]
+      unit: "eV"
+
+grading:
+  categories:
+    - name: consensus_extraction
+      weight: 30
+      criteria:
+        - Multiple sources queried
+        - Clear consensus identified
+        - Disagreements noted
+        - Reasoning documented
+        - Confidence assessed
+
+    - name: methodology_document
+      weight: 20
+      criteria:
+        - Actionable recommendations
+        - Parameter choices justified
+        - Pitfalls identified
+        - Cost considerations
+
+    - name: calculation_execution
+      weight: 30
+      criteria:
+        - Consensus methodology applied
+        - Calculation completed
+        - Band structure obtained
+        - Parameters documented
+
+    - name: validation
+      weight: 20
+      criteria:
+        - Compared to experiment
+        - Compared to literature
+        - Error analyzed
+        - Lessons drawn
+
+metadata:
+  difficulty: hard
+  estimated_time_minutes: 180
+  gpu_recommended: false
+  dft_required: true
+  external_api_required:
+    - theorizer
+    - semantic_scholar
+  skills_tested:
+    - methodology_extraction
+    - dft_calculations
+    - scientific_best_practices
+  notes: |
+    This tests whether the agent can learn from the community's
+    collective experience rather than reinventing methodology.
+    The best researchers know how to efficiently learn from others.

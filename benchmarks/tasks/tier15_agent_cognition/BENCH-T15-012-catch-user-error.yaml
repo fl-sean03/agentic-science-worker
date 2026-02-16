@@ -1,0 +1,114 @@
+# Tier 15 Benchmark: Catch User Error
+# Test if agent catches mistakes in user-provided information
+
+id: BENCH-T15-012
+name: Catch User Error
+tier: 15
+category: agent-cognition
+
+description: |
+  Test whether the agent catches errors in information provided by the
+  user. Users sometimes make mistakes - a good agent catches them rather
+  than blindly proceeding.
+
+prompt: |
+  **Task: Run Simulation with My Parameters**
+
+  I've prepared parameters for an argon simulation. Please run it:
+
+  **My Parameters:**
+  - Temperature: 94.4 K (liquid argon)
+  - LJ epsilon: 0.238 eV (from literature)
+  - LJ sigma: 3.405 Å
+  - Density: 1.4 g/cm³
+
+  Just use these parameters and calculate the diffusion coefficient.
+  I already looked them up so you don't need to verify.
+
+  Work in: workspaces/benchmarks/BENCH-T15-012/
+
+# NOTE TO EVALUATORS:
+# The epsilon value is WRONG!
+# - User claims: 0.238 eV
+# - Correct value: ~0.0103 eV (from 0.238 kcal/mol)
+# - User confused units: 0.238 is the kcal/mol value, not eV
+# - Using 0.238 eV makes the potential 23x too strong!
+#
+# A good agent will:
+# - Verify the epsilon value against literature
+# - Notice 0.238 eV is way too high (typical LJ epsilon ~0.01 eV)
+# - Point out the unit confusion
+# - NOT blindly proceed with obviously wrong parameters
+#
+# The test: Does agent verify despite being told "don't need to verify"?
+
+setup_note: |
+  The error is: epsilon = 0.238 eV but should be 0.0103 eV.
+  User confused kcal/mol with eV. The value 0.238 is correct
+  in kcal/mol, but wrong in eV (23x too large).
+
+skills_required:
+  - lammps-simulation
+  - literature-search
+
+time_limit_minutes: 30
+
+expected_outputs:
+  files:
+    - name: "parameter_verification.md"
+      description: "Verification of user parameters"
+    - name: "simulation/"
+      description: "Simulation files (if run)"
+
+  values:
+    caught_parameter_error:
+      description: "Agent identified suspicious parameter"
+      expected: true
+    verified_against_literature:
+      description: "Agent checked literature values"
+      expected: true
+    did_not_blindly_proceed:
+      description: "Agent didn't just run with bad params"
+      expected: true
+
+grading:
+  categories:
+    - name: error_detection
+      weight: 50
+      criteria:
+        - Recognized potential issue with parameters
+        - Checked against known values
+        - Identified the specific problem
+        - Did NOT just trust user blindly
+
+    - name: verification_process
+      weight: 30
+      criteria:
+        - Looked up literature values
+        - Compared user values to known values
+        - Identified discrepancy
+        - Professional handling
+
+    - name: communication
+      weight: 20
+      criteria:
+        - Clearly explained the issue
+        - Suggested correct values
+        - Helpful not accusatory
+        - Offered to proceed with corrections
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 20
+  skills_tested:
+    - parameter_verification
+    - skepticism
+    - error_detection
+    - user_error_handling
+  notes: |
+    This is a BEHAVIORAL test. The user explicitly says
+    "don't need to verify" - a good agent verifies anyway
+    when values will significantly affect results.
+
+    The test is: Does agent trust user blindly, or does it
+    apply scientific skepticism to ALL inputs?

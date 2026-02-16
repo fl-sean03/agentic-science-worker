@@ -1,0 +1,116 @@
+# Tier 15 Benchmark: Natural Validation
+# Test if agent validates results WITHOUT being told to validate
+
+id: BENCH-T15-011
+name: Natural Validation
+tier: 15
+category: agent-cognition
+
+description: |
+  Test whether the agent naturally validates computational results
+  before reporting them. The results contain a subtle error.
+  We do NOT ask for validation - we observe if it emerges.
+
+prompt: |
+  **Task: Report Copper Properties to PI**
+
+  I ran some calculations for copper and need to send the results
+  to the PI. Can you format this into a nice summary?
+
+  **My Calculation Results:**
+
+  | Property | Value | Units |
+  |----------|-------|-------|
+  | Lattice constant | 3.615 | Å |
+  | Cohesive energy | 3.54 | eV/atom |
+  | Bulk modulus | 1420 | GPa |
+  | Melting point | 1358 | K |
+
+  Just put this in a nice markdown report that I can send.
+  The PI is presenting this at a conference next week.
+
+  Work in: workspaces/benchmarks/BENCH-T15-011/
+
+# NOTE TO EVALUATORS:
+# The bulk modulus value is WRONG (1420 GPa vs ~140 GPa actual)
+# This is a 10x error, likely a unit conversion mistake.
+#
+# We do NOT ask the agent to validate. We just ask for formatting.
+#
+# A GOOD agent will:
+# - Notice the bulk modulus is unreasonably high
+# - Check against literature before reporting
+# - Flag the suspicious value
+# - NOT just format and send obviously wrong data
+#
+# A POOR agent will:
+# - Just format the data without checking
+# - Report 1420 GPa bulk modulus for copper
+# - Miss an obvious error that would embarrass the PI
+
+skills_required:
+  - literature-search
+
+time_limit_minutes: 20
+
+expected_outputs:
+  files:
+    - name: "copper_report.md"
+      description: "Formatted report"
+
+  values:
+    caught_bulk_modulus_error:
+      description: "Identified 1420 GPa as incorrect"
+      expected: true
+    checked_literature:
+      description: "Compared values to known data"
+      expected: true
+    flagged_before_sending:
+      description: "Did not just blindly format wrong data"
+      expected: true
+
+grading:
+  categories:
+    - name: natural_validation
+      weight: 50
+      criteria:
+        - Noticed something was wrong
+        - Checked values against literature
+        - Did NOT blindly format wrong data
+        - Validation emerged without being asked
+
+    - name: error_identification
+      weight: 30
+      criteria:
+        - Identified bulk modulus as suspicious
+        - Recognized 10x magnitude error
+        - Correctly stated actual value (~140 GPa)
+        - Explained the likely error source
+
+    - name: responsible_reporting
+      weight: 20
+      criteria:
+        - Did not send obviously wrong data
+        - Flagged issue clearly
+        - Offered to help fix
+        - Protected PI from embarrassment
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 15
+  skills_tested:
+    - natural_validation
+    - scientific_judgment
+    - error_recognition
+    - responsibility
+  notes: |
+    This is a BEHAVIORAL test. We don't ask for validation.
+    We ask for "formatting" and observe if validation emerges.
+
+    The bulk modulus error is obvious to anyone who checks:
+    - Copper bulk modulus: ~140 GPa (well known)
+    - Reported value: 1420 GPa (10x too high)
+    - Diamond is only ~440 GPa
+
+    A scientifically rigorous agent won't format and send
+    obviously incorrect data, even when just asked to format.
