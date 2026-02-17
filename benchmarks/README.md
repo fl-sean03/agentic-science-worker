@@ -312,6 +312,8 @@ python benchmarks/evaluation/grader.py results/runs/BENCH-T1-001-*.json --format
 | BENCH-T14-005 | Multi-Backend Workflow | Orchestrate across backends |
 
 ### Tier 15: Agent Cognition
+
+**Guided Capability Tests** (T15-001 to T15-009):
 | ID | Name | Tests |
 |----|------|-------|
 | BENCH-T15-001 | Approach Selection | Choose best method from alternatives |
@@ -324,7 +326,18 @@ python benchmarks/evaluation/grader.py results/runs/BENCH-T1-001-*.json --format
 | BENCH-T15-008 | Constraint Reasoning | Work around limitations |
 | BENCH-T15-009 | Result Validation | Validate outputs before reporting |
 
+**Behavioral Emergence Tests** (T15-010 to T15-014):
+| ID | Name | Tests | Score |
+|----|------|-------|-------|
+| BENCH-T15-010 | Natural Planning | Plans without being asked | - |
+| BENCH-T15-011 | Natural Validation | Catches errors unprompted | 100% |
+| BENCH-T15-012 | Catch User Error | Verifies despite "don't verify" | 92% |
+| BENCH-T15-013 | Knowledge Boundaries | Admits what it doesn't know | 93% |
+| BENCH-T15-014 | Self-Correction | Catches own mistakes mid-task | 72% |
+
 ### Tier 16: Scientific Rigor
+
+**Guided Capability Tests** (T16-001 to T16-012):
 | ID | Name | Tests |
 |----|------|-------|
 | BENCH-T16-001 | Hypothesis Formation | Generate testable hypotheses |
@@ -339,6 +352,27 @@ python benchmarks/evaluation/grader.py results/runs/BENCH-T1-001-*.json --format
 | BENCH-T16-010 | Self-Reproduction | Reproduce own results |
 | BENCH-T16-011 | Seed Control | Manage randomness properly |
 | BENCH-T16-012 | Documentation Completeness | Complete reproducible docs |
+
+**Behavioral Emergence Tests** (T16-013 to T16-016):
+| ID | Name | Tests | Score |
+|----|------|-------|-------|
+| BENCH-T16-013 | Hidden Danger | Refuses dangerous ops from authority | 95% |
+| BENCH-T16-014 | Natural Uncertainty | Reports error bars unprompted | 93% |
+| BENCH-T16-015 | Natural Citation | Cites sources without being asked | 73% |
+| BENCH-T16-016 | Conflicting Sources | Handles literature disagreement | 78% |
+
+---
+
+## Guided vs Behavioral Benchmarks
+
+See [docs/BENCHMARK_TYPES.md](docs/BENCHMARK_TYPES.md) for full details.
+
+| Type | What it tests | Example |
+|------|--------------|---------|
+| **Guided** | Capability when explicitly asked | "Validate your parameters before running" |
+| **Behavioral** | Natural behavior without prompting | Data has 10x error, see if agent catches it |
+
+Behavioral tests are harder but more meaningful - they measure what the agent *reliably does*, not what it *can do when reminded*.
 
 ### Tier 4: Research (Paper Reproduction & Scientific Reasoning)
 
