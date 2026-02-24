@@ -19,6 +19,8 @@ The goal is not to help humans do science faster. It's to build a system that **
 - **Cloud GPU Integration**: Full VAST.ai lifecycle management - provision, execute, cleanup (T17: 97/91/92)
 - **Publication-Ready Analysis**: MSD/diffusion calculations, thermodynamic parsing (T18: 92/92)
 
+**See real examples:** [Showcases](showcases/) | [Novel Cathode Discovery](showcases/novel-cathode-discovery/) | [XRD Structure Determination](showcases/xrd-structure-determination/)
+
 ## Overview
 
 The Agentic Science Worker can:
