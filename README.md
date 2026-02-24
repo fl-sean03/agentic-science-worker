@@ -2,7 +2,7 @@
 
 An autonomous AI researcher for computational materials science. Not a tool that executes commands—an independent lab member that takes ownership of research problems.
 
-**Current Status:** 80/86 benchmarks passing (100% pass rate) | [View Dashboard](benchmarks/CURRENT_STATUS.md)
+**Current Status:** 81/86 benchmarks passing (100% pass rate) | [View Dashboard](benchmarks/CURRENT_STATUS.md)
 
 ## Vision
 
@@ -155,7 +155,7 @@ Calculate the band structure of silicon
 
 The project includes a comprehensive benchmark suite to evaluate agent capabilities:
 
-### Current Results (80/86 passing, 100% pass rate)
+### Current Results (81/86 passing, 100% pass rate)
 
 | Tier | Category | Benchmarks | Status |
 |------|----------|------------|--------|
@@ -163,7 +163,7 @@ The project includes a comprehensive benchmark suite to evaluate agent capabilit
 | T7 | Research Campaigns | 1/3 | 33% (2 need HPC) |
 | T8 | ML/MLIP | 6/7 | 86% ✅ |
 | T9 | Autonomous Research | 3/5 | 60% (2 need DFT data) |
-| T10 | Frontier DFT | 3/4 | 75% ✅ Novel discovery, XRD reasoning |
+| T10 | Frontier DFT | 4/4 | **100%** ✅ Novel discovery, XRD, phonon research |
 | T13-T16 | Quality & Cognition | 43 | 100% ✅ |
 | T17 | Cloud GPU (VAST.ai) | 3/3 | 100% ✅ Scores: 97, 91, 92 |
 | T18 | Data Analysis | 2/2 | 100% ✅ Scores: 92, 92 |

@@ -14,13 +14,13 @@
 | Campaigns (T7) | 1/3 | 1 | 33% | 2 archived |
 | ML/MLIP (T8) | 6/7 | 6 | 86% | |
 | Autonomous (T9) | 3/5 | 3 | 100% | T9-003 fixed |
-| Frontier (T10) | 3/4 | 3 | 75% | 75, 72, 85 ✅ Novel discovery + XRD |
+| Frontier (T10) | 4/4 | 4 | 100% | 75, 72, 78, 85 ✅ All passing! |
 | HPC+ML (T11) | - | - | - | **ARCHIVED** |
 | Theory (T12) | 0/3 | - | - | Needs Theorizer |
 | Quality (T13-T16) | 43/43 | 43 | 100% | |
 | Cloud GPU (T17) | 3/3 | 3 | 100% | T17-001: 97, T17-002: 91, T17-003: 92 ✅ |
 | Data Analysis (T18) | 2/2 | 2 | 100% | T18-001: 92, T18-002: 92 ✅ |
-| **ACTIVE** | **80/86** | **80** | **100%** | |
+| **ACTIVE** | **81/86** | **81** | **100%** | |
 
 ---
 
@@ -67,12 +67,12 @@ See `skills/archive/hpc-cluster-curc/` for archived skill.
 - Run 3: 58 ✅ - Actual NEMD (Müller-Plathe), κ still too low but passes
 - **Result:** 2/3 passing, explicit MD requirement fixed Run 2 issue
 
-### T10: Frontier DFT (75%)
+### T10: Frontier DFT (100%)
 | ID | Score | Notes |
 |----|-------|-------|
 | T10-001 | 75 ✅ | Novel material discovery - 9 novel Li-ion cathodes! |
 | T10-002 | 72 ✅ | Cross-modal XRD reasoning - R-3m LiNiO2 identified |
-| T10-003 | Running | Open research question (phonon softening) |
+| T10-003 | 78 ✅ | Open research question - MLIP phonon softening investigation |
 | T10-004 | 85 ✅ | Basic DFT SCF (QE GPU working!) |
 
 ### T11: HPC+ML (ARCHIVED)
@@ -244,6 +244,7 @@ Not run - needs Theorizer MCP integration.
 
 | Date | Change |
 |------|--------|
+| 2026-02-24 | **T10 COMPLETE**: All frontier DFT passing - T10-003 (78) phonon softening investigation |
 | 2026-02-24 | **T10-001/002 PASSED**: Frontier DFT - novel cathode discovery (75), XRD reasoning (72) |
 | 2026-02-24 | **T17/T18 EXPANDED**: Created T17-004 to T17-008, T18-003 to T18-004 |
 | 2026-02-23 | **T17 COMPLETE**: All cloud GPU benchmarks pass (97, 91, 92) |
