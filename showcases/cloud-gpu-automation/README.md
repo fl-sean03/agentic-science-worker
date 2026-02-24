@@ -88,6 +88,64 @@ This same capability enables:
 | T17-007 | Long jobs with checkpointing |
 | T17-008 | Hybrid local-cloud research pipelines |
 
+## Evaluation Details
+
+The benchmark uses LLM-as-judge grading with detailed category scoring:
+
+| Category | Score | Weight | Key Evidence |
+|----------|-------|--------|--------------|
+| Provisioning | 95 | 25% | RTX 4090 at $0.2605/hr, from 19 offers, 99.7% reliability |
+| Verification | 100 | 25% | Full nvidia-smi output, specs match offer exactly |
+| Cleanup | 100 | 30% | Instance destroyed 8 sec after verification, zero orphans |
+| Documentation | 95 | 20% | Complete timeline, cost tracking, recommendations |
+
+### Strengths (from LLM evaluation)
+
+- Complete lifecycle execution: provision -> verify -> destroy -> confirm cleanup
+- GPU verification includes full nvidia-smi output showing exact specs match
+- Explicit cleanup verification with `vastai show instances` showing empty table
+- Cost tracking shows actual balance change ($66.60 -> $66.59 = $0.01)
+- Prompt resource cleanup - only 8 seconds between verification and destruction
+
+### Areas for Improvement
+
+- Selection logic could explain WHY this offer was chosen over others
+- Search/create commands not shown verbatim (only destroy)
+- No error handling documentation
+
+## Session Statistics
+
+| Metric | Value |
+|--------|-------|
+| **Duration** | 5 minutes |
+| **Agent Turns** | 29 |
+| **Total Cost** | $0.79 |
+| **Files Created** | 2 |
+| **Models Used** | Claude Opus 4.5, Haiku 4.5 |
+
+### Agent Timeline (from transcript)
+
+```
+00:32:00  Started task
+00:33:15  Balance verified: $66.60
+00:33:30  Searched 19 GPU offers
+00:34:00  Selected RTX 4090 at $0.2605/hr (Hong Kong, 99.7% reliability)
+00:34:15  Created instance ID 31913120
+00:36:03  SSH ready detected
+00:36:25  GPU verified via nvidia-smi (RTX 4090, 24GB, CUDA 12.4)
+00:36:33  Instance destroyed
+00:36:38  Cleanup verified: 0 instances
+00:36:40  Final balance: $66.59 ($0.01 spent)
+```
+
+### Files Generated
+
+```
+workspaces/benchmarks/BENCH-T17-001/
+├── instance_log.md      # Full operation timeline with nvidia-smi output
+└── cost_analysis.md     # Cost tracking and efficiency analysis
+```
+
 ## Reproduce This Result
 
 ```bash
@@ -99,4 +157,5 @@ vastai show instances | grep BENCH
 # Should return nothing
 ```
 
+**Full results:** `benchmarks/results/runs/BENCH-T17-001-*/`
 **Note:** Requires VAST.ai account with API key configured.

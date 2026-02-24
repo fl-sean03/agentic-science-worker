@@ -49,7 +49,30 @@ The agent autonomously provisioned a cloud GPU (VAST.ai), verified functionality
 Each showcase includes:
 - `README.md` - Summary and key findings
 - `outputs/` or `images/` - Key files and visualizations
-- Links to full benchmark results
+- Evaluation details with category scores
+- Session statistics (duration, cost, turns)
+- Complete file listings
+
+## Observability
+
+Every benchmark run captures detailed data for reproducibility and analysis:
+
+| Data Type | Location | Contents |
+|-----------|----------|----------|
+| **Grading Details** | `result.json` | Category scores, evidence, reasoning |
+| **Session Stats** | `result.json` | Turns, duration, cost by model |
+| **Files Created** | `result.json` | Complete list of all outputs |
+| **Workspace Artifacts** | `workspaces/benchmarks/` | Actual deliverables (CIF, JSON, MD) |
+| **Conversation Transcript** | `transcript.md` | Step-by-step actions (when available) |
+
+### Example: What You Can Learn
+
+From `result.json` you can see:
+- **How long** the agent worked (e.g., 37 turns over 22 minutes)
+- **How much** it cost (e.g., $4.14 across 3 models)
+- **What it created** (e.g., 123 files including 88 CIF structures)
+- **Where it excelled** (e.g., "Comprehensive MLIP screening")
+- **Where it struggled** (e.g., "DFT validation not executed")
 
 ## Running Your Own
 

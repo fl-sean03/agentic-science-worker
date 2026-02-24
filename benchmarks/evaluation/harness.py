@@ -106,6 +106,9 @@ class BenchmarkResult:
     agent_output: str = ""
     agent_json: Dict = field(default_factory=dict)
 
+    # Conversation transcript (for observability)
+    conversation: List[Dict] = field(default_factory=list)
+
     # Workspace
     workspace_path: str = ""
     files_created: List[str] = field(default_factory=list)
@@ -192,15 +195,14 @@ def run_agent(
     Spawn a Claude Code agent to execute the task.
 
     Uses ~/.claude credentials (subscription-based auth).
+    Captures full conversation transcript using stream-json format.
     """
 
-    # Build command
-    # Note: No --cwd option in claude CLI - use subprocess cwd instead
-    # Pass prompt via stdin to handle special characters
+    # Build command - use stream-json to capture full conversation
     cmd = [
         "claude",
         "-p",  # Print mode (non-interactive)
-        "--output-format", "json",
+        "--output-format", "stream-json",  # Stream all messages for observability
         "--dangerously-skip-permissions",  # Full autonomy
         "--allowedTools", ",".join(ALLOWED_TOOLS),
     ]
@@ -226,12 +228,24 @@ def run_agent(
 
         elapsed = time.time() - start_time
 
-        # Try to parse JSON output
+        # Parse streaming JSON output - each line is a JSON object
+        conversation = []
         agent_json = {}
-        try:
-            agent_json = json.loads(result.stdout)
-        except json.JSONDecodeError:
-            pass
+        final_result = None
+
+        for line in result.stdout.strip().split('\n'):
+            if not line.strip():
+                continue
+            try:
+                msg = json.loads(line)
+                conversation.append(msg)
+                # The final message with type="result" contains the summary
+                if msg.get('type') == 'result':
+                    agent_json = msg
+                    final_result = msg.get('result', '')
+            except json.JSONDecodeError:
+                # Non-JSON line (shouldn't happen with stream-json)
+                pass
 
         return {
             "status": "success" if result.returncode == 0 else "failed",
@@ -239,7 +253,9 @@ def run_agent(
             "stderr": result.stderr,
             "exit_code": result.returncode,
             "elapsed": elapsed,
-            "agent_json": agent_json
+            "agent_json": agent_json,
+            "conversation": conversation,
+            "final_result": final_result or result.stdout
         }
 
     except subprocess.TimeoutExpired as e:
@@ -250,7 +266,9 @@ def run_agent(
             "stderr": e.stderr or f"Timeout after {timeout}s",
             "exit_code": -1,
             "elapsed": elapsed,
-            "agent_json": {}
+            "agent_json": {},
+            "conversation": [],
+            "final_result": ""
         }
 
     except Exception as e:
@@ -261,7 +279,9 @@ def run_agent(
             "stderr": str(e),
             "exit_code": -1,
             "elapsed": elapsed,
-            "agent_json": {}
+            "agent_json": {},
+            "conversation": [],
+            "final_result": ""
         }
 
 
@@ -450,6 +470,7 @@ IMPORTANT REQUIREMENTS:
         duration_seconds=exec_result['elapsed'],
         agent_output=exec_result['stdout'],
         agent_json=exec_result['agent_json'],
+        conversation=exec_result.get('conversation', []),
         workspace_path=str(workspace),
         files_created=files_created,
         score=score,
@@ -489,7 +510,96 @@ def save_benchmark_result(result: BenchmarkResult, benchmark: Dict):
         with open(result_dir / "stderr.txt", 'w') as f:
             f.write(result.stderr)
 
+    # Save full conversation transcript (for observability)
+    if result.conversation:
+        # Save raw JSON
+        with open(result_dir / "conversation.json", 'w') as f:
+            json.dump(result.conversation, f, indent=2)
+
+        # Generate human-readable markdown transcript
+        transcript_md = generate_transcript_markdown(result, benchmark)
+        with open(result_dir / "conversation.md", 'w') as f:
+            f.write(transcript_md)
+
     print(f"Results saved: {result_dir}")
+
+
+def generate_transcript_markdown(result: BenchmarkResult, benchmark: Dict) -> str:
+    """Generate a human-readable markdown transcript from conversation."""
+    lines = [
+        f"# Agent Transcript: {result.benchmark_id}",
+        "",
+        f"**Run ID:** {result.run_id}",
+        f"**Duration:** {result.duration_seconds:.1f}s",
+        f"**Score:** {result.score}/100",
+        f"**Status:** {result.status}",
+        "",
+        "---",
+        "",
+        "## Prompt",
+        "",
+        "```",
+        benchmark.get('prompt', 'N/A'),
+        "```",
+        "",
+        "---",
+        "",
+        "## Conversation",
+        "",
+    ]
+
+    turn_num = 0
+    for msg in result.conversation:
+        msg_type = msg.get('type', 'unknown')
+
+        if msg_type == 'assistant':
+            turn_num += 1
+            lines.append(f"### Turn {turn_num}: Assistant")
+            lines.append("")
+            content = msg.get('message', {}).get('content', [])
+            for block in content:
+                if isinstance(block, dict):
+                    if block.get('type') == 'text':
+                        lines.append(block.get('text', ''))
+                    elif block.get('type') == 'tool_use':
+                        tool_name = block.get('name', 'unknown')
+                        tool_input = block.get('input', {})
+                        lines.append(f"**Tool Call:** `{tool_name}`")
+                        lines.append("```json")
+                        lines.append(json.dumps(tool_input, indent=2)[:500])  # Truncate long inputs
+                        if len(json.dumps(tool_input)) > 500:
+                            lines.append("... (truncated)")
+                        lines.append("```")
+                elif isinstance(block, str):
+                    lines.append(block)
+            lines.append("")
+
+        elif msg_type == 'user':
+            content = msg.get('message', {}).get('content', [])
+            # User messages are often tool results
+            for block in content:
+                if isinstance(block, dict) and block.get('type') == 'tool_result':
+                    tool_id = block.get('tool_use_id', '')[:8]
+                    result_content = str(block.get('content', ''))[:300]
+                    lines.append(f"**Tool Result** (id: {tool_id}...)")
+                    lines.append("```")
+                    lines.append(result_content)
+                    if len(str(block.get('content', ''))) > 300:
+                        lines.append("... (truncated)")
+                    lines.append("```")
+                    lines.append("")
+
+        elif msg_type == 'result':
+            lines.append("---")
+            lines.append("")
+            lines.append("## Final Result")
+            lines.append("")
+            lines.append(msg.get('result', 'N/A'))
+            lines.append("")
+            lines.append(f"**Total Cost:** ${msg.get('total_cost_usd', 0):.4f}")
+            lines.append(f"**Turns:** {msg.get('num_turns', 0)}")
+
+    return '\n'.join(lines)
 
 
 def run_tier(tier: int, verbose: bool = False, backend_name: str = "claude") -> List[BenchmarkResult]:

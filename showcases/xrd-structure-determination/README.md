@@ -102,6 +102,64 @@ Structure determination from XRD is a core experimental workflow. This showcase 
 
 The agent solved this in 8 minutes - a task that might take a graduate student hours of manual analysis.
 
+## Evaluation Details
+
+The benchmark uses LLM-as-judge grading with detailed category scoring:
+
+| Category | Score | Weight | Key Evidence |
+|----------|-------|--------|--------------|
+| Pattern Analysis | 85 | 20% | Correct Bragg's law, systematic absences identified |
+| Candidate Generation | 70 | 20% | 23 candidates from Materials Project (no MLIP relaxation) |
+| Pattern Matching | 75 | 30% | R-factor calculations, good physical reasoning |
+| Validation | 65 | 15% | Bond lengths verified, formation energy not calculated |
+| Scientific Communication | 75 | 15% | Clear report, 7 visualizations created |
+
+### Strengths (from LLM evaluation)
+
+- Correct Bragg's law calculations and systematic absence analysis for R-3m identification
+- Comprehensive database search with 23 candidates from Materials Project
+- Well-structured research report with clear methodology and literature references
+- Good scientific reasoning in choosing R-3m over C2/m despite numerical R-factors
+- Multiple high-quality visualizations for pattern comparison
+
+### Areas for Improvement
+
+- MLIP relaxation of candidates not performed as requested
+- Missing expected CSV output files (d_spacings.csv, r_factors.csv)
+- Formation energy calculations not performed
+
+## Session Statistics
+
+| Metric | Value |
+|--------|-------|
+| **Duration** | 8 minutes |
+| **Agent Turns** | 35 |
+| **Total Cost** | $2.23 |
+| **Files Created** | 44 |
+| **Models Used** | Claude Opus 4.5, Haiku 4.5 |
+
+### All Files Generated
+
+```
+analysis/                           # XRD analysis results
+├── final_xrd_comparison.png        # Publication-quality comparison
+├── structure_summary.png           # Structure infographic
+├── xrd_best_match.png              # Initial matching results
+├── detailed_comparison.png         # Peak-by-peak analysis
+├── r3m_refinement.png              # Lattice optimization
+├── optimized_R3m_LiNiO2.cif        # Final structure
+├── xrd_comparison_results.json     # Numerical results
+├── validation_results.json         # Bond length checks
+└── *.py                            # Analysis scripts
+
+structures/                         # 23 candidate CIF files
+├── mp-25258_LiNiO2.cif            # Best match (R-3m)
+├── mp-632864_LiNiO2.cif           # Monoclinic alternative
+└── mp_query_results.json          # Materials Project metadata
+
+RESEARCH_REPORT.md                  # Full research report
+```
+
 ## Reproduce This Result
 
 ```bash
@@ -109,4 +167,5 @@ cd /path/to/agentic-science-worker
 python benchmarks/evaluation/harness.py BENCH-T10-002
 ```
 
-Full workspace: `workspaces/benchmarks/BENCH-T10-002-*/`
+**Full results:** `benchmarks/results/runs/BENCH-T10-002-*/result.json`
+**Full workspace:** `workspaces/benchmarks/BENCH-T10-002-*/`

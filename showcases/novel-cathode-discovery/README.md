@@ -91,6 +91,78 @@ This showcase demonstrates that an AI agent can:
 
 The discovered materials are genuine candidates for experimental synthesis - not random compositions, but chemically sensible structures identified through systematic computational exploration.
 
+## Evaluation Details
+
+The benchmark uses LLM-as-judge grading with detailed category scoring:
+
+| Category | Score | Weight | Key Evidence |
+|----------|-------|--------|--------------|
+| Research Strategy | 85 | 20% | 5 well-justified hypotheses based on literature gaps |
+| Computational Screening | 80 | 25% | 88 candidates, MACE-MP-0 relaxation, proper filtering |
+| Validation | 55 | 20% | Novelty verified; DFT inputs generated but not run |
+| Scientific Insight | 80 | 20% | Clear analysis of top candidate, limitations acknowledged |
+| Report Quality | 75 | 15% | Publication-quality markdown, structured results |
+
+### Strengths (from LLM evaluation)
+
+- Well-justified hypothesis generation with 5 distinct chemical spaces
+- Adaptive problem-solving when encountering ASE disorder limitations
+- Comprehensive MLIP screening with 88 candidates and proper filtering
+- Clear documentation and organized file structure
+- Thoughtful identification of novel mixed polyanion chemistry
+
+### Areas for Improvement
+
+- DFT validation not executed (only input files generated)
+- Voltage estimation based on composition model, not explicit calculation
+- No actual literature citations with DOIs
+
+## Session Statistics
+
+| Metric | Value |
+|--------|-------|
+| **Duration** | 22 minutes |
+| **Agent Turns** | 37 |
+| **Total Cost** | $4.14 |
+| **Files Created** | 123 |
+| **Models Used** | Claude Opus 4.5, Haiku 4.5, Sonnet 4.5 |
+
+### All Files Generated
+
+The agent created 123 files across these categories:
+
+```
+structures/           # 88 CIF structure files
+├── prototypes/       # 6 template structures
+├── candidates/       # 62 generated candidates
+└── ordered/          # 46 SQS-ordered high-entropy structures
+
+screening/            # Filtering pipeline results
+├── mlip_screening_all.json
+├── stable_candidates_all.json
+├── voltage_results_corrected.json
+├── high_voltage_candidates_corrected.json
+├── novelty_check.json
+└── novel_candidates_final.json
+
+dft/                  # QE input files for top candidates
+├── cand_010/scf.in
+├── cand_011/scf.in
+├── cand_047/scf.in
+├── cand_048/scf.in
+├── cand_104/scf.in
+└── run_dft.sh
+
+literature/           # Research hypotheses
+└── research_hypotheses.md
+
+report/               # Final deliverables
+└── RESEARCH_REPORT.md
+
+analysis/             # Top candidate deep-dive
+└── top_candidate_analysis.json
+```
+
 ## Reproduce This Result
 
 ```bash
@@ -98,4 +170,5 @@ cd /path/to/agentic-science-worker
 python benchmarks/evaluation/harness.py BENCH-T10-001
 ```
 
-Full workspace: `workspaces/benchmarks/BENCH-T10-001-*/`
+**Full results:** `benchmarks/results/runs/BENCH-T10-001-*/result.json`
+**Full workspace:** `workspaces/benchmarks/BENCH-T10-001-*/`
