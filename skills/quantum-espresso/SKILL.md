@@ -171,28 +171,44 @@ Si  28.0855  Si.pbe-n-rrkjus_psl.1.0.0.UPF
 
 ## Binary Locations
 
-QE is configured via environment variables (set in `.claude/settings.json` or shell):
-
+**Local GPU-accelerated QE (RTX 5080):**
 ```bash
-# From environment variables
-QE_CPU="${QE_CPU:-/usr/local/qe/bin}"   # CPU build directory
-QE_GPU="${QE_GPU:-$QE_CPU}"              # GPU build (optional)
+# GPU Build (NVHPC-compiled, sm_120)
+QE_GPU="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin"
 
-# Check your config
-echo $QE_CPU
+# CPU Build (GCC/MPI)
+QE_CPU="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin"
+
+# Environment setup for GPU build
+QE_ENV="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/env/setup_nvhpc.sh"
 ```
 
 ### Execution
 
-**CPU:**
+**CPU (general purpose):**
 ```bash
-$QE_CPU/pw.x < input.in > output.out
+/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
+
+# With MPI
+mpirun -np 4 /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
 ```
 
-**GPU (first source environment if using NVHPC):**
+**GPU (RTX 5080 accelerated - recommended for production):**
 ```bash
-source $QE_ENV_SCRIPT  # If set
+# First source NVHPC environment
+source /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/env/setup_nvhpc.sh
+
+# Run GPU-accelerated QE
+/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin/pw.x < input.in > output.out
+
+# Or with wrapper variables
 $QE_GPU/pw.x < input.in > output.out
+```
+
+**Test scripts available:**
+```bash
+bash /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/scripts/run_example01_cpu.sh
+bash /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/scripts/run_example01_gpu.sh
 ```
 
 ---
@@ -321,3 +337,47 @@ Every QE calculation requires you to:
 5. Reference correctly in input
 
 If a pseudopotential doesn't exist for your element/functional combination, that's important information to report.
+
+---
+
+## Example: Formation Energy Calculation
+
+**Task:** Calculate formation energy of NaCl
+
+**Complete workflow:**
+
+1. **Get structure**
+   ```bash
+   # From Materials Project
+   mp-22862 → NaCl rock salt structure
+   ```
+
+2. **Download pseudopotentials**
+   ```
+   Na.pbe-spn-kjpaw_psl.1.0.0.UPF (ecutwfc=66 Ry)
+   Cl.pbe-n-rrkjus_psl.1.0.0.UPF (ecutwfc=45 Ry)
+   ```
+
+3. **Run SCF for NaCl**
+   - ecutwfc = 66 Ry (use max of both elements)
+   - k-points: 6x6x6 automatic
+   - Check convergence
+
+4. **Run reference calculations**
+   - Na metal (BCC structure)
+   - Cl₂ molecule (in large box)
+
+5. **Calculate formation energy**
+   ```
+   E_f = E(NaCl) - E(Na_metal) - 0.5*E(Cl₂)
+   ```
+
+6. **Compare to literature**
+   - Expected: ~-4.2 eV/atom
+   - If different by >10%, investigate
+
+**Common pitfall:** Forgetting reference calculations. You need ALL of:
+- The compound (NaCl)
+- The elemental references (Na metal, Cl₂)
+
+**See also:** `examples/workflows/multi-compound-study.md` for multi-compound studies

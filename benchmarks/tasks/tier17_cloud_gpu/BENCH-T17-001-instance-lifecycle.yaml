@@ -1,0 +1,174 @@
+# Tier 17 Benchmark: Basic Instance Lifecycle
+# Test complete VAST.ai instance provisioning and cleanup
+
+id: BENCH-T17-001
+name: Instance Lifecycle
+tier: 17
+category: cloud-gpu
+
+description: |
+  Test the agent's ability to complete the full VAST.ai instance lifecycle:
+  provision, verify, use, and destroy. This is the foundational cloud GPU
+  benchmark - all other T17 benchmarks build on this capability.
+
+prompt: |
+  **Task: Complete VAST.ai Instance Lifecycle**
+
+  Demonstrate your ability to provision and manage a cloud GPU instance.
+
+  **Step 1: Check Balance**
+  First, verify you have sufficient VAST.ai balance:
+  ```bash
+  vastai show user
+  ```
+  You need at least $0.25 for this task.
+
+  **Step 2: Search for GPU**
+  Find the cheapest available RTX 3090 or RTX 4090 under $0.40/hr:
+  ```bash
+  vastai search offers "gpu_name=RTX_4090 rentable=True dph<0.4" -o "dph+"
+  ```
+
+  If no 4090 available, try 3090:
+  ```bash
+  vastai search offers "gpu_name=RTX_3090 rentable=True dph<0.3" -o "dph+"
+  ```
+
+  Record the offer ID and price you select.
+
+  **Step 3: Create Instance**
+  Provision the instance:
+  ```bash
+  vastai create instance <offer_id> \
+    --image nvidia/cuda:12.2.0-devel-ubuntu22.04 \
+    --disk 20 \
+    --ssh
+  ```
+
+  **Step 4: Wait for Ready**
+  Poll until SSH is available:
+  ```bash
+  vastai show instances
+  ```
+  Look for `running` status and SSH info.
+
+  **Step 5: Verify GPU**
+  Connect via SSH and verify the GPU works:
+  ```bash
+  # Get SSH command
+  vastai ssh-url <instance_id>
+
+  # Connect and run
+  ssh -p <port> root@<host> "nvidia-smi"
+  ```
+
+  Save the nvidia-smi output to verify GPU specs.
+
+  **Step 6: Destroy Instance**
+  **CRITICAL:** Always destroy instances when done!
+  ```bash
+  vastai destroy instance <instance_id>
+  ```
+
+  **Step 7: Verify Cleanup**
+  Confirm no instances remain:
+  ```bash
+  vastai show instances
+  ```
+  Should show no running instances.
+
+  **Deliverables:**
+  Create the following in workspaces/benchmarks/BENCH-T17-001/:
+
+  1. `instance_log.md` - Timeline of operations:
+     - Balance before
+     - Offer selected (ID, GPU, price)
+     - Instance ID created
+     - Time to SSH ready
+     - nvidia-smi output
+     - Destruction confirmed
+     - Balance after
+
+  2. `cost_analysis.md` - Cost tracking:
+     - Estimated cost (price × time)
+     - Actual cost (balance diff)
+     - Any discrepancy explained
+
+  Work in: workspaces/benchmarks/BENCH-T17-001/
+
+skills_required:
+  - vast-cloud
+
+time_limit_minutes: 20
+
+cost_limit_dollars: 0.25
+
+expected_outputs:
+  files:
+    - name: "instance_log.md"
+      description: "Complete operation timeline"
+    - name: "cost_analysis.md"
+      description: "Cost tracking and analysis"
+
+  values:
+    instance_created:
+      description: "Instance was successfully created"
+      expected: true
+    gpu_verified:
+      description: "nvidia-smi ran successfully"
+      expected: true
+    instance_destroyed:
+      description: "Instance was destroyed"
+      expected: true
+    orphan_instances:
+      description: "Running instances after benchmark"
+      expected: 0
+    total_cost:
+      description: "Total cost in dollars"
+      expected_range: [0.01, 0.25]
+
+grading:
+  categories:
+    - name: provisioning
+      weight: 25
+      criteria:
+        - Appropriate GPU selected
+        - Instance created successfully
+        - SSH ready detected correctly
+        - Selection logic documented
+
+    - name: verification
+      weight: 25
+      criteria:
+        - nvidia-smi output captured
+        - GPU specs match offer
+        - Connection worked first try (or retried appropriately)
+
+    - name: cleanup
+      weight: 30
+      criteria:
+        - Instance destroyed promptly
+        - No orphan instances remain
+        - Destruction verified
+        - Would not leak resources
+
+    - name: documentation
+      weight: 20
+      criteria:
+        - Timeline complete
+        - Cost tracked accurately
+        - Operations logged clearly
+
+metadata:
+  difficulty: easy
+  estimated_time_minutes: 15
+  estimated_cost_dollars: 0.10
+  skills_tested:
+    - cloud_provisioning
+    - instance_management
+    - resource_cleanup
+  notes: |
+    This is the foundational VAST.ai benchmark. Success here indicates
+    the agent can safely use cloud GPU resources without leaking money.
+    The cleanup category is weighted highest because orphan instances
+    are the most costly failure mode.

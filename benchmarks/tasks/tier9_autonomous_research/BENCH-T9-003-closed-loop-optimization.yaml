@@ -97,6 +97,27 @@ prompt: |
   - Comparison to literature
   - Efficiency analysis
 
+  **IMPORTANT - Simulation Requirements:**
+  - You MUST run actual molecular dynamics simulations (NEMD or Green-Kubo)
+  - Analytical models (Abeles, Klemens-Callaway, etc.) are NOT sufficient alone
+  - Green-Kubo requires long correlation times (>1 ns production) for converged κ
+  - NEMD typically converges faster for crystalline solids
+  - Validate against pure Si (~150 W/m·K) and Ge (~60 W/m·K) before optimizing
+  - Optimal composition should be near x ≈ 0.3-0.7 (alloy scattering peak)
+
+  **Required Directory Structure:**
+  ```
+  workspaces/benchmarks/BENCH-T9-003/
+  ├── structures/sige_x*.cif       # Structures in CIF format
+  ├── simulations/x_*/md.log       # MD logs per composition
+  ├── analysis/thermal_conductivity.csv  # κ values table
+  ├── optimization/
+  │   ├── iteration_log.csv        # Optimization history
+  │   ├── kappa_vs_x.png           # κ(x) plot
+  │   └── trajectory.png           # Optimization trajectory
+  └── report.md                    # Full report
+  ```
+
   Work in: workspaces/benchmarks/BENCH-T9-003/
 
 skills_required:

@@ -72,6 +72,21 @@ python benchmarks/evaluation/harness.py --verify
 
 ---
 
+## Examples Directory
+
+**Check `examples/` when starting complex tasks.** It contains canonical examples of good work.
+
+| Task Type | Example to Check |
+|-----------|------------------|
+| Multi-compound study | `examples/workflows/multi-compound-study.md` |
+| Sparse/minimal instructions | `examples/workflows/sparse-input-task.md` |
+| Need to revise approach | `examples/workflows/iterative-refinement.md` |
+| Error recovery | `examples/patterns/error-recovery.md` |
+
+**Before claiming a task complete**, compare your outputs to the example's deliverables checklist.
+
+---
+
 ## For Full Context
 
 See `./AGENTS.md` for:

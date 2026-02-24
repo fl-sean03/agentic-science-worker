@@ -1,0 +1,186 @@
+# Tier 18 Benchmark: Parse LAMMPS Thermodynamic Output
+# Test ability to extract and analyze simulation data
+
+id: BENCH-T18-001
+name: Parse LAMMPS Thermo
+tier: 18
+category: data-analysis
+
+description: |
+  Test the agent's ability to parse LAMMPS thermodynamic output, calculate
+  statistics, and identify equilibration. This is foundational for any
+  MD analysis workflow.
+
+prompt: |
+  **Task: Analyze LAMMPS Thermodynamic Output**
+
+  You are given a LAMMPS log file from an NVT simulation of liquid argon.
+  Parse the thermodynamic data and perform standard analysis.
+
+  **Step 1: Generate Test Data**
+
+  First, run a short LAMMPS simulation to generate data:
+
+  Create `argon_nvt.in`:
+  ```lammps
+  # Liquid Argon NVT simulation
+  units lj
+  atom_style atomic
+  lattice fcc 0.8442
+  region box block 0 10 0 10 0 10
+  create_box 1 box
+  create_atoms 1 box
+  mass 1 1.0
+
+  pair_style lj/cut 2.5
+  pair_coeff 1 1 1.0 1.0 2.5
+
+  velocity all create 1.0 87287
+
+  fix 1 all nvt temp 1.0 1.0 0.5
+
+  thermo_style custom step temp pe ke etotal press vol
+  thermo 100
+
+  run 10000
+  ```
+
+  Run: `$LMP -in argon_nvt.in > argon_nvt.log`
+
+  **Step 2: Parse Thermo Data**
+
+  Extract columns from log file:
+  - Step
+  - Temp (temperature)
+  - PotEng (potential energy)
+  - KinEng (kinetic energy)
+  - TotEng (total energy)
+  - Press (pressure)
+  - Volume
+
+  Save to `thermo_data.csv`
+
+  **Step 3: Statistical Analysis**
+
+  Calculate for the EQUILIBRATED portion (after ~2000 steps):
+
+  | Property | Mean | Std Dev | Units |
+  |----------|------|---------|-------|
+  | Temperature | ? | ? | ε/kB |
+  | Potential Energy | ? | ? | ε |
+  | Pressure | ? | ? | ε/σ³ |
+  | Total Energy | ? | ? | ε |
+
+  **Step 4: Equilibration Detection**
+
+  Determine when system equilibrated:
+  - Plot temperature vs step
+  - Identify equilibration time (when fluctuations become stationary)
+  - Report: "Equilibrated after step X"
+
+  **Step 5: Block Averaging**
+
+  Estimate statistical uncertainty using block averaging:
+  - Divide equilibrated data into 5 blocks
+  - Calculate mean of each block
+  - Standard error = std(block_means) / sqrt(n_blocks)
+
+  Report uncertainty for each property.
+
+  **Step 6: Visualization**
+
+  Create plots:
+  - `temperature_vs_step.png` - Show equilibration
+  - `energy_components.png` - PE, KE, Total vs step
+  - `pressure_distribution.png` - Histogram of pressure
+
+  **Deliverables:**
+  Create in workspaces/benchmarks/BENCH-T18-001/:
+
+  ```
+  input/argon_nvt.in
+  output/argon_nvt.log
+  analysis/
+  ├── thermo_data.csv
+  ├── statistics.md
+  ├── temperature_vs_step.png
+  ├── energy_components.png
+  └── pressure_distribution.png
+  report.md
+  ```
+
+  Work in: workspaces/benchmarks/BENCH-T18-001/
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 30
+
+expected_outputs:
+  files:
+    - name: "analysis/thermo_data.csv"
+      description: "Parsed thermodynamic data"
+    - name: "analysis/statistics.md"
+      description: "Statistical analysis"
+    - name: "analysis/temperature_vs_step.png"
+      description: "Temperature plot"
+    - name: "report.md"
+      description: "Analysis report"
+
+  values:
+    mean_temperature:
+      description: "Mean temperature (equilibrated)"
+      expected_range: [0.9, 1.1]
+    equilibration_step:
+      description: "Step when equilibrated"
+      expected_range: [500, 4000]
+    data_rows:
+      description: "Number of thermo rows parsed"
+      expected_range: [90, 110]
+
+grading:
+  categories:
+    - name: parsing
+      weight: 30
+      criteria:
+        - Log file parsed correctly
+        - All columns extracted
+        - CSV properly formatted
+        - No data loss
+
+    - name: statistics
+      weight: 30
+      criteria:
+        - Correct mean values
+        - Standard deviation calculated
+        - Equilibration detected
+        - Block averaging done
+
+    - name: visualization
+      weight: 25
+      criteria:
+        - Plots generated
+        - Axes labeled
+        - Equilibration visible
+        - Publication quality
+
+    - name: documentation
+      weight: 15
+      criteria:
+        - Clear methodology
+        - Results interpreted
+        - Physical meaning discussed
+
+metadata:
+  difficulty: easy
+  estimated_time_minutes: 20
+  skills_tested:
+    - log_parsing
+    - statistical_analysis
+    - equilibration_detection
+    - visualization
+  notes: |
+    This foundational benchmark tests basic data analysis skills that
+    are required for any computational materials science workflow.
+    More advanced benchmarks build on these parsing and statistics skills.

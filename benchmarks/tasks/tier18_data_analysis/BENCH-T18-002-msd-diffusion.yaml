@@ -1,0 +1,198 @@
+# Tier 18 Benchmark: MSD and Diffusion Coefficient
+# Calculate diffusion from MD trajectory
+
+id: BENCH-T18-002
+name: MSD and Diffusion
+tier: 18
+category: data-analysis
+
+description: |
+  Calculate the mean squared displacement (MSD) from an MD trajectory and
+  extract the diffusion coefficient. This is a core analysis for any
+  transport property study.
+
+prompt: |
+  **Task: Calculate Diffusion Coefficient from MD Trajectory**
+
+  Run an MD simulation of liquid argon and calculate the self-diffusion
+  coefficient from the mean squared displacement.
+
+  **Step 1: Run MD Simulation**
+
+  Create a LAMMPS simulation that outputs trajectories:
+
+  ```lammps
+  # Liquid Argon NVE for diffusion
+  units lj
+  atom_style atomic
+
+  lattice fcc 0.8442
+  region box block 0 8 0 8 0 8
+  create_box 1 box
+  create_atoms 1 box
+  mass 1 1.0
+
+  pair_style lj/cut 2.5
+  pair_coeff 1 1 1.0 1.0 2.5
+
+  velocity all create 1.5 12345
+
+  # Equilibrate with NVT
+  fix 1 all nvt temp 1.0 1.0 0.5
+  run 5000
+  unfix 1
+
+  # Production with NVE (microcanonical for diffusion)
+  fix 2 all nve
+
+  # Compute MSD using LAMMPS built-in
+  compute msd all msd
+
+  thermo_style custom step temp pe ke etotal c_msd[4]
+  thermo 100
+
+  # Also dump trajectories for manual calculation
+  dump 1 all custom 500 trajectory.dump id type x y z
+
+  run 20000
+  ```
+
+  **Step 2: Extract MSD from LAMMPS**
+
+  LAMMPS computes MSD internally. Extract from log:
+  - Column `c_msd[4]` is the total MSD
+  - Plot MSD vs time (step × timestep)
+
+  **Step 3: Manual MSD Calculation**
+
+  Also calculate MSD manually from trajectory to verify:
+
+  ```python
+  def compute_msd(positions, reference_positions):
+      \"\"\"Compute MSD from trajectory.\"\"\"
+      displacements = positions - reference_positions
+      # Handle periodic boundaries
+      msd = np.mean(np.sum(displacements**2, axis=1))
+      return msd
+  ```
+
+  For each time origin t0, compute:
+  MSD(τ) = <|r(t0+τ) - r(t0)|²>
+
+  Average over multiple time origins for statistics.
+
+  **Step 4: Extract Diffusion Coefficient**
+
+  In the diffusive regime (long times), MSD is linear:
+  MSD = 6Dt (3D diffusion)
+
+  Fit the linear regime to extract D:
+  D = slope / 6
+
+  Report D in LJ units (σ²/τ).
+
+  **Step 5: Convert to Physical Units**
+
+  For argon:
+  - σ = 3.4 Å
+  - ε/kB = 120 K
+  - τ = σ√(m/ε) ≈ 2.15 ps
+
+  D_physical = D_LJ × σ² / τ
+
+  Compare to experimental: D_Ar ≈ 2-3 × 10⁻⁵ cm²/s at liquid density.
+
+  **Step 6: Visualization**
+
+  Create:
+  - `msd_vs_time.png` - MSD with linear fit region marked
+  - `diffusion_fit.png` - Linear fit showing extracted slope
+
+  **Deliverables:**
+  Create in workspaces/benchmarks/BENCH-T18-002/:
+
+  ```
+  simulation/
+  ├── argon_diffusion.in
+  ├── argon_diffusion.log
+  └── trajectory.dump
+  analysis/
+  ├── msd_data.csv
+  ├── msd_vs_time.png
+  ├── diffusion_fit.png
+  └── diffusion_analysis.py
+  results.md   # D value, comparison to literature
+  ```
+
+  Work in: workspaces/benchmarks/BENCH-T18-002/
+
+skills_required:
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 45
+
+expected_outputs:
+  files:
+    - name: "analysis/msd_data.csv"
+      description: "MSD vs time data"
+    - name: "analysis/msd_vs_time.png"
+      description: "MSD plot"
+    - name: "results.md"
+      description: "Diffusion coefficient and analysis"
+
+  values:
+    diffusion_coefficient_lj:
+      description: "D in LJ units"
+      expected_range: [0.01, 0.1]
+    linear_regime_r2:
+      description: "R² of linear fit"
+      expected_range: [0.95, 1.0]
+    msd_converged:
+      description: "MSD shows linear behavior"
+      expected: true
+
+grading:
+  categories:
+    - name: simulation
+      weight: 20
+      criteria:
+        - NVE production run
+        - Sufficient trajectory length
+        - Trajectories dumped correctly
+
+    - name: msd_calculation
+      weight: 35
+      criteria:
+        - MSD calculated correctly
+        - Multiple time origins used
+        - Statistical averaging done
+        - LAMMPS and manual agree
+
+    - name: diffusion_extraction
+      weight: 30
+      criteria:
+        - Linear regime identified
+        - Proper fitting
+        - D value reasonable
+        - Units converted correctly
+
+    - name: visualization
+      weight: 15
+      criteria:
+        - Clear MSD plot
+        - Fit shown
+        - Linear regime marked
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 35
+  skills_tested:
+    - trajectory_analysis
+    - msd_calculation
+    - linear_fitting
+    - unit_conversion
+  notes: |
+    Diffusion coefficient calculation is fundamental to transport property
+    studies. This benchmark tests both simulation setup (NVE for proper
+    dynamics) and analysis (MSD calculation, linear fitting).

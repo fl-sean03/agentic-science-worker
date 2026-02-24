@@ -278,8 +278,8 @@ class GradingAudit:
             lines.append(f"")
             lines.append(f"**Score:** {cat.points_earned}/{cat.points_possible} points ({cat.percentage:.1f}%)")
             lines.append(f"")
-            lines.append("| Check | Result | Points | Evidence |")
-            lines.append("|-------|--------|--------|----------|")
+            lines.append("| Check | Result | Points |")
+            lines.append("|-------|--------|--------|")
 
             for check in cat.checks:
                 result_emoji = {
@@ -289,18 +289,21 @@ class GradingAudit:
                     CheckResult.ERROR: "ERR"
                 }[check.result]
 
-                evidence_str = ""
-                if check.evidence and check.evidence.matched_text:
-                    evidence_str = check.evidence.matched_text[:50]
-                elif check.reasoning:
-                    evidence_str = check.reasoning[:50]
-
                 lines.append(
-                    f"| {check.check_description[:40]} | {result_emoji} | "
-                    f"{check.points_earned}/{check.points_possible} | {evidence_str} |"
+                    f"| {check.check_description} | {result_emoji} | "
+                    f"{check.points_earned}/{check.points_possible} |"
                 )
 
             lines.append("")
+
+            # Add full reasoning for each check below the table
+            for check in cat.checks:
+                if check.reasoning:
+                    lines.append(f"**{check.check_id}:** {check.reasoning}")
+                    lines.append("")
+                if check.evidence and check.evidence.matched_text:
+                    lines.append(f"*Evidence:* {check.evidence.matched_text}")
+                    lines.append("")
 
         if self.errors:
             lines.append("## Errors")

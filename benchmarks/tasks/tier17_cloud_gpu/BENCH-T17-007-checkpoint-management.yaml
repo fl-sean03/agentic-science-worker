@@ -1,0 +1,224 @@
+# Tier 17 Benchmark: Long Job with Checkpointing
+# Test checkpoint configuration and job monitoring for longer runs
+
+id: BENCH-T17-007
+name: Long Job with Checkpointing
+tier: 17
+category: cloud-gpu
+
+description: |
+  Test the agent's ability to manage longer-running cloud jobs with proper
+  checkpoint/restart file configuration. This is essential for production
+  workflows where jobs may need to be resumed after interruption.
+
+prompt: |
+  **Task: Run Long MD Simulation with Checkpoint Management**
+
+  Execute a longer MD simulation on VAST.ai with proper checkpointing.
+  The job should be recoverable at any point if interrupted.
+
+  **The Simulation:**
+  Ionic liquid equilibration (1-butyl-3-methylimidazolium chloride, [BMIM][Cl]):
+  - ~500 atoms (ion pair molecules)
+  - NPT equilibration at 400K (above Tg)
+  - Target: 500 ps total (500,000 steps at 1 fs)
+  - Expected runtime: ~30-40 min on RTX 4090
+
+  **IMPORTANT: You must complete ALL steps below.**
+
+  **Step 1: Prepare Simulation with Checkpointing**
+
+  Create LAMMPS input with restart files:
+  ```lammps
+  # Write restart every 100,000 steps (100 ps)
+  restart 100000 restart.*.bin
+
+  # Also write trajectory for analysis
+  dump 1 all custom 10000 traj.lammpstrj id type x y z
+
+  # Thermo output for monitoring
+  thermo 1000
+  ```
+
+  Use a simple ionic liquid model:
+  - OPLS-AA or simple 2-site model for speed
+  - Can use pair_style lj/cut/coul/long
+
+  **Step 2: Provision and Setup**
+
+  1. Get RTX 4090 instance
+  2. Install LAMMPS with GPU support
+  3. Upload inputs
+  4. Verify checkpoint directory structure
+
+  **Step 3: Start Job with Monitoring Plan**
+
+  Before starting, document your monitoring strategy:
+  - How often will you check progress?
+  - What metrics will you track?
+  - How will you know if job stalls?
+
+  Start the simulation:
+  ```bash
+  nohup lmp -in il.in > log.lammps 2>&1 &
+  ```
+
+  **Step 4: Monitor Progress**
+
+  Every 5-10 minutes, check:
+  1. Job still running: `ps aux | grep lmp`
+  2. Progress: `tail -20 log.lammps`
+  3. Checkpoints created: `ls -la restart.*.bin`
+  4. GPU utilization: `nvidia-smi`
+
+  Document progress at each check.
+
+  **Step 5: Verify Checkpoint Validity**
+
+  After first checkpoint is written:
+  1. Download a copy of restart file
+  2. Verify file size is reasonable
+  3. Test that LAMMPS can read it:
+     ```lammps
+     read_restart restart.100000.bin
+     ```
+
+  **Step 6: Complete or Recover**
+
+  If job completes normally:
+  - Download all outputs
+  - Verify all checkpoints present
+  - Calculate completion statistics
+
+  If interrupted (or simulate interruption):
+  - Identify latest valid checkpoint
+  - Create restart input
+  - Resume from checkpoint
+  - Complete remaining time
+
+  **Step 7: Analyze Results**
+
+  From the simulation:
+  1. Plot temperature vs time (equilibration check)
+  2. Plot density vs time (should stabilize)
+  3. Calculate final density and compare to literature
+
+  **Step 8: Document Checkpoint Strategy**
+
+  Write checkpoint management guide:
+  - Checkpoint frequency rationale
+  - Storage requirements
+  - Restart procedure
+  - Best practices
+
+  **Step 9: Cleanup**
+
+  Destroy instance, verify no orphans.
+
+  **Deliverables:**
+  Create in workspaces/benchmarks/BENCH-T17-007/:
+
+  ```
+  inputs/
+  ├── il.in                 # LAMMPS input with restart config
+  ├── il.data               # Initial structure
+  monitoring/
+  ├── progress_log.md       # Timestamped progress checks
+  ├── checkpoint_status.csv # Checkpoint file tracking
+  results/
+  ├── log.lammps
+  ├── traj.lammpstrj
+  ├── restart.*.bin         # Checkpoint files
+  analysis/
+  ├── temperature_vs_time.png
+  ├── density_vs_time.png
+  ├── equilibration_analysis.md
+  documentation/
+  ├── checkpoint_strategy.md
+  ├── restart_procedure.md
+  instance_audit.md
+  ```
+
+  Work in: workspaces/benchmarks/BENCH-T17-007/
+
+skills_required:
+  - vast-cloud
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 90
+
+cost_limit_dollars: 1.00
+
+expected_outputs:
+  files:
+    - name: "inputs/il.in"
+      description: "LAMMPS input with restart configuration"
+    - name: "monitoring/progress_log.md"
+      description: "Progress monitoring log"
+    - name: "results/log.lammps"
+      description: "Simulation log"
+    - name: "documentation/checkpoint_strategy.md"
+      description: "Checkpoint management guide"
+    - name: "instance_audit.md"
+      description: "Instance lifecycle"
+
+  values:
+    simulation_completed:
+      description: "Full 500 ps completed"
+      expected: true
+    checkpoints_created:
+      description: "Number of checkpoint files"
+      expected_range: [4, 6]
+    checkpoint_verified:
+      description: "At least one checkpoint tested"
+      expected: true
+
+grading:
+  categories:
+    - name: checkpoint_configuration
+      weight: 25
+      criteria:
+        - Restart files configured correctly
+        - Appropriate checkpoint frequency
+        - Both restart and dump configured
+        - Storage location documented
+
+    - name: monitoring
+      weight: 25
+      criteria:
+        - Regular progress checks
+        - Multiple metrics tracked
+        - Timestamps documented
+        - Would detect stalls
+
+    - name: recovery_capability
+      weight: 25
+      criteria:
+        - Checkpoint validity verified
+        - Restart procedure documented
+        - Would work if interrupted
+        - Best practices noted
+
+    - name: completion
+      weight: 25
+      criteria:
+        - Simulation completed
+        - Results analyzed
+        - Instance cleaned up
+        - Documentation complete
+
+metadata:
+  difficulty: hard
+  estimated_time_minutes: 75
+  estimated_cost_dollars: 0.75
+  skills_tested:
+    - checkpoint_management
+    - job_monitoring
+    - long_running_jobs
+    - cloud_workflow
+  notes: |
+    This benchmark tests production-readiness. Real simulations run for
+    hours or days - they MUST have checkpoint/restart capability. The
+    monitoring and documentation aspects are as important as running
+    the job itself. A good checkpoint strategy means never losing work.

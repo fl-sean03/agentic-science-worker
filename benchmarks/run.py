@@ -52,7 +52,7 @@ PASS_THRESHOLDS = {
 
 # Default configuration
 DEFAULT_TIMEOUT_SECONDS = 1800  # 30 minutes
-GRADING_TIMEOUT_SECONDS = 300  # 5 minutes for grading
+GRADING_TIMEOUT_SECONDS = 600  # 10 minutes for thorough grading
 
 ALLOWED_TOOLS = [
     "Bash", "Read", "Write", "Edit", "Glob", "Grep",
@@ -218,26 +218,48 @@ def grade_with_llm_agent(
     Returns grading details with audit trail.
     """
     # Build grading prompt
-    grading_prompt = f"""You are grading a benchmark result. Evaluate the work in this workspace.
+    grading_prompt = f"""You are a CRITICAL GRADER evaluating a benchmark result. Your job is to thoroughly explore this workspace and rigorously grade the work against specific criteria.
 
-## Benchmark
+## Benchmark Being Graded
 ID: {benchmark.get('id')}
 Name: {benchmark.get('name')}
 
-## Task Description
+## Original Task Given to Agent
 {benchmark.get('description', '')}
 
 ## Expected Outputs
 {yaml.dump(benchmark.get('expected_outputs', {}), default_flow_style=False)}
 
-## Grading Criteria
+## Grading Rubric (Use This!)
 {yaml.dump(benchmark.get('grading', {}), default_flow_style=False)}
 
-## Instructions
+## YOUR GRADING PROCESS (Follow These Steps)
 
-1. Read the files in this workspace to understand what the agent produced
-2. Evaluate each grading category according to the criteria
-3. Return a JSON object with this structure:
+### Step 1: Explore the Workspace
+Use Glob to find ALL files created:
+- `Glob pattern="**/*"` to see everything
+- Note what was created vs what was expected
+
+### Step 2: Read Key Artifacts
+For each important file:
+- Read the content
+- Check if it meets the criteria
+- Note specific evidence (quote lines, values, etc.)
+
+### Step 3: Check for Errors
+Look for:
+- Error messages in logs
+- Incomplete outputs
+- Missing required files
+- Scientific errors (wrong values, missing units, etc.)
+
+### Step 4: Evaluate Against Each Criterion
+For EACH grading criterion in the rubric:
+- State what you found (with file:line evidence)
+- Determine if it passes, partially passes, or fails
+- Assign points accordingly
+
+### Step 5: Return Your Grading
 
 ```json
 {{
@@ -245,18 +267,26 @@ Name: {benchmark.get('name')}
     "categories": {{
         "<category_name>": {{
             "score": <0-100>,
-            "weight": <from criteria>,
-            "notes": "<what you found>"
+            "weight": <from rubric>,
+            "evidence": "<specific files/lines that support your score>",
+            "notes": "<what you found, be specific>"
         }}
     }},
-    "reasoning": "<overall assessment>",
-    "strengths": ["<list of things done well>"],
-    "weaknesses": ["<list of issues>"],
-    "suggestions": ["<improvements>"]
+    "reasoning": "<overall critical assessment>",
+    "strengths": ["<specific things done well with evidence>"],
+    "weaknesses": ["<specific issues found with evidence>"],
+    "suggestions": ["<concrete improvements>"]
 }}
 ```
 
-Be fair but rigorous. Award partial credit where appropriate.
+## GRADING STANDARDS
+- Be RIGOROUS - don't give points for incomplete work
+- Require EVIDENCE - cite specific files and content
+- Check CORRECTNESS - wrong values = low score even if file exists
+- Penalize MISSING ITEMS - if rubric requires it and it's missing, deduct points
+- Award PARTIAL CREDIT fairly - 50% complete = ~50% of points
+
+DO NOT be lenient. Scientific work requires precision.
 """
 
     # Run grading agent
@@ -358,6 +388,26 @@ def run_benchmark(
     # Workspace is INSIDE results directory (preserved!)
     workspace = run_dir / "workspace"
     workspace.mkdir(parents=True, exist_ok=True)
+
+    # Copy AGENTS.md and CLAUDE.md to workspace so agent has context
+    agents_md = PROJECT_ROOT / "AGENTS.md"
+    claude_md = PROJECT_ROOT / "CLAUDE.md"
+    if agents_md.exists():
+        shutil.copy(agents_md, workspace / "AGENTS.md")
+    if claude_md.exists():
+        shutil.copy(claude_md, workspace / "CLAUDE.md")
+
+    # Also copy skills directory (symlink to save space)
+    skills_src = PROJECT_ROOT / "skills"
+    skills_dst = workspace / "skills"
+    if skills_src.exists() and not skills_dst.exists():
+        skills_dst.symlink_to(skills_src)
+
+    # Copy examples directory (symlink)
+    examples_src = PROJECT_ROOT / "examples"
+    examples_dst = workspace / "examples"
+    if examples_src.exists() and not examples_dst.exists():
+        examples_dst.symlink_to(examples_src)
 
     print(f"\n{'='*60}")
     print(f"BENCHMARK: {benchmark_id}")

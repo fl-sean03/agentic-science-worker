@@ -392,14 +392,36 @@ if not agent_output or len(agent_output.strip()) < 50:
     return {'passed': False, 'reason': 'Empty or trivial output'}
 ```
 
-### 3. Overfitting to Benchmark
+### 3. Overfitting to Benchmark ("Teaching to the Test")
 
-**Problem**: Agents learn benchmark patterns, not real skills.
+**Problem**: Agents learn benchmark patterns, not real skills. Fixes that are
+too specific inflate scores without improving general capability.
 
 **Solution**:
 - Keep some tasks hidden
 - Rotate task variants
 - Use different parameter values than training examples
+- **Fixes must be GENERAL, not benchmark-specific**
+
+**Example of BAD fix:**
+```markdown
+# Adding to AGENTS.md
+For thermal expansion of Al, expect 23×10⁻⁶/K
+```
+This only helps one benchmark.
+
+**Example of GOOD fix:**
+```markdown
+# Adding to AGENTS.md
+Before reporting any property, verify it against expected ranges
+from the task or literature. Document deviations.
+```
+This helps ALL benchmarks.
+
+**Generalization checklist:**
+- Would this help with OTHER benchmarks?
+- Am I adding methodology (good) or domain knowledge (usually bad)?
+- Does this mention a specific element/property? → Generalize it
 
 ### 4. Ignoring Cost/Latency
 

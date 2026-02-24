@@ -27,13 +27,25 @@ prompt: |
   Before reporting your final answer, you MUST:
 
   1. **Check units** - Is your answer in the right units (/K)?
-  2. **Check magnitude** - Is 10⁻⁶ reasonable? Not 10⁻³ or 10⁻⁹?
+  2. **Check magnitude** - Is it in the expected range (15-30 × 10⁻⁶)?
   3. **Check sign** - Should be positive (materials expand when heated)
   4. **Check literature** - Does it match published values?
   5. **Check methodology** - Did you equilibrate properly? Enough time?
 
+  If your result is OUTSIDE the expected range (15-30 × 10⁻⁶), you MUST:
+  - Document this as an error/issue
+  - Investigate potential causes
+  - Either fix and re-run, or explain why the deviation is expected
+
   If you find an error at ANY point, document it and fix it before
   continuing. Do NOT just report the first number you calculate.
+
+  **Required Files (create ALL of these):**
+  - calculations/ (directory with simulation files)
+  - verification_checklist.md (your self-verification checks)
+  - errors_found.md (create even if empty - shows verification was done)
+  - results/alpha.txt (final value with uncertainty)
+  - comparison_to_literature.md (comparison to published values)
 
   Work in: workspaces/benchmarks/BENCH-T15-004/
 

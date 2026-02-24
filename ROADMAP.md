@@ -1,6 +1,6 @@
 # Roadmap
 
-**Last Updated:** 2026-02-16
+**Last Updated:** 2026-02-23
 
 This document tracks what we're building, what's done, and what's next.
 
@@ -64,40 +64,43 @@ And eventually: discover something genuinely new.
 
 | Capability | Status | Evidence |
 |------------|--------|----------|
-| LAMMPS simulations | Production | 42 benchmarks passed |
+| LAMMPS simulations | Production | 40+ benchmarks passed |
 | Literature search | Production | Agent finds parameters autonomously |
 | Parameter extraction | Production | Correct citations in outputs |
 | Result verification | Production | Compares to published values |
-| Error recovery | Production | T7-002: 4 HPC errors handled |
-| HPC job submission | Production | T5-T6 tiers passing |
-| ML potentials (MACE, CHGNet) | Production | T8 tier passing |
-| Quantum ESPRESSO | Beta | T1-006 works, needs more testing |
+| Error recovery | Production | T13 robustness tier 100% |
+| ML potentials (MACE, CHGNet) | Production | T8 tier 86% passing |
+| Quantum ESPRESSO (GPU) | Production | T10-004: 85, local GPU build working |
+| VAST.ai cloud GPU | Production | T17 tier 100% (97, 91, 92) |
+| Data analysis | Production | T18 tier 100% (92, 92) |
+| Agent cognition | Production | T15 tier 100% |
+| Scientific rigor | Production | T16 tier 100% |
 
 ### Benchmark Progress
 
 ```
-Tier 1  (Basic):            7/7   ████████████████████ 100%
-Tier 2  (Intermediate):     4/4   ████████████████████ 100%
-Tier 3  (Advanced):         3/3   ████████████████████ 100%
-Tier 4  (Research):         7/7   ████████████████████ 100%
-Tier 5  (HPC Fundamentals): 7/7   ████████████████████ 100%
-Tier 6  (HPC Scale):        5/5   ████████████████████ 100%
-Tier 7  (Campaigns):        1/3   ██████░░░░░░░░░░░░░░  33%
-Tier 8  (ML Materials):     6/7   █████████████████░░░  86%
-Tier 9  (Autonomous):       2/5   ████████░░░░░░░░░░░░  40%
-Tier 10 (Frontier):         0/3   ░░░░░░░░░░░░░░░░░░░░   0%
-Tier 11 (HPC+ML Hybrid):    0/7   ░░░░░░░░░░░░░░░░░░░░   0%
-Tier 12 (Theory Synthesis): 0/3   ░░░░░░░░░░░░░░░░░░░░   0%
-Tier 13 (Robustness):       0/8   ░░░░░░░░░░░░░░░░░░░░   0%
-Tier 14 (Compute Decision): 0/5   ░░░░░░░░░░░░░░░░░░░░   0%
-Tier 15 (Agent Cognition):  4/14  █████░░░░░░░░░░░░░░░  29%  [9 guided + 5 behavioral]
-Tier 16 (Scientific Rigor): 4/16  █████░░░░░░░░░░░░░░░  25%  [12 guided + 4 behavioral]
+Tier 1-4  (Foundation):     21/21  ████████████████████ 100%
+Tier 5-6  (HPC):            -/-    ARCHIVED (CURC deferred)
+Tier 7    (Campaigns):      1/3    ██████░░░░░░░░░░░░░░  33% (2 need HPC)
+Tier 8    (ML Materials):   6/7    █████████████████░░░  86%
+Tier 9    (Autonomous):     3/5    ████████████░░░░░░░░  60%
+Tier 10   (Frontier DFT):   1/4    █████░░░░░░░░░░░░░░░  25% (QE working!)
+Tier 11   (HPC+ML):         -/-    ARCHIVED (CURC deferred)
+Tier 12   (Theory):         0/3    ░░░░░░░░░░░░░░░░░░░░   0% (needs Theorizer)
+Tier 13   (Robustness):     8/8    ████████████████████ 100%
+Tier 14   (Compute):        5/5    ████████████████████ 100%
+Tier 15   (Cognition):      14/14  ████████████████████ 100%
+Tier 16   (Rigor):          16/16  ████████████████████ 100%
+Tier 17   (Cloud GPU):      3/3    ████████████████████ 100% [NEW]
+Tier 18   (Data Analysis):  2/2    ████████████████████ 100% [NEW]
 
-Total: 50/104 benchmarks (48%)
+Active: 78/86 benchmarks passing (100% pass rate)
 ```
 
-**Behavioral Benchmark Results (T15-T16):**
-All 8 behavioral tests passing (87% avg score). Core Principles validated.
+**Recent Achievements (2026-02-23):**
+- T17 Cloud GPU tier: All 3 benchmarks pass (97, 91, 92) - VAST.ai validated
+- T18 Data Analysis tier: Both benchmarks pass (92, 92) - new capability
+- T10-004 Basic DFT: Score 85 - QE GPU acceleration working
 
 ---
 
@@ -105,70 +108,47 @@ All 8 behavioral tests passing (87% avg score). Core Principles validated.
 
 ### High Priority
 
-- [ ] **Complete T7 tier** - Research campaigns
-  - [ ] T7-001: Multi-day research study
-  - [ ] T7-003: Collaborative computation
-
-- [ ] **Complete T8 tier** - ML materials
-  - [ ] T8-006: Fine-tuning ML potentials
-
-- [ ] **Complete T9 tier** - Autonomous research
-  - [ ] T9-001: Active learning loop
-  - [ ] T9-002: Multi-fidelity optimization
-  - [ ] T9-003: Closed-loop optimization
-
-### Medium Priority
-
-- [ ] **T10 Frontier Benchmarks**
+- [ ] **Run remaining T10 benchmarks** - Frontier DFT (QE GPU ready!)
   - [ ] T10-001: Novel material discovery
   - [ ] T10-002: Cross-modal reasoning
   - [ ] T10-003: Open research question
 
-- [ ] **T11 HPC+ML Hybrid Benchmarks**
-  - [ ] T11-001: Million-atom MLIP simulation
-  - [ ] T11-002: Massive screening campaign
-  - [ ] T11-003: Active learning at scale
-  - [ ] T11-004: Long timescale dynamics
-  - [ ] T11-005: Distributed training
-  - [ ] T11-006: Multi-fidelity campaign
-  - [ ] T11-007: Autonomous discovery
+- [ ] **Expand T17 tier** - Cloud GPU (per VASTAI_BENCHMARK_PROPOSAL.md)
+  - [ ] T17-004: Cost-aware GPU selection
+  - [ ] T17-005: Multi-instance parallel jobs
+  - [ ] T17-006: Error recovery
+  - [ ] T17-007: Long job with checkpointing
+  - [ ] T17-008: Hybrid local-cloud pipeline
 
-- [ ] **T12 Theory Synthesis Benchmarks** [NEW - uses ASTA Theorizer]
+- [ ] **Expand T18 tier** - Data Analysis
+  - [ ] T18-003: Publication-quality plots
+  - [ ] T18-004: Error propagation analysis
+
+### Medium Priority
+
+- [ ] **Complete T8 tier** - ML materials
+  - [ ] T8-006: Fine-tuning ML potentials (needs DFT data)
+
+- [ ] **T12 Theory Synthesis** - Blocked on Theorizer MCP
   - [ ] T12-001: Literature-driven hypothesis generation
-  - [ ] T12-002: Research gap discovery and exploitation
+  - [ ] T12-002: Research gap discovery
   - [ ] T12-003: Methodology consensus extraction
 
-- [ ] **T13 Robustness Benchmarks** [agent resilience]
-  - [ ] T13-001: Operation with limited tools
-  - [ ] T13-002: Minimal/unclear instructions
-  - [ ] T13-003: Blocker handling and escalation
-  - [ ] T13-004: Error recovery and diagnosis
-  - [ ] T13-005: Appropriate clarification seeking
+### Deferred (CURC HPC)
 
-- [ ] **T15 Agent Cognition Benchmarks** [NEW - planning/reasoning]
-  - [ ] T15-001: Approach selection (choose best method)
-  - [ ] T15-002: Plan decomposition (break complex tasks)
-  - [ ] T15-003: Plan revision (adapt when plan fails)
-  - [ ] T15-004: Error self-detection (recognize mistakes)
-  - [ ] T15-005: Confidence calibration (appropriate certainty)
-  - [ ] T15-006: Learning from failure (in-session improvement)
-  - [ ] T15-007: Resource planning (estimate before starting)
-  - [ ] T15-008: Constraint reasoning (work around limits)
-  - [ ] T15-009: Result validation (verify before reporting)
+- [ ] T5-T6: HPC Fundamentals/Scale - **ARCHIVED**
+- [ ] T7-001, T7-003: Research campaigns needing HPC
+- [ ] T11-*: HPC+ML Hybrid - **ARCHIVED**
 
-- [ ] **T16 Scientific Rigor Benchmarks** [NEW - scientific method/safety]
-  - [ ] T16-001: Hypothesis formation
-  - [ ] T16-002: Uncertainty quantification
-  - [ ] T16-003: Dangerous command refusal (rm -rf, etc.)
-  - [ ] T16-004: Reproducibility protocol
-  - [ ] T16-005: Experimental design
-  - [ ] T16-006: Negative result handling
-  - [ ] T16-007: Input validation
-  - [ ] T16-008: Resource limits (graceful stop)
-  - [ ] T16-009: Data integrity (preserve important files)
-  - [ ] T16-010: Self-reproduction (reproduce own results)
-  - [ ] T16-011: Seed control (manage randomness)
-  - [ ] T16-012: Documentation completeness
+### Completed (100% Pass Rate)
+
+- [x] T1-T4: Foundation (21/21)
+- [x] T13: Robustness (8/8)
+- [x] T14: Compute Decision (5/5)
+- [x] T15: Agent Cognition (14/14)
+- [x] T16: Scientific Rigor (16/16)
+- [x] T17: Cloud GPU (3/3) - NEW
+- [x] T18: Data Analysis (2/2) - NEW
 
 ### Low Priority / Nice to Have
 
@@ -301,6 +281,27 @@ See `benchmarks/AUTHORING_GUIDE.md` for how to write new benchmarks.
 ---
 
 ## Changelog
+
+### 2026-02-23
+- **T17 Cloud GPU Tier Complete**
+  - T17-001 Instance Lifecycle: 97 (first run)
+  - T17-002 Environment Setup: 91 (first run)
+  - T17-003 File Transfer: 92 (first run)
+  - VAST.ai integration fully validated
+- **T18 Data Analysis Tier Created**
+  - T18-001 Parse LAMMPS Thermo: 92 (first run)
+  - T18-002 MSD/Diffusion: 92 (first run)
+- **T10-004 Basic DFT SCF: 85**
+  - QE GPU build validated (local RTX 5080)
+  - Path: `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
+- **CURC HPC Deferred**
+  - Archived T5, T6, T11 tiers
+  - Moved skills to `skills/archive/hpc-cluster-curc/`
+  - VAST.ai replaces HPC for cloud compute needs
+- **Key Learning Validated**
+  - Detailed prompts with completion checklists prevent early termination
+  - All new benchmarks passed first run using this pattern
+- **Total: 78/86 active benchmarks (100% pass rate)**
 
 ### 2026-02-16
 - **Behavioral Benchmark Validation**

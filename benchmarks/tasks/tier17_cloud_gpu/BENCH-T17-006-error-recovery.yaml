@@ -1,0 +1,205 @@
+# Tier 17 Benchmark: Error Recovery
+# Test handling cloud compute failures gracefully
+
+id: BENCH-T17-006
+name: Error Recovery
+tier: 17
+category: cloud-gpu
+
+description: |
+  Test the agent's ability to detect and recover from cloud compute failures.
+  Real cloud environments have failures - SSH timeouts, job stalls, instance
+  issues. The agent must handle these gracefully and still complete the task.
+
+prompt: |
+  **Task: Complete Simulation Despite Cloud Failures**
+
+  Run a LAMMPS simulation on VAST.ai with intentional failure handling.
+  You WILL encounter issues - your job is to detect and recover.
+
+  **The Simulation:**
+  Simple Lennard-Jones fluid equilibration:
+  - 1000 atoms
+  - NPT at 300K, 1 atm
+  - 100,000 steps (should take ~5 min on GPU)
+
+  **IMPORTANT: You must complete ALL steps below. Failures are EXPECTED.**
+
+  **Step 1: Initial Attempt**
+
+  1. Provision a cheap RTX 3090 instance
+  2. Setup LAMMPS
+  3. Upload input files
+  4. Start simulation
+
+  **Step 2: Monitor for Issues**
+
+  While job runs, actively monitor:
+  - SSH connectivity (can you run commands?)
+  - Job progress (is log file growing?)
+  - GPU utilization (is it actually running?)
+
+  Check every 30-60 seconds:
+  ```bash
+  ssh vast@... "tail -5 log.lammps"
+  ssh vast@... "nvidia-smi --query-gpu=utilization.gpu --format=csv"
+  ```
+
+  **Step 3: Detect Failure Mode**
+
+  Look for these symptoms:
+  a) SSH timeout - instance unreachable
+  b) Job stall - log file not updating
+  c) GPU idle - utilization at 0%
+  d) Error in log - LAMMPS crashed
+
+  Document which failure you detect.
+
+  **Step 4: Recovery Decision**
+
+  Based on failure type, choose recovery strategy:
+
+  | Failure | Strategy |
+  |---------|----------|
+  | SSH timeout | Wait 30s, retry 2x, then provision new instance |
+  | Job stall | Kill process, restart from checkpoint |
+  | GPU idle | Check for OOM, reduce batch or get bigger GPU |
+  | LAMMPS crash | Fix input, restart |
+
+  Document your decision and rationale.
+
+  **Step 5: Execute Recovery**
+
+  Implement your chosen recovery:
+  1. If switching instances - destroy old, provision new
+  2. If restarting - locate checkpoint/restart file
+  3. If input issue - fix and re-run
+
+  **Step 6: Complete the Job**
+
+  Ensure simulation completes successfully:
+  - All 100,000 steps finished
+  - Final configuration saved
+  - Thermodynamic data in log
+
+  **Step 7: Document Lessons**
+
+  Write incident report:
+  - What failed and when
+  - How you detected it
+  - What recovery you chose
+  - Time lost to failure
+  - How to prevent next time
+
+  **Step 8: Cleanup**
+
+  Destroy ALL instances (original and any recovery instances).
+  Verify zero orphans.
+
+  **Failure Injection Note:**
+  If the simulation runs without issues, simulate a failure:
+  - Kill the SSH session mid-job
+  - Reconnect and recover
+  This tests your recovery procedures even if cloud is stable.
+
+  **Deliverables:**
+  Create in workspaces/benchmarks/BENCH-T17-006/:
+
+  ```
+  inputs/
+  ├── lj_fluid.in
+  ├── lj_fluid.data
+  simulation/
+  ├── log.lammps          # Final successful log
+  ├── final.data          # Final configuration
+  recovery/
+  ├── failure_detection.md
+  ├── recovery_decision.md
+  ├── recovery_execution.md
+  incident_report.md        # Complete incident documentation
+  instance_audit.md         # All instances tracked
+  ```
+
+  Work in: workspaces/benchmarks/BENCH-T17-006/
+
+skills_required:
+  - vast-cloud
+  - lammps-simulation
+  - data-analysis
+
+time_limit_minutes: 60
+
+cost_limit_dollars: 0.60
+
+expected_outputs:
+  files:
+    - name: "simulation/log.lammps"
+      description: "Successful simulation log"
+    - name: "recovery/failure_detection.md"
+      description: "How failure was detected"
+    - name: "recovery/recovery_decision.md"
+      description: "Recovery strategy rationale"
+    - name: "incident_report.md"
+      description: "Complete incident documentation"
+    - name: "instance_audit.md"
+      description: "All instances documented"
+
+  values:
+    simulation_completed:
+      description: "Simulation finished successfully"
+      expected: true
+    recovery_performed:
+      description: "At least one recovery action taken"
+      expected: true
+    instances_remaining:
+      description: "Orphan instances after benchmark"
+      expected: 0
+
+grading:
+  categories:
+    - name: failure_detection
+      weight: 25
+      criteria:
+        - Active monitoring performed
+        - Failure identified correctly
+        - Detection was timely
+        - Symptoms documented
+
+    - name: recovery_decision
+      weight: 25
+      criteria:
+        - Strategy appropriate for failure type
+        - Trade-offs considered
+        - Decision well-justified
+        - Alternatives discussed
+
+    - name: recovery_execution
+      weight: 25
+      criteria:
+        - Recovery implemented correctly
+        - Job completed after recovery
+        - No data loss
+        - Efficient recovery time
+
+    - name: documentation
+      weight: 25
+      criteria:
+        - Incident fully documented
+        - Lessons learned noted
+        - Prevention strategies suggested
+        - All instances cleaned up
+
+metadata:
+  difficulty: hard
+  estimated_time_minutes: 45
+  estimated_cost_dollars: 0.40
+  skills_tested:
+    - failure_detection
+    - recovery_planning
+    - cloud_resilience
+    - incident_documentation
+  notes: |
+    This benchmark tests resilience. Cloud environments fail - SSH drops,
+    instances crash, jobs stall. An autonomous agent must detect issues
+    and recover, not just give up. The incident documentation is as
+    important as the recovery itself - good post-mortems prevent future issues.

@@ -1,0 +1,195 @@
+# Tier 17 Benchmark: Cloud Environment Setup
+# Test setting up a complete simulation environment on VAST.ai
+
+id: BENCH-T17-002
+name: Environment Setup
+tier: 17
+category: cloud-gpu
+
+description: |
+  Test the agent's ability to set up a complete computational materials
+  science environment on a fresh VAST.ai instance. This includes installing
+  conda, ML potentials (MACE, CHGNet), and verifying with a test calculation.
+
+prompt: |
+  **Task: Setup Simulation Environment on VAST.ai**
+
+  You need to set up a cloud GPU instance with a complete environment for
+  running ML potential simulations. The environment should support MACE,
+  CHGNet, and ASE.
+
+  **IMPORTANT: You must complete ALL steps below.**
+
+  This benchmark requires you to:
+  1. Provision a VAST.ai instance
+  2. Install conda and packages
+  3. Run a test calculation
+  4. Document everything
+  5. Destroy the instance
+
+  Do NOT stop after provisioning. The test calculation is required.
+
+  ---
+
+  **Step 1: Provision Instance**
+  Find an RTX 4090 (needed for MACE GPU) under $0.50/hr:
+  ```bash
+  vastai search offers "gpu_name=RTX_4090 rentable=True dph<0.5 cuda_vers>=12.0" -o "dph+"
+  ```
+
+  Create with enough disk space for conda:
+  ```bash
+  vastai create instance <offer_id> \
+    --image nvidia/cuda:12.2.0-devel-ubuntu22.04 \
+    --disk 50 \
+    --ssh
+  ```
+
+  **Step 2: Setup Environment**
+  Once connected, run the setup sequence:
+
+  ```bash
+  # Install miniconda
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  bash Miniconda3-latest-Linux-x86_64.sh -b -p /root/miniconda3
+  source /root/miniconda3/bin/activate
+
+  # Create environment
+  conda create -n mlip python=3.11 -y
+  conda activate mlip
+
+  # Install core packages
+  pip install torch --index-url https://download.pytorch.org/whl/cu121
+  pip install ase pymatgen
+
+  # Install ML potentials
+  pip install mace-torch
+  pip install chgnet
+  ```
+
+  **Step 3: Verify Installation**
+  Run a test calculation to verify everything works:
+
+  ```python
+  from ase.build import bulk
+  from mace.calculators import mace_mp
+
+  # Load MACE-MP model
+  calc = mace_mp(model="medium", device="cuda", default_dtype="float32")
+
+  # Test on silicon
+  si = bulk('Si', 'diamond', a=5.43)
+  si.calc = calc
+
+  energy = si.get_potential_energy()
+  forces = si.get_forces()
+
+  print(f"Si energy: {energy:.4f} eV")
+  print(f"Max force: {forces.max():.6f} eV/A")
+  ```
+
+  Expected: Energy should be ~-10 to -12 eV, forces near 0.
+
+  **Step 4: Document Setup**
+  Record:
+  - Total setup time (from SSH ready to test complete)
+  - Any errors encountered and fixes
+  - Package versions installed
+  - GPU memory usage during test
+
+  **Step 5: Destroy Instance**
+  Clean up when done:
+  ```bash
+  vastai destroy instance <instance_id>
+  ```
+
+  **Deliverables:**
+  Create in workspaces/benchmarks/BENCH-T17-002/:
+
+  1. `setup_log.md` - Setup timeline with commands and outputs
+  2. `environment.txt` - `pip list` output
+  3. `test_results.md` - Test calculation results
+  4. `cost_analysis.md` - Time and cost breakdown
+
+  Work in: workspaces/benchmarks/BENCH-T17-002/
+
+skills_required:
+  - vast-cloud
+
+time_limit_minutes: 45
+
+cost_limit_dollars: 0.75
+
+expected_outputs:
+  files:
+    - name: "setup_log.md"
+      description: "Complete setup timeline"
+    - name: "environment.txt"
+      description: "Installed packages"
+    - name: "test_results.md"
+      description: "Verification test output"
+    - name: "cost_analysis.md"
+      description: "Cost tracking"
+
+  values:
+    setup_time_minutes:
+      description: "Time from SSH to test complete"
+      expected_range: [5, 25]
+    mace_installed:
+      description: "MACE package installed"
+      expected: true
+    chgnet_installed:
+      description: "CHGNet package installed"
+      expected: true
+    test_passed:
+      description: "Test calculation succeeded"
+      expected: true
+    si_energy:
+      description: "Silicon energy from MACE"
+      expected_range: [-15, -8]
+      unit: "eV"
+
+grading:
+  categories:
+    - name: environment_setup
+      weight: 35
+      criteria:
+        - Conda installed correctly
+        - Python environment created
+        - All packages installed
+        - No dependency conflicts
+
+    - name: verification
+      weight: 30
+      criteria:
+        - Test calculation runs
+        - Uses GPU (not CPU fallback)
+        - Results are reasonable
+        - No runtime errors
+
+    - name: efficiency
+      weight: 20
+      criteria:
+        - Setup under 20 minutes
+        - Minimal redundant installs
+        - Efficient command sequence
+
+    - name: cleanup
+      weight: 15
+      criteria:
+        - Instance destroyed
+        - Cost tracked
+        - No orphans
+
+metadata:
+  difficulty: medium
+  estimated_time_minutes: 30
+  estimated_cost_dollars: 0.25
+  skills_tested:
+    - cloud_environment_setup
+    - package_installation
+    - gpu_verification
+  notes: |
+    This benchmark tests the ability to bootstrap a complete ML environment
+    on a fresh cloud instance. This is essential for portable, reproducible
+    workflows that don't depend on pre-configured machines.

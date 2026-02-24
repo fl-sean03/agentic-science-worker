@@ -1,6 +1,23 @@
 # Agentic Science Worker
 
-An autonomous AI agent system for computational materials science research. Designed to work with multiple coding agents ([Claude Code](https://claude.com/claude-code), [Aider](https://aider.chat), [OpenAI Codex](https://openai.com/codex), [Cursor](https://cursor.com)), this system enables AI to conduct scientific research like a PhD-level computational scientist.
+An autonomous AI researcher for computational materials science. Not a tool that executes commands—an independent lab member that takes ownership of research problems.
+
+**Current Status:** 80/86 benchmarks passing (100% pass rate) | [View Dashboard](benchmarks/CURRENT_STATUS.md)
+
+## Vision
+
+**Today:** Handle defined workflows and research questions autonomously.
+
+**Tomorrow:** Receive a group meeting transcript, work independently for hours or days, return with research contributions—hypotheses tested, literature synthesized, calculations completed.
+
+The goal is not to help humans do science faster. It's to build a system that **does science**: forms hypotheses, tests them computationally, identifies what's interesting, and generates knowledge that didn't exist before.
+
+## Recent Highlights
+
+- **Novel Material Discovery**: Autonomously discovered 9 novel Li-ion cathode materials including Li₂Ni(PO₄)(SO₄) with 5.1V voltage (T10-001: 75)
+- **Cross-Modal Reasoning**: Determined crystal structure from XRD pattern using computational methods (T10-002: 72)
+- **Cloud GPU Integration**: Full VAST.ai lifecycle management - provision, execute, cleanup (T17: 97/91/92)
+- **Publication-Ready Analysis**: MSD/diffusion calculations, thermodynamic parsing (T18: 92/92)
 
 ## Overview
 
@@ -8,12 +25,17 @@ The Agentic Science Worker can:
 
 - **Run molecular dynamics simulations** (LAMMPS) with literature-sourced parameters
 - **Perform DFT calculations** (Quantum ESPRESSO) for electronic structure
+- **Use ML interatomic potentials** (MACE, CHGNet, M3GNet) for fast screening
+- **Provision cloud GPUs** (VAST.ai) for overflow compute
 - **Search scientific literature** and extract methodology/parameters
 - **Query materials databases** (Materials Project) for structures and properties
-- **Analyze results** and compare with published values
-- **Execute on HPC clusters** for large-scale computations
+- **Analyze results** with publication-quality figures and error propagation
 
-The agent operates autonomously: given a scientific question, it researches the methodology, finds parameters, runs simulations, verifies results against literature, and iterates until achieving physically reasonable results.
+Given a scientific question, it researches the methodology, finds parameters, runs simulations, verifies results against literature, and iterates until achieving physically reasonable results—like a competent graduate student working independently.
+
+## Supported Coding Agents
+
+Works with multiple coding agents ([Claude Code](https://claude.com/claude-code), [Aider](https://aider.chat), [Cursor](https://cursor.com)). Each reads `AGENTS.md` as primary context, gaining the knowledge and principles to work as an autonomous researcher.
 
 ## Architecture
 
@@ -28,19 +50,19 @@ The agent operates autonomously: given a scientific question, it researches the 
 ┌─────────────────────────────────────────────────────────────┐
 │                        Skills                               │
 │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │
-│  │ LAMMPS   │ │ QE       │ │ HPC      │ │ MLIP     │       │
-│  │ Skill    │ │ Skill    │ │ Skill    │ │ Skill    │       │
+│  │ LAMMPS   │ │ QE/DFT   │ │ VAST.ai  │ │ MLIP     │       │
+│  │ Sim      │ │ Calc     │ │ Cloud    │ │ Potentials│      │
 │  └──────────┘ └──────────┘ └──────────┘ └──────────┘       │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐                    │
-│  │Literature│ │Materials │ │ Data     │                    │
-│  │ Search   │ │ Database │ │ Analysis │                    │
-│  └──────────┘ └──────────┘ └──────────┘                    │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │
+│  │Literature│ │Materials │ │ Data     │ │ Resource │       │
+│  │ Search   │ │ Database │ │ Analysis │ │ Acquire  │       │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘       │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    External Tools                           │
-│  LAMMPS │ Quantum ESPRESSO │ Python │ HPC Cluster │ Web    │
+│  LAMMPS │ Quantum ESPRESSO │ MACE/CHGNet │ VAST.ai │ Web   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -131,15 +153,20 @@ Calculate the band structure of silicon
 
 The project includes a comprehensive benchmark suite to evaluate agent capabilities:
 
-### Tiers
+### Current Results (80/86 passing, 100% pass rate)
 
-| Tier | Category | Description |
-|------|----------|-------------|
-| 1-2 | Basic | Single-tool tasks (LAMMPS, QE, literature search) |
-| 3-4 | Advanced | Multi-step workflows, paper reproduction |
-| 5-7 | HPC | Remote cluster execution, async jobs, error recovery |
-| 8-10 | ML/AI | Machine learning potentials, autonomous research |
-| 11 | Frontier | HPC + ML hybrid, multi-fidelity campaigns |
+| Tier | Category | Benchmarks | Status |
+|------|----------|------------|--------|
+| T1-T4 | Foundation | 21 | 100% ✅ |
+| T7 | Research Campaigns | 1/3 | 33% (2 need HPC) |
+| T8 | ML/MLIP | 6/7 | 86% ✅ |
+| T9 | Autonomous Research | 3/5 | 60% (2 need DFT data) |
+| T10 | Frontier DFT | 3/4 | 75% ✅ Novel discovery, XRD reasoning |
+| T13-T16 | Quality & Cognition | 43 | 100% ✅ |
+| T17 | Cloud GPU (VAST.ai) | 3/3 | 100% ✅ Scores: 97, 91, 92 |
+| T18 | Data Analysis | 2/2 | 100% ✅ Scores: 92, 92 |
+
+*T5-T6, T11 archived (HPC deferred). T12 blocked on Theorizer MCP.*
 
 ### Running Benchmarks
 
@@ -206,65 +233,62 @@ agentic-science-worker/
 ├── CLAUDE.md                 # Claude Code-specific wrapper
 ├── config.example.yaml       # Configuration template
 ├── skills/                   # Skill definitions (portable)
-│   ├── lammps-simulation/
-│   ├── quantum-espresso/
-│   ├── hpc-cluster/
-│   ├── literature-search/
-│   ├── materials-database/
-│   ├── data-analysis/
-│   ├── mlip-simulation/
-│   └── resource-acquisition/
-├── configs/                  # Agent-specific configurations
-│   ├── claude/               # Claude Code settings
-│   ├── aider/                # Aider configuration
-│   ├── codex/                # OpenAI Codex settings
-│   └── cursor/               # Cursor rules
-├── .claude/
-│   ├── settings.json.example # Settings template
-│   ├── skills -> ../skills   # Symlink for compatibility
-│   └── hooks/                # Pre/post tool hooks
+│   ├── lammps-simulation/    # Molecular dynamics
+│   ├── quantum-espresso/     # DFT calculations
+│   ├── vast-cloud/           # VAST.ai cloud GPU management
+│   ├── mlip-simulation/      # ML potentials (MACE, CHGNet)
+│   ├── literature-search/    # Paper search and extraction
+│   ├── materials-database/   # Materials Project queries
+│   ├── data-analysis/        # Property calculations, plotting
+│   ├── resource-acquisition/ # Finding parameters, structures
+│   └── archive/              # Archived skills (HPC, etc.)
 ├── benchmarks/
+│   ├── CURRENT_STATUS.md     # Live dashboard
 │   ├── tasks/                # Benchmark definitions (YAML)
-│   │   ├── tier1_basic/
-│   │   ├── tier2_intermediate/
+│   │   ├── tier1_basic/      # Foundation tasks
+│   │   ├── tier10_frontier/  # Novel discovery, XRD reasoning
+│   │   ├── tier17_cloud_gpu/ # VAST.ai lifecycle tests
+│   │   ├── tier18_data_analysis/  # MSD, plotting, errors
 │   │   └── ...
 │   ├── evaluation/           # Harness and graders
 │   │   ├── harness.py
 │   │   ├── grader.py
 │   │   ├── llm_grader.py
-│   │   └── backends/         # Agent backend abstraction
+│   │   └── vast_safety.py    # Cloud instance cleanup
 │   └── results/              # Benchmark results
-├── docs/                     # Project documentation
-├── scripts/                  # Utility scripts
+├── examples/                 # Canonical workflow examples
+├── research/                 # Research methodology docs
 └── workspaces/               # Agent work directories (gitignored)
 ```
 
-## HPC Integration
+## Cloud GPU Integration (VAST.ai)
 
-The agent can execute on remote HPC clusters via SSH:
+The agent can provision and use cloud GPUs via VAST.ai for overflow compute:
 
-1. Configure SSH access (passwordless with key):
+1. Install VAST CLI and authenticate:
 ```bash
-# ~/.ssh/config
-Host cu_alpine
-    HostName login.rc.colorado.edu
-    User your_username
-    IdentityFile ~/.ssh/id_ed25519
+pip install vastai
+vastai set api-key YOUR_API_KEY
 ```
 
-2. Set HPC configuration in `config.yaml`:
-```yaml
-hpc:
-  enabled: true
-  ssh_alias: "cu_alpine"
-  scratch_dir: "/scratch/alpine/$USER"
+2. The agent can then autonomously:
+- Search for cost-effective GPUs (`vastai search offers`)
+- Provision instances with appropriate images
+- Transfer files via SCP, run calculations
+- Monitor job progress remotely
+- **Always clean up** - destroy instances after completion
+
+3. Built-in safety:
+- Instance labeling for tracking (BENCH-* prefix)
+- Post-benchmark orphan detection
+- Cost tracking and limits
+
+Example workflow the agent handles:
+```
+Local: Prepare inputs → Cloud: Run GPU job → Local: Analyze results
 ```
 
-3. The agent can then:
-- Submit SLURM jobs
-- Monitor job status
-- Handle queue-aware partition selection
-- Recover from HPC errors automatically
+*HPC cluster support archived - see `skills/archive/hpc-cluster-curc/` if needed.*
 
 ## ML Potentials (Optional)
 

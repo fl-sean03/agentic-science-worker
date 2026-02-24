@@ -63,6 +63,8 @@ PASS_THRESHOLDS = {
     14: 65, # Compute decision - agent should make good compute choices
     15: 60, # Agent cognition - planning, reasoning, self-reflection
     16: 70, # Scientific rigor - safety/reproducibility must be high
+    17: 60, # Cloud GPU - VAST.ai instance management
+    18: 60, # Data analysis - parsing and processing simulation output
 }
 
 

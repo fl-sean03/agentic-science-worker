@@ -1,10 +1,47 @@
 # Agentic Science Worker Benchmarks
 
+**Last Updated:** 2026-02-19
+**Status:** 84/85 passing (99%), 104 total defined
+
+## Quick Status
+
+| Tier | Name | Run | Pass | Notes |
+|------|------|-----|------|-------|
+| T1-T4 | Foundation | 21/21 | 21 | 100% - Complete |
+| T5-T6 | HPC | 12/12 | 12 | 100% - Complete |
+| T7 | Campaigns | 1/3 | 1 | 2 need HPC (postponed) |
+| T8 | ML/MLIP | 6/7 | 6 | 1 needs setup |
+| T9 | Autonomous | 2/5 | 2 | 3 need DFT |
+| T10-T12 | Frontier | 0/13 | 0 | Need DFT/HPC/Theorizer |
+| T13-T16 | Quality | 43/43 | 42 | 98% - 1 hard failure |
+
+**Total: 85/104 run, 84 passing (99%)**
+
+---
+
 ## What is a Benchmark?
 
 A benchmark is a **complete, real-world scientific task** that the agent must solve autonomously. The agent receives only a natural language prompt - it must figure out what to do, execute the necessary steps, and produce correct results.
 
 Benchmarks measure: **"Can this agent actually do computational materials science?"**
+
+---
+
+## Quick Start
+
+```bash
+# Run single benchmark
+python benchmarks/run.py BENCH-T1-001
+
+# Run with verbose output
+python benchmarks/run.py BENCH-T15-003 --verbose
+
+# List available benchmarks
+python benchmarks/run.py --list
+
+# Run entire tier
+python benchmarks/run.py --tier 1
+```
 
 ---
 
@@ -400,10 +437,13 @@ Behavioral tests are harder but more meaningful - they measure what the agent *r
 
 | Document | Description |
 |----------|-------------|
+| [CURRENT_STATUS.md](CURRENT_STATUS.md) | Live dashboard of all benchmark scores |
 | [AUTHORING_GUIDE.md](AUTHORING_GUIDE.md) | How to create new benchmarks |
+| [docs/BENCHMARK_TYPES.md](docs/BENCHMARK_TYPES.md) | Guided vs Behavioral benchmarks |
 | [docs/BENCHMARK_BEST_PRACTICES.md](docs/BENCHMARK_BEST_PRACTICES.md) | Best practices from research |
-| [docs/BENCHMARK_DESIGN.md](docs/BENCHMARK_DESIGN.md) | Design decisions and architecture |
-| [docs/TESTS_VS_BENCHMARKS.md](../docs/TESTS_VS_BENCHMARKS.md) | Distinction between tests and benchmarks |
+| [research/BENCHMARK_STRATEGY.md](../research/BENCHMARK_STRATEGY.md) | Goals and methodology |
+
+**Archived**: Historical planning docs in `docs/archive/`
 
 ---
 

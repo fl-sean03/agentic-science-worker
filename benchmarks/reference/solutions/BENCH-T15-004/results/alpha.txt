@@ -1,0 +1,40 @@
+# Thermal Expansion Coefficient of Aluminum
+
+## Result
+
+α = (41.4 ± 5.0) × 10⁻⁶ /K
+
+## Details
+
+- Temperature range: 300-600 K
+- Method: NPT MD with EAM potential (Zhou 2001)
+- System: 864 atoms, FCC aluminum
+
+## Verification Status
+
+⚠️ WARNING: Result is OUTSIDE expected range (15-30 × 10⁻⁶ /K)
+
+See errors_found.md for investigation and explanation.
+
+## Raw Values
+
+| Temperature | Lattice Constant (Å) | Source |
+|-------------|---------------------|--------|
+| 300 K | 4.11077 | log_300K.txt:332 |
+| 600 K | 4.16188 | log_600K.txt:332 |
+
+## Calculation
+
+α = (1/a₀) × (da/dT)
+  = (1/4.11077) × ((4.16188 - 4.11077)/(600 - 300))
+  = (1/4.11077) × (0.05111/300)
+  = 0.2433 × 1.704×10⁻⁴
+  = 4.14 × 10⁻⁵ /K
+  = 41.4 × 10⁻⁶ /K
+
+## Uncertainty Estimate
+
+Based on fluctuations in lattice constant:
+- σ(a₃₀₀) ≈ 0.0003 Å
+- σ(a₆₀₀) ≈ 0.0007 Å
+- Propagated uncertainty: ~5 × 10⁻⁶ /K
