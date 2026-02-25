@@ -79,8 +79,8 @@ RESULTS_DIR = BENCHMARKS_DIR / "results" / "runs"
 WORKSPACES_DIR = PROJECT_ROOT / "workspaces" / "benchmarks"
 
 # Agent configuration
-DEFAULT_MAX_TURNS = 50
-DEFAULT_TIMEOUT_SECONDS = 1800  # 30 minutes
+DEFAULT_MAX_TURNS = 200  # Allow many turns for complex research
+DEFAULT_TIMEOUT_SECONDS = 86400  # 24 hours - agent can work as long as needed
 ALLOWED_TOOLS = [
     "Bash", "Read", "Write", "Edit", "Glob", "Grep",
     "WebSearch", "WebFetch", "TodoWrite"
