@@ -21,7 +21,8 @@ skills/
 ├── materials-database/   # Materials Project
 ├── mlip-simulation/      # ML potentials
 ├── data-analysis/        # Data processing
-└── resource-acquisition/ # Finding files/parameters
+├── resource-acquisition/ # Finding files/parameters
+└── iff-parameters/       # IFF force field search, export, composition
 ```
 
 ### Configuration Files
