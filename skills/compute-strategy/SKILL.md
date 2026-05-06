@@ -194,6 +194,15 @@ Escalate (don't silently retry) on:
 
 ---
 
+## Companion skills — composes with
+
+This skill answers **WHERE** to run. Two siblings answer the other questions:
+
+- **`compute-validation/SKILL.md`** — *IS IT READY*. Verification (reasoning, no compute) + smoke loop (cheap-compute measurement + extrapolation) before committing to production. Read this before any expensive submission.
+- **`campaign-orchestration/SKILL.md`** — *HOW TO MANAGE LONG EXECUTION*. Stateless agents over per-campaign WORKFLOW.md files. Read this when a campaign has multiple stages over hours-to-days.
+
+Read all three when driving a non-trivial compute campaign.
+
 ## Backend-specific details
 
 Each available backend has a page in `backends/` with concrete partition/queue/instance details. Read the relevant one before picking specifics.

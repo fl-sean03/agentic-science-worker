@@ -1,0 +1,104 @@
+# priors.yaml — failure-pattern catalog for <project>
+#
+# Lives at <project>/.priors.yaml or simulations/.priors.yaml.
+# Loaded by the compute-validation skill during Layer A verification.
+# Each verification: extract characteristics of the current campaign, evaluate
+# every pattern's `matches` rules against them, surface matches in
+# VERIFICATION.md, and apply mitigations for high/critical-severity matches.
+#
+# Append a new pattern whenever a smoke (Layer B) or production run surfaces
+# a failure mode that wasn't predicted by verification. The next campaign
+# benefits.
+
+version: 1
+project: <project-name>
+last_updated: YYYY-MM-DD
+
+patterns:
+  # --- Example 1: configuration-level prior, caught at verification time -----
+  - id: namd-velocity-limit-on-short-minimization
+    name: NAMD "atom velocity > limit" from too-short minimization
+    description: |
+      NAMD throws "atom velocity v=NNNN > limit" early in a run when the system
+      starts with high-energy clashes that minimization didn't fully relax.
+      The crash is deterministic at the same step count for a given seed.
+    matches:
+      tool: namd
+      minimize_steps: { lt: 5000 }
+      has_solvent: true
+    risk_class: high
+    layer_caught: smoke         # how this pattern was originally surfaced
+    indicators:
+      - "FATAL ERROR: Atom NNNN velocity"
+      - "early crash within first ~100 steps"
+    mitigation:
+      - "Increase minimize from 1000 to 10000 steps in the production config"
+      - "If still crashes: consider a heating phase before production"
+    rationale: |
+      Short minimization leaves residual high-energy contacts. The first
+      integrator step then assigns velocities consistent with that potential
+      energy, which exceeds NAMD's velocity-limit safety threshold.
+    references:
+      - "campaigns/2026-04-12-cubic-npt/SMOKE_ANALYSIS_002.md"
+    discovered: 2026-04-12
+    last_observed: 2026-04-13
+    incidents: ["12345678", "12345692"]
+
+  # --- Example 2: geometric prior, only matters for slab campaigns -----------
+  - id: slab-npt-needs-useConstantArea
+    name: NPT on slab without useConstantArea collapses vacuum gap
+    description: |
+      Running NAMD NPT on a slab geometry (vacuum gap in z) without
+      `useConstantArea yes` lets the barostat compress the cell isotropically,
+      which collapses the vacuum gap and drives density unphysically high.
+      Symptom: density rising monotonically through smoke; if production
+      proceeds, by ~20 ns the vacuum is gone and self-image artifacts
+      dominate.
+    matches:
+      geometry: slab
+      ensemble: npt
+      useConstantArea: { in: [false, "no", null] }
+    risk_class: critical
+    layer_caught: verification
+    indicators:
+      - "density slope > 0.005 g/cm^3/ns in smoke"
+      - "z-extent shrinking each restart"
+    mitigation:
+      - "Set `useConstantArea yes` in the NPT config"
+      - "Verify post-fix that density slope returns to ~0 within smoke noise"
+    rationale: |
+      `useConstantArea yes` constrains the barostat to scale only the z
+      direction, preserving the xy slab cross-section and the vacuum gap.
+      Without it, the barostat sees an effectively low-density box (because
+      of the vacuum) and compresses it.
+    references:
+      - "compute-validation/workflows/verification.md (worked example)"
+    discovered: 2026-05-06
+    last_observed: 2026-05-06
+    incidents: []
+
+  # Schema reference for new entries:
+  #
+  # - id: <unique-slug>            # required; stable identifier
+  #   name: <short human label>
+  #   description: |               # one paragraph; what the failure looks like
+  #     ...
+  #   matches:                     # predicates the agent evaluates
+  #     <key>: <exact-value>       # equality
+  #     <key>: { lt: <value> }     # less-than
+  #     <key>: { gt: <value> }     # greater-than
+  #     <key>: { in: [<list>] }    # membership
+  #   risk_class: low | medium | high | critical
+  #   layer_caught: verification | smoke | production | none-yet
+  #   indicators:                  # signals an agent can grep/extract
+  #     - <signal-or-string>
+  #   mitigation:                  # concrete actions; first one is preferred
+  #     - <action>
+  #   rationale: |                 # why the mitigation works
+  #     ...
+  #   references:                  # paths or URLs
+  #     - <path-or-url>
+  #   discovered: YYYY-MM-DD       # date this pattern was added
+  #   last_observed: YYYY-MM-DD    # most-recent campaign that triggered it
+  #   incidents:                   # job IDs or campaign slugs that hit it
+  #     - <id-or-slug>

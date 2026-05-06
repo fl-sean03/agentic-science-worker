@@ -258,5 +258,6 @@ Starter WORKFLOW.md skeletons live in `templates/`. Copy and edit:
 ## Cross-references
 
 - `compute-strategy/SKILL.md` — backend selection, smoke-first iteration, the underlying compute decisions this skill orchestrates over
+- `compute-validation/SKILL.md` — verification + smoke-loop discipline. A campaign's stage 1 (smoke) should follow this skill's protocol. WORKFLOW.md may include a stage `0.5-verification` requiring `VERIFICATION.md` before stage 1 begins.
 - `vast-cloud/SKILL.md` — Vast.ai backend driver
 - For Alpine HPC specifics: `compute-strategy/backends/alpine.md`

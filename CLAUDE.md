@@ -14,23 +14,25 @@ Skills are in `./skills/` (symlinked to `.claude/skills/` for compatibility):
 
 ```
 skills/
-├── compute-strategy/     # Backend selection, smoke-first iteration, partition routing
-├── vast-cloud/           # Vast.ai cloud GPU driver
-├── lammps-simulation/    # Molecular dynamics
-├── quantum-espresso/     # DFT calculations
-├── literature-search/    # Paper search
-├── materials-database/   # Materials Project
-├── mlip-simulation/      # ML potentials
-├── torch-sim/            # PyTorch-based simulation
-├── data-analysis/        # Data processing
-├── resource-acquisition/ # Finding files/parameters
-├── iff-parameters/       # IFF force field search, export, composition
-├── theory-synthesis/     # Theory/method synthesis
-├── ggen/                 # Generation utilities
-└── archive/              # Deprecated skills (e.g., hpc-cluster-curc, replaced by compute-strategy)
+├── compute-strategy/        # WHERE to run: backend selection, smoke-first iteration, partition routing
+├── compute-validation/      # IS IT READY: verification + smoke-loop discipline before production
+├── campaign-orchestration/  # HOW TO MANAGE: stateless agents over WORKFLOW.md files
+├── vast-cloud/              # Vast.ai cloud GPU driver
+├── lammps-simulation/       # Molecular dynamics
+├── quantum-espresso/        # DFT calculations
+├── literature-search/       # Paper search
+├── materials-database/      # Materials Project
+├── mlip-simulation/         # ML potentials
+├── torch-sim/               # PyTorch-based simulation
+├── data-analysis/           # Data processing
+├── resource-acquisition/    # Finding files/parameters
+├── iff-parameters/          # IFF force field search, export, composition
+├── theory-synthesis/        # Theory/method synthesis
+├── ggen/                    # Generation utilities
+└── archive/                 # Deprecated skills (e.g., hpc-cluster-curc, replaced by compute-strategy)
 ```
 
-`compute-strategy/` is the meta-skill: read it whenever picking a backend or partition for a compute job. It points at `vast-cloud/` and per-backend pages under `compute-strategy/backends/` for concrete details.
+The compute trio (`compute-strategy`, `compute-validation`, `campaign-orchestration`) compose: strategy decides backend, validation gates production behind verification + smoke analysis, orchestration manages long-running stateful execution. Read all three when driving a non-trivial compute campaign.
 
 ### Configuration Files
 
