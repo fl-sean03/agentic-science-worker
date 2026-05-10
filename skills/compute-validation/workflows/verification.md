@@ -485,15 +485,19 @@ That's why Layer B (smoke + analysis) exists. It runs cheaply enough to be a mea
 
 **Don't skip Layer B because Layer A was clean.** A clean Layer A means you're not aware of any predictable bugs — but the empirical class is still out there. Layer B is the only filter for it.
 
+**Don't skip Layer A' (orchestration safety) because Layer A was clean.** Layer A reasons about *physics correctness*. Layer A' is the parallel sibling that reasons about *script + submission + chain safety* — the class of failure that lives in interactions between scheduler behavior, automation, and notification. A bulletproof physics config with a runaway resubmit loop is still a disaster. Both A and A' must pass before Layer B.
+
 ---
 
 ## Cross-references
 
 - Parent skill: `compute-validation/SKILL.md`
+- Sibling layer (orchestration safety): `workflows/orchestration-safety.md`
 - Smoke layer: `workflows/smoke-analysis.md`
 - Iteration discipline: `workflows/iteration-discipline.md`
 - Per-tool signal extraction: `tools/<tool>.md`
 - VERIFICATION.md template: `templates/VERIFICATION.template.md`
+- ORCHESTRATION_CHECK.md template: `templates/ORCHESTRATION_CHECK.template.md`
 - Priors schema: `templates/priors.template.yaml`
 - Composing skill (where to run): `compute-strategy/SKILL.md`
-- Composing skill (long-running state): `campaign-orchestration/SKILL.md`
+- Composing skill (long-running state + runtime monitoring): `campaign-orchestration/SKILL.md`

@@ -39,24 +39,35 @@ This is the gate before any HPC submission, ML training run, DFT calculation, la
 
 Smoke runs aren't pass/fail sanity checks — **they're measurements**. A 5-minute smoke produces enough data to predict 5-day production behavior, *if* the agent extracts the right signal.
 
-Combined with reasoning-based verification (cheap, fast, catches predictable bugs), this gives two complementary error filters:
+Combined with reasoning-based verification (cheap, fast, catches predictable bugs), this gives three complementary error filters:
 
 | Layer | Catches | Why |
 |---|---|---|
-| **Verification** (reasoning, no compute) | Predictable failures (parameter mistakes, known-bad patterns, resource mismatches) | The agent reasons through the system using priors + analytical predictions |
-| **Smoke + Analysis** (cheap compute, ~30 min) | Empirical drift bugs that only surface dynamically (slow box shrinkage, gradient explosion, memory leaks, throughput collapse) | Short-time observation → extrapolated long-time prediction |
+| **Verification** (Layer A — physics reasoning, no compute) | Predictable physics/config failures (parameter mistakes, known-bad patterns, resource mismatches) | The agent reasons through the system using priors + analytical predictions |
+| **Orchestration safety** (Layer A' — script reasoning, no compute) | Submission-side failures (runaway loops, silent chain death, race conditions, notification floods) | The agent reasons about scripts + submission patterns + automation; catches what physics-verification misses |
+| **Smoke + Analysis** (Layer B — cheap compute, ~30 min) | Empirical drift bugs that only surface dynamically (slow box shrinkage, gradient explosion, memory leaks, throughput collapse) | Short-time observation → extrapolated long-time prediction |
 
-What slips through both layers is the genuine production-only risk class — rare and often instructive. Acceptable.
+What slips through all three layers is the genuine production-only risk class — rare and often instructive. Acceptable.
 
-## The three-layer model
+## The four-layer model
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│ Layer A — VERIFICATION (deep reasoning, no compute)                │
+│ Layer A — VERIFICATION (physics reasoning, no compute)             │
 │   • Read system, configs, priors, AGENTS.md, related campaigns     │
-│   • Predict failure modes; estimate resources; spot anti-patterns  │
+│   • Predict physics failure modes; estimate resources              │
 │   • Apply mitigations BEFORE first compute                         │
 │   → Output: VERIFICATION.md (green/yellow/red items + fixes)       │
+└──────────────────────────────┬─────────────────────────────────────┘
+                               ↓ (parallel sibling to A)
+┌────────────────────────────────────────────────────────────────────┐
+│ Layer A' — ORCHESTRATION SAFETY (script reasoning, no compute)     │
+│   • Read submit scripts, deploy logic, workflow files              │
+│   • Pattern-match priors + brainstorm pathological failures        │
+│   • Verify circuit breakers for self-propagating actions           │
+│   → Output: ORCHESTRATION_CHECK.md (risk register + mitigations)   │
+│   Catches: runaway loops, mail floods, silent chain death,         │
+│   walltime cliff bugs, dependency-semantics mistakes               │
 └──────────────────────────────┬─────────────────────────────────────┘
                                ↓
 ┌────────────────────────────────────────────────────────────────────┐
@@ -125,6 +136,29 @@ The agent investigates 8 categories before any compute:
 The agent should **falsify**, not validate. Actively try to find ways the campaign will fail. Confirmation bias is the enemy.
 
 For high-stakes campaigns: dispatch 2 subagents to do independent verification, compare. Catches blind spots.
+
+**Layer A is for physics reasoning. Layer A' (orchestration safety) is the sibling that reasons about scripts and submission patterns. Both must pass before Layer B.**
+
+## Layer A' — Orchestration Safety (script/submission reasoning, no compute)
+
+[Detailed workflow: `workflows/orchestration-safety.md`]
+
+Parallel sibling to Layer A. Where Layer A asks "will the physics fail?", Layer A' asks "will the submission workflow fail?"
+
+The agent investigates:
+
+| # | Category | What to think about |
+|---|---|---|
+| 1 | **Pattern matching** | Does this match a known `class: orchestration` pattern in `priors.yaml`? |
+| 2 | **Self-propagation register** | Every action that can spawn another action: in-script `sbatch`, arrays, dependency chains, cron/watchdogs, agent loops. For each: are all four circuit breakers present? (bounded counter, rate ceiling, failure ceiling, notification cap) |
+| 3 | **Failure-mode brainstorm** | For THIS specific submission, how could it fail in pathological ways? Fast-fail loop? Walltime cliff bash unreliability? Race conditions? Dependency-type wrong choice? Resource limit hit? |
+| 4 | **Worst-case enumeration** | Concrete numbers: how many submissions/emails/dollars/wasted-compute in the worst scenario? |
+| 5 | **What am I NOT thinking about** | Final discipline check — re-read with fresh eyes, look for what's unusual about this job |
+| 6 | **Output** | `ORCHESTRATION_CHECK.md` with risk register, mitigations applied, candidates to add to priors |
+
+Backend-specific reasoning hints live in `tools/<backend>.md` (e.g., `tools/slurm-orchestration.md` for SLURM clusters).
+
+The lesson encoded here: **any action that can self-propagate needs a circuit breaker.** Mail flood incidents, runaway resubmit loops, recursive agent spawning, watchdog cycles — all share this shape. The four-guardrails principle (bounded counter, rate ceiling, failure ceiling, notification cap) generalizes across all of them.
 
 ## Layer B — Smoke Loop (cheap compute + deep analysis)
 

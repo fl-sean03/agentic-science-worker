@@ -238,6 +238,31 @@ Starter WORKFLOW.md skeletons live in `templates/`. Copy and edit:
 - `templates/WORKFLOW.template.md` — generic multi-stage HPC campaign
 - `templates/WORKFLOW.namd-ensemble.md` — pre-fab for NAMD MD ensembles (NPT → 1000K decorr → snapshots → cool+prod array)
 
+## Runtime monitoring during the tick (agentic anomaly scan)
+
+Each orchestration tick should do more than progress state machines. It should also reason about whether the *current state of all campaigns* looks healthy — the runtime sibling to `compute-validation/workflows/orchestration-safety.md` (which is static pre-submission analysis).
+
+This is agentic, not threshold-based. The agent reads sacct + queue state + recent logs and asks:
+
+- **Does the pattern of completions look right?** Compare submissions/completions per hour against expected throughput for each campaign. Sudden spikes (>10 completions in 15 min) or pile-ups (>50 same-name jobs queued) are anomalies even if no single threshold fires.
+- **Are any chains stalling?** A chain link in PD for >24 hr while others advance is suspicious.
+- **Are any failures replicating?** Two consecutive same-error failures on a chain = pattern; investigate before continuing.
+- **Are any logs producing unexpected output?** Real-time log tail check for FATAL, OOM, "RESTART" without progress, or other anomaly signatures.
+
+Use the project's `.priors.yaml` (`class: orchestration` patterns) as seeds for what anomalies to look for. The runaway-resubmit pattern (today's bug class) shows up as "many fast completions in short time" — a heuristic the agent can apply.
+
+When the scan flags concerns:
+- **Low confidence**: write to the campaign's WORKFLOW.md action queue for next tick
+- **Medium confidence**: pause the chain (`scancel` future links) and write to ORCHESTRATION_CHECK.md
+- **High confidence + critical class**: escalate to user immediately
+
+The agent should reason about the specific campaign, not just match thresholds. A pattern that looks like a runaway in a NAMD context might be normal in a different campaign — context matters. Same falsification mindset that drives Layer A and Layer A' applies to runtime monitoring.
+
+This is the *post-submission* analog to Layer A' (`compute-validation/workflows/orchestration-safety.md`'s pre-submission static analysis). Together they catch:
+- Pre-submission: predictable orchestration anti-patterns + brainstormed risks
+- Runtime: novel anomalies that emerge during execution
+- Post-run: bidirectional learning loop updates priors
+
 ## Why this design
 
 - **Durable state** — files survive agent restarts, reboots, model changes
@@ -258,6 +283,7 @@ Starter WORKFLOW.md skeletons live in `templates/`. Copy and edit:
 ## Cross-references
 
 - `compute-strategy/SKILL.md` — backend selection, smoke-first iteration, the underlying compute decisions this skill orchestrates over
-- `compute-validation/SKILL.md` — verification + smoke-loop discipline. A campaign's stage 1 (smoke) should follow this skill's protocol. WORKFLOW.md may include a stage `0.5-verification` requiring `VERIFICATION.md` before stage 1 begins.
+- `compute-validation/SKILL.md` — verification + orchestration-safety + smoke-loop discipline. A campaign's stages should follow this skill's protocol. WORKFLOW.md may include `0.5-verification` (requires `VERIFICATION.md`) AND `0.6-orchestration-check` (requires `ORCHESTRATION_CHECK.md`) before any compute-bearing stage.
+- `compute-validation/workflows/orchestration-safety.md` — Layer A' static analysis of submission scripts; this skill's runtime-monitoring tick is the post-submission complement.
 - `vast-cloud/SKILL.md` — Vast.ai backend driver
 - For Alpine HPC specifics: `compute-strategy/backends/alpine.md`
