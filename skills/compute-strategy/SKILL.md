@@ -210,6 +210,8 @@ Each available backend has a page in `backends/` with concrete partition/queue/i
 | Backend | Page | Use for |
 |---|---|---|
 | CU Boulder Alpine HPC | [`backends/alpine.md`](./backends/alpine.md) | Production GPU work, free with CU allocation |
+| ALCF Polaris | [`backends/polaris.md`](./backends/polaris.md) | A100 GPU HPC (PBS Pro), free with DOE allocation; high-throughput MD; readiness vehicle toward ALCC/INCITE |
+| ALCF Crux | [`backends/crux.md`](./backends/crux.md) | CPU HPC (dual EPYC Rome, 128 cores/node, PBS Pro), free with DOE allocation; large/parallel CPU MD, bulk core-hours |
 | Vast.ai | [`backends/vast-ai.md`](./backends/vast-ai.md) | On-demand GPU, no queue, pay per hour |
 | Local (WSL2 / native) | [`backends/local.md`](./backends/local.md) | Sub-hour CPU/GPU work, debugging, prep |
 
