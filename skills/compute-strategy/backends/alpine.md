@@ -8,16 +8,17 @@ University of Colorado Research Computing's Alpine cluster. Free with allocation
 
 | Item | Value |
 |---|---|
-| Hostname | `login.rc.colorado.edu` |
+| Hostname | `dtn.rc.colorado.edu` (the Data Transfer Node — has full SLURM + scratch/projects). NOT the login node. |
 | User | `sefl7948` |
-| SSH alias | `cu_alpine` (configured in `~/.ssh/config`) |
-| Connect | `ssh cu_alpine` |
-| Authentication | Public-key (Duo MFA cached by SSH controlmaster) |
+| SSH alias | `cu_alpine` (and `alpine`) → the DTN, configured in `~/.ssh/config` |
+| Connect | `ssh cu_alpine` — key-only, **NO Duo**, no password, no VPN |
+| Authentication | Public-key, CILogon-registered. Duo-free via the DTN (works on the CU campus network). |
+| Login node | `login.rc.colorado.edu` (alias `alpine-login`) needs IdentiKey **password + Duo** — use ONLY for an interactive shell on the login node, not for autonomous work. |
 | Scratch | `/scratch/alpine/sefl7948/` (~787 TB free, project-wide) |
 | Project space | `/projects/sefl7948/` (~250 GB total, software lives here) |
 | SLURM | 24.11.5 (current as of 2026-05) |
 
-If `ssh cu_alpine` errors with permission denied or controlmaster timeout: ask the user to refresh Duo (`ssh cu_alpine` interactively, complete the push). Don't try to fix it without them.
+The DTN is **Duo-free** — there is no "refresh Duo" step. If `ssh cu_alpine` errors: confirm you're on the CU campus network (the key path requires it) and that the key `~/.ssh/cu_alpine` is present. (Canonical writeup: `~/.claude/skills/cu-hpc-access`.)
 
 ## Pre-installed software (project-paid)
 
