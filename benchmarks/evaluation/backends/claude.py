@@ -33,10 +33,14 @@ class ClaudeBackend(AgentBackend):
         max_turns: int = 50,
         timeout: int = 1800,
         allowed_tools: List[str] = None,
-        verbose: bool = False
+        verbose: bool = False,
+        model: str = None
     ) -> Dict[str, Any]:
         """
         Run Claude Code agent with the given prompt.
+
+        `model` (Slice A1, rebase-2026-07-02): explicit model pin passed as
+        `--model`; None preserves the legacy unpinned behavior.
         """
         if allowed_tools is None:
             allowed_tools = self.DEFAULT_TOOLS
@@ -49,6 +53,8 @@ class ClaudeBackend(AgentBackend):
             "--dangerously-skip-permissions",  # Full autonomy
             "--allowedTools", ",".join(allowed_tools),
         ]
+        if model:
+            cmd += ["--model", model]  # Slice A1: pin executor model
 
         if verbose:
             print(f"  Command: {' '.join(cmd)}...")

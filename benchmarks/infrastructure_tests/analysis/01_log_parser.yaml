@@ -33,7 +33,7 @@ command: |
   EOF
 
   # Run parser
-  python3 /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/scripts/parse_lammps_log.py log.lammps --stats
+  python3 /home/sf2/work/agents/science-agent/1-ScienceAgent/scripts/parse_lammps_log.py log.lammps --stats
 
 timeout: 30
 

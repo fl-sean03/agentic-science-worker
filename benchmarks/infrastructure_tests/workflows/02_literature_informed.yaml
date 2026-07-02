@@ -16,7 +16,7 @@ command: |
 
   echo "=== Step 1: Search for MD Force Field Papers ==="
 
-  python3 /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/scripts/search_semantic_scholar.py \
+  python3 /home/sf2/work/agents/science-agent/1-ScienceAgent/scripts/search_semantic_scholar.py \
     search "Lennard-Jones argon molecular dynamics parameters" --limit 5 > search_results.txt 2>&1
 
   cat search_results.txt

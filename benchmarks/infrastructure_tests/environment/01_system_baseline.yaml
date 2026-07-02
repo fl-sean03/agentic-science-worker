@@ -2,7 +2,8 @@
 # Validates that the system meets basic requirements
 
 name: system-baseline
-description: Verify WSL2 and basic system configuration
+description: Verify basic system configuration (bare-metal Ubuntu since 2026-06;
+  WSL2 checks retired with the machine migration — rebase-2026-07-02)
 category: environment
 difficulty: trivial
 expected_time: 5s
@@ -10,9 +11,9 @@ expected_time: 5s
 type: validation
 
 checks:
-  - name: WSL2 kernel detected
+  - name: Linux kernel detected
     type: command_succeeds
-    command: "uname -r | grep -i microsoft"
+    command: "uname -s | grep -i linux"
 
   - name: Home directory exists
     type: file_exists
@@ -20,7 +21,7 @@ checks:
 
   - name: Workspace directory exists
     type: file_exists
-    path: /home/sf2/LabWork/Workspace
+    path: /home/sf2/work
 
   - name: Python3 available
     type: command_succeeds

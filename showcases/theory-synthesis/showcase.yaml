@@ -47,10 +47,10 @@ usage: |
 
 setup:
   repositories:
-    theorizer: ~/LabWork/Workspace/29-AgenticScienceWorker/asta-theorizer
-    paper_finder: ~/LabWork/Workspace/29-AgenticScienceWorker/asta-paper-finder
-  api_keys_file: ~/LabWork/Workspace/29-AgenticScienceWorker/asta-theorizer/api_keys.donotcommit.json
-  s2_key_file: ~/LabWork/Workspace/29-AgenticScienceWorker/asta-theorizer/s2_key.donotcommit.txt
+    theorizer: ~/work/agents/science-agent/asta-theorizer
+    paper_finder: ~/work/agents/science-agent/asta-paper-finder
+  api_keys_file: ~/work/agents/science-agent/asta-theorizer/api_keys.donotcommit.json
+  s2_key_file: ~/work/agents/science-agent/asta-theorizer/s2_key.donotcommit.txt
   cache_dir: ~/.cache/science-agent/theorizer
 
 notes:
