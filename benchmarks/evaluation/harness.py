@@ -696,8 +696,64 @@ def print_tier_summary(tier: int, results: List[BenchmarkResult]):
 # Infrastructure Verification
 # ============================================================================
 
+# ----------------------------------------------------------------------------
+# Runnability probe (Slice A2, rebase-2026-07-02; provenance claude-fable-5)
+#
+# History: after the 2026-06-13 machine reorg, every configured binary path
+# pointed at a directory that no longer existed and nothing noticed — configs
+# were trusted instead of probed. The probe below EXECUTES each binary and
+# reports what actually happens (present-but-broken is reported as broken).
+# Binary locations may come from env vars (legacy: LMP/QE_CPU/QE_GPU) or from
+# an untracked ./config.yaml (config.example.yaml documents the schema); env
+# vars win when both are set.
+# ----------------------------------------------------------------------------
+
+def load_config_binaries() -> Dict[str, str]:
+    """Read binaries.{lammps,qe_cpu,qe_gpu} from PROJECT_ROOT/config.yaml (if any)."""
+    cfg_path = PROJECT_ROOT / "config.yaml"
+    if not cfg_path.exists():
+        return {}
+    try:
+        with open(cfg_path) as f:
+            cfg = yaml.safe_load(f) or {}
+        return {k: str(v) for k, v in (cfg.get("binaries") or {}).items() if v}
+    except Exception as e:
+        print(f"⚠ config.yaml present but unreadable: {e}")
+        return {}
+
+
+def probe_binary(path_str: Optional[str], args: List[str], expect: str,
+                 timeout: int = 20, stdin_devnull: bool = False) -> Dict[str, str]:
+    """
+    Execute a binary and report what actually happened (never trust existence).
+
+    Returns {"state": one of missing|runs|broken|hang, "detail": str}.
+    """
+    if not path_str:
+        return {"state": "missing", "detail": "no path configured"}
+    p = Path(path_str)
+    if not p.exists():
+        return {"state": "missing", "detail": f"path does not exist: {p}"}
+    try:
+        r = subprocess.run(
+            [str(p)] + args,
+            capture_output=True, text=True, timeout=timeout,
+            stdin=(subprocess.DEVNULL if stdin_devnull else None),
+            cwd="/tmp"
+        )
+        out = (r.stdout or "") + (r.stderr or "")
+        if expect.lower() in out.lower():
+            return {"state": "runs", "detail": out.strip().splitlines()[0][:120] if out.strip() else "ok"}
+        first_err = out.strip().splitlines()[0][:160] if out.strip() else f"exit={r.returncode}, no output"
+        return {"state": "broken", "detail": first_err}
+    except subprocess.TimeoutExpired:
+        return {"state": "hang", "detail": f"no response within {timeout}s (MPI-runtime/env rot is the known cause)"}
+    except OSError as e:
+        return {"state": "broken", "detail": str(e)}
+
+
 def verify_infrastructure() -> bool:
-    """Verify all required infrastructure is available."""
+    """Verify all required infrastructure is available (live probes, not path trust)."""
     print("Verifying infrastructure...")
     print("-" * 40)
 
@@ -706,34 +762,52 @@ def verify_infrastructure() -> bool:
     # Check Claude CLI
     try:
         result = subprocess.run(["claude", "--version"], capture_output=True, text=True)
-        print(f"✓ Claude CLI: available")
+        print(f"✓ Claude CLI: available ({result.stdout.strip()})")
     except FileNotFoundError:
         print(f"✗ Claude CLI: NOT FOUND")
         all_ok = False
 
-    # Check LAMMPS (from environment or common locations)
-    lmp_path = os.environ.get("LMP") or os.environ.get("LAMMPS_PATH")
-    if lmp_path and Path(lmp_path).exists():
-        print(f"✓ LAMMPS: {lmp_path}")
-    elif shutil.which("lmp"):
-        print(f"✓ LAMMPS: {shutil.which('lmp')} (from PATH)")
+    # Binary locations: env vars win, config.yaml fills the gaps
+    cfg_bins = load_config_binaries()
+
+    # Check LAMMPS — live execution probe
+    lmp_path = (os.environ.get("LMP") or os.environ.get("LAMMPS_PATH")
+                or cfg_bins.get("lammps") or shutil.which("lmp"))
+    lmp_probe = probe_binary(lmp_path, ["-h"], expect="LAMMPS")
+    if lmp_probe["state"] == "runs":
+        print(f"✓ LAMMPS: {lmp_path} EXECUTES ({lmp_probe['detail']})")
+    elif lmp_probe["state"] == "missing":
+        print(f"✗ LAMMPS: NOT FOUND (set LMP env var or binaries.lammps in config.yaml) — {lmp_probe['detail']}")
+        all_ok = False
     else:
-        print(f"✗ LAMMPS: NOT FOUND (set LMP or LAMMPS_PATH env var)")
+        print(f"✗ LAMMPS: present but DOES NOT RUN [{lmp_probe['state']}]: {lmp_probe['detail']}")
         all_ok = False
 
-    # Check QE (from environment or common locations)
-    qe_path = os.environ.get("QE_CPU") or os.environ.get("QE_PATH")
+    # Check QE — live execution probe (empty stdin makes pw.x fail fast with a
+    # namelist error; producing that error IS proof of execution)
+    qe_path = os.environ.get("QE_CPU") or os.environ.get("QE_PATH") or cfg_bins.get("qe_cpu")
+    if not qe_path and shutil.which("pw.x"):
+        qe_path = shutil.which("pw.x")
+    if qe_path and Path(qe_path).is_dir():
+        qe_path = str(Path(qe_path) / "pw.x")
     if qe_path:
-        pw_path = Path(qe_path) / "pw.x" if Path(qe_path).is_dir() else Path(qe_path)
-        if pw_path.exists():
-            print(f"✓ QE: {pw_path}")
+        qe_probe = probe_binary(qe_path, [], expect="namelist", stdin_devnull=True)
+        if qe_probe["state"] == "runs":
+            print(f"✓ QE: {qe_path} EXECUTES")
+        elif qe_probe["state"] == "missing":
+            print(f"✗ QE: NOT FOUND at {qe_path} - DFT benchmarks unavailable")
         else:
-            print(f"✗ QE: NOT FOUND at {qe_path}")
-            all_ok = False
-    elif shutil.which("pw.x"):
-        print(f"✓ QE: {shutil.which('pw.x')} (from PATH)")
+            print(f"⚠ QE: present but DOES NOT RUN [{qe_probe['state']}]: {qe_probe['detail']} - DFT benchmarks unavailable")
     else:
-        print(f"⚠ QE: NOT FOUND (set QE_CPU or QE_PATH env var) - DFT benchmarks unavailable")
+        print(f"⚠ QE: NOT FOUND (set QE_CPU env var or binaries.qe_cpu in config.yaml) - DFT benchmarks unavailable")
+
+    # API keys: presence only (validating them would require external calls;
+    # this probe makes none)
+    for var in ("MP_API_KEY", "SEMANTIC_SCHOLAR_API_KEY"):
+        if os.environ.get(var):
+            print(f"✓ {var}: set (validity not probed)")
+        else:
+            print(f"⚠ {var}: not set (database/literature tasks may be limited)")
 
     # Check Python packages
     try:
@@ -753,32 +827,38 @@ def verify_infrastructure() -> bool:
     benchmarks = list_benchmarks()
     print(f"✓ Benchmarks: {len(benchmarks)} tasks found")
 
-    # Check HPC access (optional)
+    # Check HPC access (optional). Slice A2 note: this probe opens a real SSH
+    # connection to a shared university machine — an EXTERNAL action. Per the
+    # standing rule (external actions only in owner-sanctioned sessions), it is
+    # now opt-in instead of automatic.
     print(f"\nHPC Infrastructure (optional):")
-    try:
-        hpc_result = subprocess.run(
-            ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5", "cu_alpine", "echo HPC_OK"],
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-        if "HPC_OK" in hpc_result.stdout:
-            print(f"✓ HPC SSH: cu_alpine accessible")
-            # Check for SLURM
-            slurm_result = subprocess.run(
-                ["ssh", "cu_alpine", "which squeue"],
+    if not os.environ.get("SW_VERIFY_HPC"):
+        print(f"⚠ HPC SSH: probe skipped (external action; set SW_VERIFY_HPC=1 in an owner-sanctioned session to enable)")
+    else:
+        try:
+            hpc_result = subprocess.run(
+                ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5", "cu_alpine", "echo HPC_OK"],
                 capture_output=True,
                 text=True,
                 timeout=10
             )
-            if slurm_result.returncode == 0:
-                print(f"✓ HPC SLURM: squeue available")
+            if "HPC_OK" in hpc_result.stdout:
+                print(f"✓ HPC SSH: cu_alpine accessible")
+                # Check for SLURM
+                slurm_result = subprocess.run(
+                    ["ssh", "cu_alpine", "which squeue"],
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                if slurm_result.returncode == 0:
+                    print(f"✓ HPC SLURM: squeue available")
+                else:
+                    print(f"⚠ HPC SLURM: not found (HPC benchmarks may fail)")
             else:
-                print(f"⚠ HPC SLURM: not found (HPC benchmarks may fail)")
-        else:
-            print(f"⚠ HPC SSH: connection failed (HPC benchmarks unavailable)")
-    except (subprocess.TimeoutExpired, FileNotFoundError):
-        print(f"⚠ HPC SSH: not configured (HPC benchmarks unavailable)")
+                print(f"⚠ HPC SSH: connection failed (HPC benchmarks unavailable)")
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            print(f"⚠ HPC SSH: not configured (HPC benchmarks unavailable)")
 
     # Check ML packages (optional for ML tiers)
     print(f"\nML Infrastructure (optional):")
