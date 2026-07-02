@@ -12,7 +12,7 @@ skills_tested:
 type: command
 
 command: |
-  cd /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent
+  cd /home/sf2/work/agents/science-agent/1-ScienceAgent
   python3 scripts/search_semantic_scholar.py search "DFT materials science" --limit 3
 
 timeout: 60

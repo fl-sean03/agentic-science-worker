@@ -142,7 +142,7 @@
 
 ```bash
 # Navigate to benchmarks
-cd /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent
+cd /home/sf2/work/agents/science-agent/1-ScienceAgent
 
 # Run single benchmark
 python benchmarks/run.py BENCH-T15-003

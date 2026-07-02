@@ -4,7 +4,7 @@
 
 set -e
 
-LMP="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/md-lammps/install/bin/lmp"
+LMP="${LMP:-/home/sf2/work/compute/gpu-tests/1-GPUTests/md-lammps/install/bin/lmp}"
 
 if [ $# -lt 1 ]; then
     echo "Usage: $0 <input_file> [gpu|cpu] [additional_args...]"

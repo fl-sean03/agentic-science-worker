@@ -87,7 +87,7 @@ command: |
   write_data minimized.data
   EOF
 
-  /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/md-lammps/install/bin/lmp -in in.min
+  /home/sf2/work/compute/gpu-tests/1-GPUTests/md-lammps/install/bin/lmp -in in.min
 
   echo "=== Step 3: NVT Equilibration ==="
 
@@ -113,11 +113,11 @@ command: |
   write_restart equilibrated.restart
   EOF
 
-  /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/md-lammps/install/bin/lmp -in in.nvt > nvt.log 2>&1
+  /home/sf2/work/compute/gpu-tests/1-GPUTests/md-lammps/install/bin/lmp -in in.nvt > nvt.log 2>&1
 
   echo "=== Step 4: Analyze Results ==="
 
-  python3 /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/scripts/parse_lammps_log.py nvt.log --stats
+  python3 /home/sf2/work/agents/science-agent/1-ScienceAgent/scripts/parse_lammps_log.py nvt.log --stats
 
   echo "=== Workflow Complete ==="
   ls -la

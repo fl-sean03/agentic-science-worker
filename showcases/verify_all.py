@@ -52,7 +52,7 @@ def check_torch_sim():
 
 def check_theorizer():
     """Check theorizer installation (requires 'theorizer' conda env)."""
-    theorizer_root = Path.home() / "LabWork/Workspace/29-AgenticScienceWorker/asta-theorizer"
+    theorizer_root = Path.home() / "work/agents/science-agent/asta-theorizer"
 
     if not theorizer_root.exists():
         return False, "asta-theorizer not cloned"
@@ -71,7 +71,7 @@ def check_theorizer():
                 "bash", "-c",
                 "source ~/miniconda3/etc/profile.d/conda.sh && "
                 "conda activate theorizer 2>/dev/null && "
-                "cd ~/LabWork/Workspace/29-AgenticScienceWorker/asta-theorizer && "
+                "cd ~/work/agents/science-agent/asta-theorizer && "
                 "python -c 'import sys; sys.path.insert(0, \"src\"); from Theorizer import Theorizer; print(\"OK\")'"
             ],
             capture_output=True,

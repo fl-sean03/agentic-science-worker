@@ -95,7 +95,7 @@ def validate_skill(skill_path: Path) -> list:
 
 
 def main():
-    skills_dir = Path("/home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/.claude/skills")
+    skills_dir = Path("/home/sf2/work/agents/science-agent/1-ScienceAgent/.claude/skills")
 
     if not skills_dir.exists():
         print("ERROR: Skills directory not found")

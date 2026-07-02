@@ -4,9 +4,9 @@
 
 set -e
 
-QE_CPU="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin"
-QE_GPU="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin"
-NVHPC_ENV="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/env/setup_nvhpc.sh"
+QE_CPU="${QE_CPU:-/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin}"
+QE_GPU="${QE_GPU:-/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin}"
+NVHPC_ENV="${NVHPC_ENV:-/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/env/setup_nvhpc.sh}"
 
 if [ $# -lt 2 ]; then
     echo "Usage: $0 <input_file> <output_file> [gpu|cpu] [nprocs]"

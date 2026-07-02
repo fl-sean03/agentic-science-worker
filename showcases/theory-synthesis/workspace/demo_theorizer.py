@@ -26,7 +26,7 @@ import json
 from pathlib import Path
 
 # Add theorizer source to path
-THEORIZER_ROOT = Path.home() / "LabWork/Workspace/29-AgenticScienceWorker/asta-theorizer"
+THEORIZER_ROOT = Path.home() / "work/agents/science-agent/asta-theorizer"
 sys.path.insert(0, str(THEORIZER_ROOT / "src"))
 
 
