@@ -125,10 +125,13 @@ log.lammps
 workspaces/phase0-tests/
 workspaces/projects/
 
-# Hide from public repo (owner rule, Jan 2026). rebase-2026-07-02 scoped this
-# from `docs/` to `docs/*` so the rebase record set below can be tracked;
-# whether it stays tracked before any push is owner decision B-6.
-docs/*
-!docs/rebase/
-!docs/PATH_MIGRATION_2026-06-13.md
+# Hide from public repo (owner rule, Jan 2026). rebase-2026-07-02 adjusted the
+# original `docs/` rule ONLY to let the rebase record set be tracked; nested
+# docs/ dirs (e.g. benchmarks/docs leftovers) stay ignored exactly as before.
+# Whether the rebase records stay tracked before any push is owner decision B-6.
+**/docs/
+!/docs/
+/docs/*
+!/docs/rebase/
+!/docs/PATH_MIGRATION_2026-06-13.md
 workspaces/copper_calc/
