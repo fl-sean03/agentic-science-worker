@@ -1,3 +1,4 @@
+<!-- CANONICAL LIVE COPY as of 2026-07-02: promoted from 08_upgrades/upgrade-2026-07-02/six-files/ (that copy is the frozen cycle record; update THIS one going forward). Promotion: rebase-2026-07-02 S7, model claude-fable-5. docs/ is gitignore-scoped; docs/rebase/ is explicitly tracked (ADR-106, owner review at B-6). -->
 # Assumptions & Open Questions — Agentic Science Worker (1-ScienceAgent)
 
 **Last reviewed:** 2026-07-02  ·  **Reviewing model:** claude-fable-5
