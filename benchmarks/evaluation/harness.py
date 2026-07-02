@@ -86,6 +86,37 @@ ALLOWED_TOOLS = [
     "WebSearch", "WebFetch", "TodoWrite"
 ]
 
+# ----------------------------------------------------------------------------
+# Model identity pinning (Slice A1, rebase-2026-07-02; provenance claude-fable-5)
+#
+# Every historical result artifact is era-ambiguous because neither the executor
+# nor the LLM judge ever pinned or recorded a model. From this change on:
+#   - the executor spawn gets an explicit `--model EXECUTOR_MODEL`,
+#   - the grader spawn gets an explicit `--model GRADER_MODEL`,
+#   - result.json carries `model`, `grader_model`, `cli_version`.
+# Override via env (SW_BENCH_MODEL / SW_BENCH_GRADER_MODEL) or the harness
+# `--model` / `--grader-model` CLI flags. Task YAMLs, thresholds, and rubrics
+# are deliberately untouched (comparability invariant).
+# ----------------------------------------------------------------------------
+EXECUTOR_MODEL = os.environ.get("SW_BENCH_MODEL", "claude-fable-5")
+GRADER_MODEL = os.environ.get("SW_BENCH_GRADER_MODEL",
+                              os.environ.get("SW_BENCH_MODEL", "claude-fable-5"))
+
+_CLI_VERSION_CACHE: Optional[str] = None
+
+
+def get_cli_version() -> str:
+    """Return `claude --version` output (cached; 'unknown' on failure)."""
+    global _CLI_VERSION_CACHE
+    if _CLI_VERSION_CACHE is None:
+        try:
+            out = subprocess.run(["claude", "--version"],
+                                 capture_output=True, text=True, timeout=30)
+            _CLI_VERSION_CACHE = out.stdout.strip() or "unknown"
+        except Exception:
+            _CLI_VERSION_CACHE = "unknown"
+    return _CLI_VERSION_CACHE
+
 
 # ============================================================================
 # Data Structures
@@ -123,6 +154,13 @@ class BenchmarkResult:
     error_message: Optional[str] = None
     stderr: str = ""
     exit_code: int = 0
+
+    # Model identity (Slice A1, rebase-2026-07-02): pre-2026-07 artifacts lack
+    # these fields — treat their absence as "model unrecorded (Opus-4.8 era or
+    # earlier, unattributable)".
+    model: str = ""
+    grader_model: str = ""
+    cli_version: str = ""
 
 
 # ============================================================================
@@ -206,6 +244,8 @@ def run_agent(
         "--dangerously-skip-permissions",  # Full autonomy
         "--allowedTools", ",".join(ALLOWED_TOOLS),
     ]
+    if EXECUTOR_MODEL:
+        cmd += ["--model", EXECUTOR_MODEL]  # Slice A1: pin executor model
 
     if verbose:
         print(f"  Command: {' '.join(cmd)}...")
@@ -369,7 +409,8 @@ IMPORTANT REQUIREMENTS:
             max_turns=benchmark.get('max_turns', DEFAULT_MAX_TURNS),
             timeout=timeout_seconds,
             allowed_tools=ALLOWED_TOOLS,
-            verbose=verbose
+            verbose=verbose,
+            model=EXECUTOR_MODEL  # Slice A1: pin executor model
         )
 
     print("-" * 40)
@@ -405,7 +446,8 @@ IMPORTANT REQUIREMENTS:
                 benchmark,
                 workspace,
                 exec_result['stdout'],
-                timeout=300  # 5 minutes for thorough grading with tools
+                timeout=300,  # 5 minutes for thorough grading with tools
+                model=GRADER_MODEL  # Slice A1: pin grader model
             )
 
             score = llm_result.total_score
@@ -479,7 +521,11 @@ IMPORTANT REQUIREMENTS:
         grading_details=grading_details,
         stderr=exec_result['stderr'],
         exit_code=exec_result['exit_code'],
-        error_message=exec_result['stderr'] if exec_result['status'] == 'error' else None
+        error_message=exec_result['stderr'] if exec_result['status'] == 'error' else None,
+        # Slice A1: record model identity in every artifact
+        model=EXECUTOR_MODEL,
+        grader_model=GRADER_MODEL if grading_details.get('grader') == 'llm' else grading_details.get('grader', ''),
+        cli_version=get_cli_version()
     )
 
     # Save results
@@ -980,6 +1026,8 @@ def run_all_tiers(verbose: bool = False, save_report: bool = True,
 def main():
     import argparse
 
+    global EXECUTOR_MODEL, GRADER_MODEL  # Slice A1: CLI may override the pins
+
     parser = argparse.ArgumentParser(
         description="Benchmark Harness for Agentic Science Worker"
     )
@@ -1062,8 +1110,28 @@ def main():
         action="store_true",
         help="List available agent backends"
     )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=None,
+        help=f"Pin executor model (default: env SW_BENCH_MODEL or '{EXECUTOR_MODEL}')"
+    )
+    parser.add_argument(
+        "--grader-model",
+        type=str,
+        default=None,
+        help=f"Pin grader model (default: env SW_BENCH_GRADER_MODEL or executor model)"
+    )
 
     args = parser.parse_args()
+
+    # Slice A1: CLI overrides for model pinning
+    if args.model:
+        EXECUTOR_MODEL = args.model
+        if not args.grader_model and "SW_BENCH_GRADER_MODEL" not in os.environ:
+            GRADER_MODEL = args.model
+    if args.grader_model:
+        GRADER_MODEL = args.grader_model
 
     if args.list_backends:
         print("\nAvailable backends:")

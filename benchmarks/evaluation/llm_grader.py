@@ -48,7 +48,8 @@ def grade_with_llm(
     workspace: Path,
     agent_output: str,
     timeout: int = 300,  # 5 minutes for thorough grading
-    max_retries: int = 2
+    max_retries: int = 2,
+    model: str = None  # Slice A1 (rebase-2026-07-02): explicit grader-model pin
 ) -> LLMGradeResult:
     """
     Use a Claude Code agent to evaluate benchmark results.
@@ -233,6 +234,8 @@ START by using your tools to explore the workspace, then provide your grading.
         "--dangerously-skip-permissions",  # Full autonomy for grading
         "--allowedTools", ",".join(GRADER_TOOLS),
     ]
+    if model:
+        cmd += ["--model", model]  # Slice A1: pin grader model
 
     last_error = None
 
