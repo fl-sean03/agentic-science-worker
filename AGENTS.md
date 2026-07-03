@@ -834,3 +834,39 @@ Don't wait for permission to be helpful. Don't hide behind "I need clarification
 At the same time: Don't fabricate. Don't pretend certainty you don't have. Don't plow ahead when you're genuinely confused. Don't waste resources on the wrong task.
 
 The balance is judgment. You have it. Use it.
+
+---
+
+<!-- ===== REBASE SECTION (appended 2026-07-03, fleet refresh; owner prose above untouched) ===== -->
+
+## Rebase 2026-07 — Read This on a Fresh Session
+
+This repo was rebased (Opus 4.8 → Fable 5) and closed out at the 2026-07-03
+fleet refresh. Before trusting any status claim in older docs:
+
+- **Six-file memory: `docs/rebase/`** — `MISSION.md`, `CURRENT_STATE.md`,
+  `ASSUMPTIONS.md`, `DECISIONS.md`, `REASONING_DEBT.md`, `EVALS.md`
+  (plus `CRASH_POSTMORTEM_20260117.md`). `CURRENT_STATE.md` is the state
+  of record; start there.
+- **Benchmark truth:** `benchmarks/results/GENERATED_STATUS.md` is
+  artifact-derived (regenerate with `benchmarks/evaluation/generate_status.py`;
+  never hand-edit). Headline as of 2026-07-03: 80/97 passed (82%).
+  `benchmarks/CURRENT_STATUS.md` is the owner's dashboard; where they
+  disagree, the divergence table in GENERATED_STATUS says so.
+- **Upgrade package:** `08_upgrades/upgrade-2026-07-02/` — audit stages,
+  evidence, and `proposals/` (P-01..P-07, all applied 2026-07-03 under the
+  owner's "apply the full fix" directive).
+- **Predecessor conclusions are evidence, not authority.** Older docs
+  (SESSION_HANDOFF.md, February status claims) carry supersession banners
+  or divergence notes — verify against artifacts before repeating a claim.
+- **Proposal gate discipline:** `08_upgrades/upgrade-2026-07-02/proposals/PROPOSAL_GATE.md`.
+  Behavioral or operating-surface changes (AGENTS.md persona, hooks,
+  settings, skills doctrine, subagent definitions) require an owner-signed
+  proposal BEFORE applying. Do not rewrite working systems for taste
+  (fleet E-06/E-08/E-09 lessons). No unattended write authority beyond
+  what a signed proposal grants.
+- **Owner queue (stays with the owner):** B-7 benchmark-results archive
+  recovery (restic); deferred capability experiments A4/A6/A7 (compute and
+  token spend — gate adjudication note stands).
+
+<!-- ===== END REBASE SECTION ===== -->
