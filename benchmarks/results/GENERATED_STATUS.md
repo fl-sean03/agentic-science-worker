@@ -1,6 +1,6 @@
 # GENERATED Benchmark Status — artifact-derived, do not hand-edit
 
-**Generated:** 2026-07-02 16:28 UTC by `benchmarks/evaluation/generate_status.py` (rebase-2026-07-02, model claude-fable-5)
+**Generated:** 2026-07-03 02:43 UTC by `benchmarks/evaluation/generate_status.py` (rebase-2026-07-02, model claude-fable-5)
 **Source artifacts:** `/home/sf2/work/agents/science-agent/1-ScienceAgent/benchmarks/results/runs` (97 runs with result.json)
 
 > This file is regenerated mechanically; every number is read from a
@@ -115,7 +115,7 @@
 | T13-004 | passed | 88 | 60 | unrecorded | `BENCH-T13-004-20260224-233518` |
 | T13-005 | passed | 88 | 60 | unrecorded | `BENCH-T13-005-20260224-233540` |
 | T13-006 | failed | 21 | 60 | unrecorded | `BENCH-T13-006-20260224-233612` |
-| T13-007 | passed | 97 | 60 | unrecorded | `BENCH-T13-007-20260224-233758` |
+| T13-007 | passed | 96 | 60 | claude-fable-5 | `BENCH-T13-007-20260702-162253` |
 | T13-008 | passed | 93 | 60 | unrecorded | `BENCH-T13-008-20260224-233852` |
 
 ### Tier 14 — 5/5 passed
@@ -216,7 +216,7 @@
 | T13-003 | score: dashboard 92 vs artifact 18; outcome: dashboard ✅ vs artifact failed | `BENCH-T13-003-20260224-233208` |
 | T13-005 | score: dashboard 76 vs artifact 88 | `BENCH-T13-005-20260224-233540` |
 | T13-006 | score: dashboard 72 vs artifact 21; outcome: dashboard ✅ vs artifact failed | `BENCH-T13-006-20260224-233612` |
-| T13-007 | score: dashboard 94 vs artifact 97 | `BENCH-T13-007-20260224-233758` |
+| T13-007 | score: dashboard 94 vs artifact 96 | `BENCH-T13-007-20260702-162253` |
 | T13-008 | score: dashboard 82 vs artifact 93 | `BENCH-T13-008-20260224-233852` |
 | T14-001 | score: dashboard 92 vs artifact 91 | `BENCH-T14-001-20260224-234226` |
 | T14-003 | score: dashboard 85 vs artifact 88 | `BENCH-T14-003-20260224-234447` |
