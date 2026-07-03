@@ -1,6 +1,6 @@
 # P-02 — `.mcp.json`: repoint filesystem MCP server root (Track B-2)
 
-**Status:** PROPOSED · **Author model:** claude-fable-5 · **Date:** 2026-07-02
+**Status:** APPROVED+APPLIED 2026-07-03 (owner sign-off: 2026-07-03 "apply the full fix" directive) · **Author model:** claude-fable-5 · **Date:** 2026-07-02
 **Target:** `.mcp.json` (untracked in git; read by the live session at boot).
 
 ## Why
@@ -30,4 +30,4 @@ Fresh session: list the MCP server, read one file through it. Revert = restore
 the old string (quoted above).
 
 ## APPROVAL
-- [ ] APPROVED ____________ (date / initials)   ·   [ ] REJECTED: ____________
+- [x] APPROVED 2026-07-03 — owner directive "apply the full fix" (fleet refresh close-out); applied by Fable 5 finalizer.
