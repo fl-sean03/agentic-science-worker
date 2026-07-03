@@ -581,7 +581,6 @@ Skills are located in `./skills/` directory. Each skill provides domain-specific
 |-------|-------------|
 | `lammps-simulation` | Molecular dynamics with LAMMPS |
 | `quantum-espresso` | DFT calculations with QE |
-| `hpc-cluster` | Remote HPC execution via SSH/SLURM |
 | `vast-cloud` | On-demand GPU cloud (VAST AI) - no queues, pay per hour |
 | `literature-search` | Finding papers and extracting parameters |
 | `materials-database` | Querying Materials Project |
@@ -590,6 +589,15 @@ Skills are located in `./skills/` directory. Each skill provides domain-specific
 | `theory-synthesis` | Literature-driven hypothesis generation (Theorizer) |
 | `ggen` | Crystal structure generation |
 | `torch-sim` | High-throughput MLIP simulations |
+| `resource-acquisition` | Sourcing potentials/pseudopotentials/structures |
+| `iff-parameters` | IFF force-field database access (search/export/compose) |
+| `compute-strategy` | Cross-backend job routing (local / Vast.ai / Alpine / ALCF) |
+| `compute-validation` | Verify-before-compute gates (physics + smoke + orchestration safety) |
+| `campaign-orchestration` | Durable WORKFLOW.md state + stateless tick agents for long campaigns |
+| `project-update` | Tier-1 in-repo update engine (hosted here for use in other repos) |
+
+Archived: `skills/archive/hpc-cluster-curc/` (CURC-era HPC skill, retired
+2026-02-20; Alpine/ALCF access now lives in `compute-strategy` backends).
 
 ---
 

@@ -1,6 +1,6 @@
 # P-06 — `AGENTS.md`: minimal factual skills-table refresh (Track B-1)
 
-**Status:** PROPOSED · **Author model:** claude-fable-5 · **Date:** 2026-07-02
+**Status:** APPROVED+APPLIED 2026-07-03 (owner sign-off: 2026-07-03 "apply the full fix" directive) · **Author model:** claude-fable-5 · **Date:** 2026-07-02
 **Target:** `AGENTS.md` (tracked; THE primary live operating surface).
 
 ## Scope discipline (why this is so small)
@@ -50,4 +50,4 @@ the owner wants belt-and-suspenders (table content is not behavioral
 instruction, so A/B is optional here). Revert = git revert.
 
 ## APPROVAL
-- [ ] APPROVED ____________ (date / initials)   ·   [ ] REJECTED: ____________
+- [x] APPROVED 2026-07-03 — owner directive "apply the full fix" (fleet refresh close-out); applied by Fable 5 finalizer.
