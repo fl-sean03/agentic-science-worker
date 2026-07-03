@@ -2,6 +2,8 @@
 
 Real examples of autonomous research conducted by the Agentic Science Worker. Each showcase demonstrates end-to-end capability on a challenging scientific task.
 
+> **Note:** Showcases represent specific successful runs. Complex autonomous benchmarks show variability - the same benchmark may score differently on different runs. These showcases demonstrate what the agent CAN achieve.
+
 ## Featured Showcases
 
 ### 1. [Novel Li-Ion Cathode Discovery](novel-cathode-discovery/)

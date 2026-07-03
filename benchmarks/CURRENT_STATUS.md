@@ -1,6 +1,6 @@
 # Benchmark Current Status
 
-**Last Updated:** 2026-02-23
+**Last Updated:** 2026-02-25
 **Maintainer:** Automated via benchmark runs
 
 ---
@@ -9,18 +9,20 @@
 
 | Category | Run | Pass | Rate | Notes |
 |----------|-----|------|------|-------|
-| Foundation (T1-T4) | 21/21 | 21 | 100% | |
+| Foundation (T1-T4) | 21 | 17 | 81% | 2 failed, 2 timeout |
 | HPC (T5-T6) | - | - | - | **ARCHIVED** |
-| Campaigns (T7) | 1/3 | 1 | 33% | 2 archived |
-| ML/MLIP (T8) | 6/7 | 6 | 86% | |
-| Autonomous (T9) | 3/5 | 3 | 100% | T9-003 fixed |
-| Frontier (T10) | 4/4 | 4 | 100% | 75, 72, 78, 85 ✅ All passing! |
+| Campaigns (T7) | 2 | 2 | 100% | T7-001 stalled & killed |
+| ML/MLIP (T8) | 7 | 6 | 86% | 1 timeout |
+| Autonomous (T9) | 5 | 2 | 40% | Regressions |
+| Frontier (T10) | 4 | 2 | 50% | T10-001/002 regressed |
 | HPC+ML (T11) | - | - | - | **ARCHIVED** |
-| Theory (T12) | 0/3 | - | - | Needs Theorizer |
-| Quality (T13-T16) | 43/43 | 43 | 100% | |
-| Cloud GPU (T17) | 3/3 | 3 | 100% | T17-001: 97, T17-002: 91, T17-003: 92 ✅ |
-| Data Analysis (T18) | 2/2 | 2 | 100% | T18-001: 92, T18-002: 92 ✅ |
-| **ACTIVE** | **81/86** | **81** | **100%** | |
+| Theory (T12) | 3 | 3 | 100% | NEW - All passing! |
+| Quality (T13-T16) | 43 | 38 | 88% | Some regressions |
+| Cloud GPU (T17) | 8 | 7 | 88% | 1 timeout |
+| Data Analysis (T18) | 4 | 4 | 100% | All expanded benchmarks pass |
+| **ACTIVE** | **97/98** | **80** | **82%** | Fresh run 2026-02-25 |
+
+**Note:** This represents a complete fresh run. Some variance from previous results expected.
 
 ---
 
@@ -34,12 +36,14 @@ Basic execution capabilities - all passing.
 **ARCHIVED (2026-02-20):** CURC access deferred. Use VAST.ai for GPU compute.
 See `skills/archive/hpc-cluster-curc/` for archived skill.
 
-### T7: Research Campaigns (33%)
+### T7: Research Campaigns (100% of runnable)
 | ID | Score | Time | Notes |
 |----|-------|------|-------|
-| T7-001 | Not run | 480 min | Needs HPC |
-| T7-002 | 85 ✅ | 240 min | Passing |
-| T7-003 | Not run | 360 min | Needs HPC |
+| T7-001 | STALLED | 480 min | Ran 5+ hours then stalled, killed |
+| T7-002 | 67 ✅ | 240 min | Passing |
+| T7-003 | 55 ✅ | 360 min | Passing |
+
+**T7-001 Analysis (2026-02-25):** Multi-day research benchmark ran for 5+ hours, completed 3/7 temperatures for Si thermal conductivity, then stalled for 2 hours with no activity. Process killed. Partial work saved in workspace.
 
 ### T8: ML/MLIP (86%)
 | ID | Score | Notes |
@@ -52,34 +56,38 @@ See `skills/archive/hpc-cluster-curc/` for archived skill.
 | T8-006 | Not run | Fine-tuning (needs setup) |
 | T8-007 | 95 ✅ | Model benchmarking |
 
-### T9: Autonomous Research (80%)
+### T9: Autonomous Research (40%)
 | ID | Score | Time | Notes |
 |----|-------|------|-------|
-| T9-001 | Not run | 240 min | Active learning MLIP (needs DFT) |
-| T9-002 | Not run | 300 min | Multi-fidelity workflow (needs DFT) |
-| T9-003 | 58 ✅ | 175 min | 2/3 passing (48, 62, 58), mean=56 |
-| T9-004 | 65 ✅ | - | Hypothesis-driven |
-| T9-005 | 82 ✅ | - | Autonomous debugging |
+| T9-001 | 48 ❌ | 240 min | Active learning - below threshold |
+| T9-002 | 74 ✅ | 300 min | Multi-fidelity workflow |
+| T9-003 | 0 ❌ | 175 min | Regression - needs investigation |
+| T9-004 | 8 ❌ | - | Hypothesis-driven - major regression |
+| T9-005 | 78 ✅ | - | Autonomous debugging |
 
-**T9-003 Consistency Testing Complete (2026-02-20):**
-- Run 1: 48 ❌ - Actual MD, wrong dirs, short sims, wrong minimum
-- Run 2: 62 ✅ - Analytical models only (Abeles) - prompted fix
-- Run 3: 58 ✅ - Actual NEMD (Müller-Plathe), κ still too low but passes
-- **Result:** 2/3 passing, explicit MD requirement fixed Run 2 issue
+**T9 Regressions (2026-02-25):** Fresh run shows significant regressions in T9-003 and T9-004. These complex autonomous benchmarks appear sensitive to agent variability.
 
-### T10: Frontier DFT (100%)
+### T10: Frontier DFT (50%)
 | ID | Score | Notes |
 |----|-------|-------|
-| T10-001 | 75 ✅ | Novel material discovery - 9 novel Li-ion cathodes! |
-| T10-002 | 72 ✅ | Cross-modal XRD reasoning - R-3m LiNiO2 identified |
-| T10-003 | 78 ✅ | Open research question - MLIP phonon softening investigation |
-| T10-004 | 85 ✅ | Basic DFT SCF (QE GPU working!) |
+| T10-001 | 5 ❌ | Novel material discovery - regression from 75 |
+| T10-002 | 17 ❌ | Cross-modal XRD reasoning - regression from 72 |
+| T10-003 | 88 ✅ | Open research question - MLIP phonon investigation |
+| T10-004 | 83 ✅ | Basic DFT SCF (QE GPU working) |
+
+**T10-001/002 Regressions (2026-02-25):** These frontier benchmarks previously passed but failed in fresh run. High-complexity tasks show agent variability.
 
 ### T11: HPC+ML (ARCHIVED)
 Requires CURC - deferred.
 
-### T12: Theory Synthesis (0%)
-Not run - needs Theorizer MCP integration.
+### T12: Theory Synthesis (100%)
+| ID | Score | Notes |
+|----|-------|-------|
+| T12-001 | 78 ✅ | Literature-driven hypothesis generation |
+| T12-002 | 68 ✅ | Research gap discovery |
+| T12-003 | 75 ✅ | Methodology consensus extraction |
+
+**T12 Now Passing (2026-02-25):** All theory synthesis benchmarks now pass. Theorizer MCP integration working.
 
 ### T13: Robustness (100%)
 | ID | Score | Test |
@@ -244,6 +252,12 @@ Not run - needs Theorizer MCP integration.
 
 | Date | Change |
 |------|--------|
+| 2026-02-25 | **FULL FRESH RUN**: 97/98 benchmarks, 80 passed (82%). Archived old results. |
+| 2026-02-25 | **T12 NOW PASSING**: All 3 theory synthesis benchmarks pass (78, 68, 75) |
+| 2026-02-25 | **T17/T18 EXPANDED**: 8 cloud GPU + 4 data analysis benchmarks now |
+| 2026-02-25 | **REGRESSIONS**: T9-003/004, T10-001/002 failed - agent variability on complex tasks |
+| 2026-02-25 | **T7-001 STALLED**: Multi-day benchmark ran 5+ hrs then stalled, killed |
+| 2026-02-25 | **TIMEOUTS**: 5 benchmarks (T2-002, T4-005/006, T8-005, T17-004) |
 | 2026-02-24 | **T10 COMPLETE**: All frontier DFT passing - T10-003 (78) phonon softening investigation |
 | 2026-02-24 | **T10-001/002 PASSED**: Frontier DFT - novel cathode discovery (75), XRD reasoning (72) |
 | 2026-02-24 | **T17/T18 EXPANDED**: Created T17-004 to T17-008, T18-003 to T18-004 |

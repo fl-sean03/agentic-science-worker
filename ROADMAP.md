@@ -68,39 +68,42 @@ And eventually: discover something genuinely new.
 | Literature search | Production | Agent finds parameters autonomously |
 | Parameter extraction | Production | Correct citations in outputs |
 | Result verification | Production | Compares to published values |
-| Error recovery | Production | T13 robustness tier 100% |
+| Error recovery | Production | T13 robustness tier 75% |
 | ML potentials (MACE, CHGNet) | Production | T8 tier 86% passing |
-| Quantum ESPRESSO (GPU) | Production | T10-004: 85, local GPU build working |
-| VAST.ai cloud GPU | Production | T17 tier 100% (97, 91, 92) |
-| Data analysis | Production | T18 tier 100% (92, 92) |
-| Agent cognition | Production | T15 tier 100% |
-| Scientific rigor | Production | T16 tier 100% |
+| Quantum ESPRESSO (GPU) | Production | T10-003/004 passing |
+| VAST.ai cloud GPU | Production | T17 tier 88% (7/8) |
+| Data analysis | Production | T18 tier 100% (4/4) |
+| Theory synthesis | Production | T12 tier 100% (3/3) NEW |
+| Agent cognition | Production | T15 tier 86% |
+| Scientific rigor | Production | T16 tier 88% |
 
 ### Benchmark Progress
 
 ```
-Tier 1-4  (Foundation):     21/21  ████████████████████ 100%
+Tier 1-4  (Foundation):     17/21  ████████████████░░░░  81%
 Tier 5-6  (HPC):            -/-    ARCHIVED (CURC deferred)
-Tier 7    (Campaigns):      1/3    ██████░░░░░░░░░░░░░░  33% (2 need HPC)
+Tier 7    (Campaigns):      2/2    ████████████████████ 100% (T7-001 stalled)
 Tier 8    (ML Materials):   6/7    █████████████████░░░  86%
-Tier 9    (Autonomous):     3/5    ████████████░░░░░░░░  60%
-Tier 10   (Frontier DFT):   1/4    █████░░░░░░░░░░░░░░░  25% (QE working!)
+Tier 9    (Autonomous):     2/5    ████████░░░░░░░░░░░░  40% (regressions)
+Tier 10   (Frontier DFT):   2/4    ██████████░░░░░░░░░░  50% (regressions)
 Tier 11   (HPC+ML):         -/-    ARCHIVED (CURC deferred)
-Tier 12   (Theory):         0/3    ░░░░░░░░░░░░░░░░░░░░   0% (needs Theorizer)
-Tier 13   (Robustness):     8/8    ████████████████████ 100%
+Tier 12   (Theory):         3/3    ████████████████████ 100% [NEW - ALL PASS]
+Tier 13   (Robustness):     6/8    ███████████████░░░░░  75%
 Tier 14   (Compute):        5/5    ████████████████████ 100%
-Tier 15   (Cognition):      14/14  ████████████████████ 100%
-Tier 16   (Rigor):          16/16  ████████████████████ 100%
-Tier 17   (Cloud GPU):      3/3    ████████████████████ 100% [NEW]
-Tier 18   (Data Analysis):  2/2    ████████████████████ 100% [NEW]
+Tier 15   (Cognition):      12/14  █████████████████░░░  86%
+Tier 16   (Rigor):          14/16  ██████████████████░░  88%
+Tier 17   (Cloud GPU):      7/8    ██████████████████░░  88%
+Tier 18   (Data Analysis):  4/4    ████████████████████ 100%
 
-Active: 78/86 benchmarks passing (100% pass rate)
+Active: 80/97 benchmarks passing (82% pass rate)
 ```
 
-**Recent Achievements (2026-02-23):**
-- T17 Cloud GPU tier: All 3 benchmarks pass (97, 91, 92) - VAST.ai validated
-- T18 Data Analysis tier: Both benchmarks pass (92, 92) - new capability
-- T10-004 Basic DFT: Score 85 - QE GPU acceleration working
+**Fresh Run Results (2026-02-25):**
+- Complete fresh run of 98 benchmarks (97 completed, 1 stalled)
+- T12 Theory Synthesis: All 3 pass (78, 68, 75) - NEW capability validated
+- T17/T18 Expanded: 8 cloud GPU + 4 data analysis benchmarks
+- Regressions: T9-003/004, T10-001/002 failed in fresh run
+- Timeouts: 5 benchmarks (long-running complex tasks)
 
 ---
 
@@ -281,6 +284,34 @@ See `benchmarks/AUTHORING_GUIDE.md` for how to write new benchmarks.
 ---
 
 ## Changelog
+
+### 2026-02-25
+- **COMPLETE FRESH BENCHMARK RUN**
+  - Archived 3.2GB of old results to `benchmarks/results/archive/runs_20260224_pre_overhaul/`
+  - Ran all 98 active benchmarks with parallel runner (6 workers)
+  - 97 completed, 1 stalled (T7-001 multi-day research)
+  - Results: 80 passed (82%), 12 failed, 5 timeout
+- **T12 Theory Synthesis - ALL PASSING**
+  - T12-001: 78 (hypothesis generation)
+  - T12-002: 68 (research gaps)
+  - T12-003: 75 (methodology consensus)
+  - Theorizer MCP integration validated
+- **T17/T18 Expanded**
+  - T17 now has 8 benchmarks (7 passing, 1 timeout)
+  - T18 now has 4 benchmarks (all passing)
+- **Regressions Identified**
+  - T9-003, T9-004: Major regressions (0, 8) vs previous (58, 65)
+  - T10-001, T10-002: Regressions (5, 17) vs previous (75, 72)
+  - Complex autonomous tasks show agent variability
+- **Timeouts (5 benchmarks)**
+  - T2-002, T4-005, T4-006, T8-005, T17-004
+- **T7-001 Stalled**
+  - Multi-day research benchmark ran 5+ hours
+  - Completed 3/7 temperatures then stalled 2 hours
+  - Killed - partial work in workspace
+- **Infrastructure**
+  - Parallel runner validated (6 workers stable, 10 caused OOM)
+  - 7.1 hours total runtime for 74 benchmarks
 
 ### 2026-02-23
 - **T17 Cloud GPU Tier Complete**
