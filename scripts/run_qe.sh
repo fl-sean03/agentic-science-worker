@@ -4,9 +4,13 @@
 
 set -e
 
-QE_CPU="${QE_CPU:-/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin}"
-QE_GPU="${QE_GPU:-/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin}"
-NVHPC_ENV="${NVHPC_ENV:-/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/env/setup_nvhpc.sh}"
+# NOTE (2026-07-03): QE is locally UNAVAILABLE. These builds exist on disk but do
+# NOT run (MPI runtime rot: libmpi.so.40 missing; rebase A-04 refuted 2026-07-02),
+# and the gpu-tests workspace was archived to ~/work/archive/gpu-tests-wsl/ (M-3).
+# Toolchain rebuild is on the owner queue; until then this script fails honestly.
+QE_CPU="${QE_CPU:-/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin}"
+QE_GPU="${QE_GPU:-/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin}"
+NVHPC_ENV="${NVHPC_ENV:-/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/env/setup_nvhpc.sh}"
 
 if [ $# -lt 2 ]; then
     echo "Usage: $0 <input_file> <output_file> [gpu|cpu] [nprocs]"
