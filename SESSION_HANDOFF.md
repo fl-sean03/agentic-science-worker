@@ -158,8 +158,8 @@ For flaky benchmarks, run 3x before/after fixes:
 
 ### Local GPU
 - **GPU:** RTX 5080 (16GB VRAM)
-- **QE GPU:** `/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
-- **QE CPU:** `/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin/pw.x`
+- **QE GPU:** `/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
+- **QE CPU:** `/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin/pw.x`
 - **NVHPC:** `~/hpc-sdk/` (for QE compilation)
 
 ### VAST.ai

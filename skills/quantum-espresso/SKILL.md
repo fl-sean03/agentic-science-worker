@@ -171,35 +171,41 @@ Si  28.0855  Si.pbe-n-rrkjus_psl.1.0.0.UPF
 
 ## Binary Locations
 
+> **Status 2026-07-03:** these builds are ARCHIVED (WSL-era; moved to
+> `~/work/archive/gpu-tests-wsl/`, compute M-3) and do **not** run on the
+> bare-metal host (MPI runtime rot — `libmpi.so.40` missing; verified
+> 2026-07-02, rebase A-04 refuted). Local QE is unavailable until the
+> toolchain rebuild (owner queue). `harness.py --verify` reports live state.
+
 **Local GPU-accelerated QE (RTX 5080):**
 ```bash
 # GPU Build (NVHPC-compiled, sm_120)
-QE_GPU="/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin"
+QE_GPU="/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin"
 
 # CPU Build (GCC/MPI)
-QE_CPU="/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin"
+QE_CPU="/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin"
 
 # Environment setup for GPU build
-QE_ENV="/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/env/setup_nvhpc.sh"
+QE_ENV="/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/env/setup_nvhpc.sh"
 ```
 
 ### Execution
 
 **CPU (general purpose):**
 ```bash
-/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
+/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
 
 # With MPI
-mpirun -np 4 /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
+mpirun -np 4 /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
 ```
 
 **GPU (RTX 5080 accelerated - recommended for production):**
 ```bash
 # First source NVHPC environment
-source /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/env/setup_nvhpc.sh
+source /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/env/setup_nvhpc.sh
 
 # Run GPU-accelerated QE
-/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin/pw.x < input.in > output.out
+/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin/pw.x < input.in > output.out
 
 # Or with wrapper variables
 $QE_GPU/pw.x < input.in > output.out
@@ -207,8 +213,8 @@ $QE_GPU/pw.x < input.in > output.out
 
 **Test scripts available:**
 ```bash
-bash /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/scripts/run_example01_cpu.sh
-bash /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/scripts/run_example01_gpu.sh
+bash /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/scripts/run_example01_cpu.sh
+bash /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/scripts/run_example01_gpu.sh
 ```
 
 ---

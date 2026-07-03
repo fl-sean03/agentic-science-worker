@@ -8,7 +8,14 @@ repo (35 files found referencing dead roots on 2026-07-02):
 | Dead root | Live root |
 |---|---|
 | `/home/sf2/LabWork/Workspace/29-AgenticScienceWorker/` | `/home/sf2/work/agents/science-agent/` |
-| `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/` | `/home/sf2/work/compute/gpu-tests/1-GPUTests/` |
+| `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/` | `/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/` |
+
+> **Update 2026-07-03:** gpu-tests moved a second time — the 06-13 landing spot
+> `~/work/compute/gpu-tests/1-GPUTests/` was archived to
+> `~/work/archive/gpu-tests-wsl/1-GPUTests/` at the fleet close-out (compute M-3:
+> WSL-era binaries do not run on bare-metal; working LAMMPS is
+> `/home/sf2/builds/lammps/build/lmp`, QE pending toolchain rebuild — owner queue).
+> The Live-root column above reflects the post-07-03 location.
 
 ## Repaired mechanically (2026-07-02, this branch)
 
