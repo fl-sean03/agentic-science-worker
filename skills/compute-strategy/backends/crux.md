@@ -137,4 +137,4 @@ Same Eagle filesystem as Polaris: `/eagle/projects/HydrogenStorage/<campaign>/` 
 
 ## Project-level wrappers
 
-ALCF is operated from the hub at `~/LabWork/Workspace/35-ALCF/` — see `35-ALCF/AGENTS.md` and `STATUS.md` for the full multi-resource allocation. There is no CCM-style wrapper for Crux — drive it through `ssh crux` + PBS directly.
+ALCF is operated from the hub at `~/work/compute/alcf/` — see `alcf/AGENTS.md` and `STATUS.md` for the full multi-resource allocation. There is no CCM-style wrapper for Crux — drive it through `ssh crux` + PBS directly.

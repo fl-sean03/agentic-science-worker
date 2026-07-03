@@ -1,6 +1,6 @@
 # P-05 — skill pages: dead-path fixes (Track B-1)
 
-**Status:** PROPOSED · **Author model:** claude-fable-5 · **Date:** 2026-07-02
+**Status:** APPROVED+APPLIED 2026-07-03 (owner sign-off: 2026-07-03 "apply the full fix" directive) · **Author model:** claude-fable-5 · **Date:** 2026-07-02
 **Targets (all tracked, all live operating surface — skills the live agent
 executes from):** `skills/quantum-espresso/SKILL.md`,
 `skills/compute-strategy/SKILL.md`,
@@ -79,4 +79,4 @@ Fresh session invoking each skill must resolve every referenced path
 (`test -e` per token — coldseed-lint-style). Revert = git revert.
 
 ## APPROVAL
-- [ ] APPROVED ____________ (date / initials)   ·   [ ] REJECTED: ____________
+- [x] APPROVED 2026-07-03 — owner directive "apply the full fix" (fleet refresh close-out); applied by Fable 5 finalizer.

@@ -174,4 +174,4 @@ Add rows as new failures appear.
 
 ## Project-level wrappers
 
-ALCF/Polaris is operated from a dedicated hub: **`~/LabWork/Workspace/35-ALCF/`**. The applied playbook is `35-ALCF/docs/POLARIS_PLAYBOOK.md` — bring-up checklist, stage tracking, NAMD launch examples, validation-gate artifacts, lessons learned; `35-ALCF/AGENTS.md` has hub boundaries; `35-ALCF/deploy/templates/` has PBS job templates. This page is the cross-project backend reference; the hub is where Polaris operational state lives. There is no CCM-style wrapper for Polaris yet — drive it through `ssh polaris` + PBS directly.
+ALCF/Polaris is operated from a dedicated hub: **`~/work/compute/alcf/`**. The applied playbook is `alcf/docs/POLARIS_PLAYBOOK.md` — bring-up checklist, stage tracking, NAMD launch examples, validation-gate artifacts, lessons learned; `alcf/AGENTS.md` has hub boundaries; `alcf/deploy/templates/` has PBS job templates. This page is the cross-project backend reference; the hub is where Polaris operational state lives. There is no CCM-style wrapper for Polaris yet — drive it through `ssh polaris` + PBS directly.

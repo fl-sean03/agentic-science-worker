@@ -174,32 +174,32 @@ Si  28.0855  Si.pbe-n-rrkjus_psl.1.0.0.UPF
 **Local GPU-accelerated QE (RTX 5080):**
 ```bash
 # GPU Build (NVHPC-compiled, sm_120)
-QE_GPU="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin"
+QE_GPU="/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin"
 
 # CPU Build (GCC/MPI)
-QE_CPU="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin"
+QE_CPU="/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin"
 
 # Environment setup for GPU build
-QE_ENV="/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/env/setup_nvhpc.sh"
+QE_ENV="/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/env/setup_nvhpc.sh"
 ```
 
 ### Execution
 
 **CPU (general purpose):**
 ```bash
-/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
+/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
 
 # With MPI
-mpirun -np 4 /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
+mpirun -np 4 /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
 ```
 
 **GPU (RTX 5080 accelerated - recommended for production):**
 ```bash
 # First source NVHPC environment
-source /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/env/setup_nvhpc.sh
+source /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/env/setup_nvhpc.sh
 
 # Run GPU-accelerated QE
-/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin/pw.x < input.in > output.out
+/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin/pw.x < input.in > output.out
 
 # Or with wrapper variables
 $QE_GPU/pw.x < input.in > output.out
@@ -207,8 +207,8 @@ $QE_GPU/pw.x < input.in > output.out
 
 **Test scripts available:**
 ```bash
-bash /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/scripts/run_example01_cpu.sh
-bash /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/scripts/run_example01_gpu.sh
+bash /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/scripts/run_example01_cpu.sh
+bash /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/scripts/run_example01_gpu.sh
 ```
 
 ---

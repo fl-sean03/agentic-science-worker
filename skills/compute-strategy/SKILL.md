@@ -228,7 +228,7 @@ This skill is the *framework*. Projects are encouraged to add their own thin spe
 
 The skill provides the *standards* and the *decision framework*. The project provides the *application*.
 
-A canonical example of the project-level layer (slab Thrust 4 in the Pt-NEC LOHC project): `~/LabWork/Workspace/31-Hydrogenation/simulations/surfaces/HPC_PLAYBOOK.md`.
+A canonical example of the project-level layer (slab Thrust 4 in the Pt-NEC LOHC project): `~/work/research/hydrogenation/simulations/surfaces/HPC_PLAYBOOK.md`.
 
 ---
 
