@@ -10,7 +10,9 @@ Validates commands before execution to prevent:
 
 import json
 import re
+import subprocess
 import sys
+from pathlib import Path
 
 
 def validate_command(command: str) -> tuple:
@@ -48,6 +50,20 @@ def validate_command(command: str) -> tuple:
     if 'pw.x' in command:
         if '>' not in command and 'tee' not in command:
             warnings.append("QE output not redirected. Consider: pw.x < input > output")
+
+    # Deterministic input lint (2026-01-17 CRASH class; see
+    # docs/rebase/CRASH_POSTMORTEM_20260117.md). Extract `< input` / `-in input`
+    # and lint it; a BLOCK becomes an error (hook exit 2).
+    m = re.search(r'(?:pw\.x[^|;&]*<\s*(\S+))|(?:\blmp\b[^|;&]*-in\s+(\S+))', command)
+    if m:
+        input_file = m.group(1) or m.group(2)
+        kind = 'qe' if m.group(1) else 'lammps'
+        lint = Path(__file__).resolve().parent.parent.parent / 'scripts' / 'lint_sim_input.py'
+        if lint.exists() and Path(input_file).exists():
+            r = subprocess.run([sys.executable, str(lint), kind, input_file],
+                               capture_output=True, text=True, timeout=10)
+            if r.returncode == 1:
+                errors.append(f"Input lint BLOCK: {r.stdout.strip()}")
 
     return errors, warnings
 

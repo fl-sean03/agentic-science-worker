@@ -1,6 +1,6 @@
 # P-07 — activate the sim-input lint inside the PreToolUse hook (Track B-2)
 
-**Status:** PROPOSED · **Author model:** claude-fable-5 · **Date:** 2026-07-02
+**Status:** APPROVED+APPLIED 2026-07-03 (owner sign-off: 2026-07-03 "apply the full fix" directive) · **Author model:** claude-fable-5 · **Date:** 2026-07-02
 **Target:** `.claude/hooks/validate_simulation.py` (tracked; executed by the
 live session on every Bash call → operating surface).
 
@@ -53,4 +53,4 @@ BENCH-T1-001 to confirm normal LAMMPS flows are not impeded; (3) watch
 revert (single commit).
 
 ## APPROVAL
-- [ ] APPROVED ____________ (date / initials)   ·   [ ] REJECTED: ____________
+- [x] APPROVED 2026-07-03 — owner directive "apply the full fix" (fleet refresh close-out); applied by Fable 5 finalizer.
