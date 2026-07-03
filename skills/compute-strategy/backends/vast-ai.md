@@ -57,7 +57,7 @@ Cheaper-tier hosts can fail mid-run; the reliability filter pays for itself in n
 Some projects wrap Vast.ai access through a higher-level tool. **If a project says "use the wrapper, not raw vastai," respect that.**
 
 Known wrappers in this user's environment:
-- **CCM (CloudComputeManager)** at `~/Workspace/main/46-CCM/`: hardened wrapper covering submission, daemon, sync, recovery. Used by the Pt-NEC LOHC project. The project rule there is **never call vastai CLI directly** — use `ccm jobs submit`, `ccm status`, `ccm exec`. CCM has a checkpoint-restart system, reliability filtering, async recovery.
+- **CCM (CloudComputeManager)** at `~/work/compute/ccm/`: hardened wrapper covering submission, daemon, sync, recovery. Used by the Pt-NEC LOHC project. The project rule there is **never call vastai CLI directly** — use `ccm jobs submit`, `ccm status`, `ccm exec`. CCM has a checkpoint-restart system, reliability filtering, async recovery.
 
 If your project doesn't have a wrapper, the lower-level recipes in `skills/vast-cloud/SKILL.md` are the canonical entry point.
 

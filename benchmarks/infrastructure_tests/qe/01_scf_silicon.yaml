@@ -60,7 +60,7 @@ command: |
   mkdir -p tmp
 
   # Run QE CPU
-  /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < si_scf.in > si_scf.out 2>&1
+  /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin/pw.x < si_scf.in > si_scf.out 2>&1
 
   # Show results
   grep "!" si_scf.out || echo "Energy not found"

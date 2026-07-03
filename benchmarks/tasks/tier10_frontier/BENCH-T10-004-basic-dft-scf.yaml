@@ -79,13 +79,13 @@ prompt: |
 
   Use the local GPU build:
   ```bash
-  source /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/env/setup_nvhpc.sh
-  /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin/pw.x < si_scf.in > si_scf.out
+  source /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/env/setup_nvhpc.sh
+  /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin/pw.x < si_scf.in > si_scf.out
   ```
 
   Or CPU build:
   ```bash
-  /home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin/pw.x < si_scf.in > si_scf.out
+  /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin/pw.x < si_scf.in > si_scf.out
   ```
 
   **Step 5: Parse Results**

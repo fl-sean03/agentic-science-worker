@@ -324,7 +324,7 @@ See `benchmarks/AUTHORING_GUIDE.md` for how to write new benchmarks.
   - T18-002 MSD/Diffusion: 92 (first run)
 - **T10-004 Basic DFT SCF: 85**
   - QE GPU build validated (local RTX 5080)
-  - Path: `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
+  - Path: `/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
 - **CURC HPC Deferred**
   - Archived T5, T6, T11 tiers
   - Moved skills to `skills/archive/hpc-cluster-curc/`

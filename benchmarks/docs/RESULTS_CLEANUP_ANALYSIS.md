@@ -1,7 +1,7 @@
 # Benchmark Results Cleanup Analysis
 
 **Generated:** 2026-02-24
-**Analysis Path:** `/home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/benchmarks/results/runs/`
+**Analysis Path:** `/home/sf2/work/agents/science-agent/1-ScienceAgent/benchmarks/results/runs/`
 
 ---
 
@@ -226,10 +226,10 @@ Archive these directories first (over 100 MB each, low scores):
 
 ```bash
 # Create archive directory
-mkdir -p /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/benchmarks/results/archive/
+mkdir -p /home/sf2/work/agents/science-agent/1-ScienceAgent/benchmarks/results/archive/
 
 # Archive large low-scoring runs
-cd /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/benchmarks/results/runs/
+cd /home/sf2/work/agents/science-agent/1-ScienceAgent/benchmarks/results/runs/
 
 # Compress and move (example for top 3)
 tar -czf ../archive/BENCH-T15-003-20260217-115302.tar.gz BENCH-T15-003-20260217-115302 && rm -rf BENCH-T15-003-20260217-115302
@@ -304,8 +304,8 @@ To archive all recommended runs at once:
 
 ```bash
 #!/bin/bash
-RUNS_DIR="/home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/benchmarks/results/runs"
-ARCHIVE_DIR="/home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/benchmarks/results/archive"
+RUNS_DIR="/home/sf2/work/agents/science-agent/1-ScienceAgent/benchmarks/results/runs"
+ARCHIVE_DIR="/home/sf2/work/agents/science-agent/1-ScienceAgent/benchmarks/results/archive"
 
 mkdir -p "$ARCHIVE_DIR"
 

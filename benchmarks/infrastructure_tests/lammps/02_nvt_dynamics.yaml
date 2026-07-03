@@ -91,7 +91,7 @@ command: |
   EOF
 
   # Run LAMMPS
-  /home/sf2/work/compute/gpu-tests/1-GPUTests/md-lammps/install/bin/lmp -in in.nvt
+  /home/sf2/builds/lammps/build/lmp -in in.nvt
 
 timeout: 90
 

@@ -212,9 +212,9 @@ Requires CURC - deferred.
 - T12-* - Theory synthesis needs Theorizer integration
 
 **QE Locations (Local GPU-accelerated builds):**
-- **GPU (RTX 5080):** `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
-- **CPU:** `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin/pw.x`
-- **Env setup:** `source /home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/env/setup_nvhpc.sh`
+- **GPU (RTX 5080):** `/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
+- **CPU:** `/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin/pw.x`
+- **Env setup:** `source /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/env/setup_nvhpc.sh`
 
 ---
 

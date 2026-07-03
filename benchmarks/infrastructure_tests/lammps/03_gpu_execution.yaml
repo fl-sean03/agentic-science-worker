@@ -43,7 +43,7 @@ command: |
   EOF
 
   # Run with GPU
-  /home/sf2/work/compute/gpu-tests/1-GPUTests/md-lammps/install/bin/lmp \
+  /home/sf2/builds/lammps/build/lmp \
     -sf gpu -pk gpu 1 neigh yes \
     -in in.lj 2>&1 | tee output.log
 

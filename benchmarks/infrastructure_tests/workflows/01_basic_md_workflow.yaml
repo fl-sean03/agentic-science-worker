@@ -87,7 +87,7 @@ command: |
   write_data minimized.data
   EOF
 
-  /home/sf2/work/compute/gpu-tests/1-GPUTests/md-lammps/install/bin/lmp -in in.min
+  /home/sf2/builds/lammps/build/lmp -in in.min
 
   echo "=== Step 3: NVT Equilibration ==="
 
@@ -113,7 +113,7 @@ command: |
   write_restart equilibrated.restart
   EOF
 
-  /home/sf2/work/compute/gpu-tests/1-GPUTests/md-lammps/install/bin/lmp -in in.nvt > nvt.log 2>&1
+  /home/sf2/builds/lammps/build/lmp -in in.nvt > nvt.log 2>&1
 
   echo "=== Step 4: Analyze Results ==="
 
