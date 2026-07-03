@@ -1,3 +1,8 @@
+> **SUPERSEDED (2026-07-02).** This handoff describes the February 2026 state and
+> pre-reorg paths. Current truth: `docs/rebase/CURRENT_STATE.md` (state),
+> `benchmarks/results/GENERATED_STATUS.md` (artifact-derived benchmark status),
+> `CLAUDE.md` (skill index). Kept verbatim below as a historical record.
+
 # Session Handoff - Agentic Science Worker
 
 **Last Updated:** 2026-02-23
@@ -9,7 +14,7 @@
 
 ```bash
 # Navigate to project
-cd /home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent
+cd /home/sf2/work/agents/science-agent/1-ScienceAgent
 
 # Check current status
 cat benchmarks/CURRENT_STATUS.md
@@ -153,8 +158,8 @@ For flaky benchmarks, run 3x before/after fixes:
 
 ### Local GPU
 - **GPU:** RTX 5080 (16GB VRAM)
-- **QE GPU:** `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
-- **QE CPU:** `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin/pw.x`
+- **QE GPU:** `/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
+- **QE CPU:** `/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin/pw.x`
 - **NVHPC:** `~/hpc-sdk/` (for QE compilation)
 
 ### VAST.ai
@@ -183,7 +188,7 @@ python benchmarks/evaluation/harness.py --tier 17
 ## Directory Structure
 
 ```
-/home/sf2/LabWork/Workspace/29-AgenticScienceWorker/1-ScienceAgent/
+/home/sf2/work/agents/science-agent/1-ScienceAgent/
 ├── AGENTS.md                 # Agent instructions (read by Claude)
 ├── ROADMAP.md                # Vision and progress
 ├── SESSION_HANDOFF.md        # This file

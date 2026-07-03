@@ -1,6 +1,6 @@
 # P-03 — `SESSION_HANDOFF.md`: supersession banner + dead-path fixes (Track B-1)
 
-**Status:** PROPOSED · **Author model:** claude-fable-5 · **Date:** 2026-07-02
+**Status:** APPROVED+APPLIED 2026-07-03 (owner sign-off: 2026-07-03 "apply the full fix" directive) · **Author model:** claude-fable-5 · **Date:** 2026-07-02
 **Target:** `SESSION_HANDOFF.md` (tracked; on the new-session boot path — it
 actively misdirects: dead `cd` path, "78/86 (100%)" claim, obsolete "don't run
 T12" prohibition).
@@ -46,4 +46,4 @@ Fresh context asked "orient yourself in this project" must cite current paths
 and the 80/97 artifact truth (E-01/E-02-style probe). Revert = git revert.
 
 ## APPROVAL
-- [ ] APPROVED ____________ (date / initials)   ·   [ ] REJECTED: ____________
+- [x] APPROVED 2026-07-03 — owner directive "apply the full fix" (fleet refresh close-out); applied by Fable 5 finalizer.
