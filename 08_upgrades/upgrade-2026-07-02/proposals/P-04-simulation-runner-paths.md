@@ -1,6 +1,6 @@
 # P-04 — `.claude/agents/simulation-runner.md`: binary path fixes (Track B-1/B-2)
 
-**Status:** PROPOSED · **Author model:** claude-fable-5 · **Date:** 2026-07-02
+**Status:** APPROVED+APPLIED 2026-07-03 (owner sign-off: 2026-07-03 "apply the full fix" directive) · **Author model:** claude-fable-5 · **Date:** 2026-07-02
 **Target:** `.claude/agents/simulation-runner.md` (tracked; a live-session
 subagent definition → operating surface).
 
@@ -28,4 +28,4 @@ Spawn the subagent on a trivial LAMMPS task; it must use the working binary and
 flag QE as unavailable rather than failing blind. Revert = git revert.
 
 ## APPROVAL
-- [ ] APPROVED ____________ (date / initials)   ·   [ ] REJECTED: ____________
+- [x] APPROVED 2026-07-03 — owner directive "apply the full fix" (fleet refresh close-out); applied by Fable 5 finalizer.

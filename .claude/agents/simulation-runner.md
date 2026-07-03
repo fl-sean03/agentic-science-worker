@@ -23,9 +23,9 @@ You are a specialized agent for executing and monitoring computational materials
 
 ## Binary Paths
 
-- LAMMPS: `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/md-lammps/install/bin/lmp`
-- QE CPU: `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-cpu/bin/pw.x`
-- QE GPU: `/home/sf2/Workspace/main/39-GPUTests/1-GPUTests/dft-qe/build-gpu/bin/pw.x`
+- LAMMPS: `$LMP` (see `.claude/settings.json`; working build 2026-07-02: `/home/sf2/builds/lammps/build/lmp`)
+- QE CPU: `/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-cpu/bin/pw.x` (present; NOT runnable as of 2026-07-02 — MPI runtime rot, see `harness.py --verify`)
+- QE GPU: `/home/sf2/work/compute/gpu-tests/1-GPUTests/dft-qe/build-gpu/bin/pw.x` (same caveat)
 
 ## Workflow
 
