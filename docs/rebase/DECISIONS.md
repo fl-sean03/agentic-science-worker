@@ -87,3 +87,23 @@ Provenance note on the "Model" column: **no artifact in this repo records which 
 **Decision:** operating-surface changes (AGENTS.md, CLAUDE.md, skills/* the live agent executes from, `.claude/*`, `.mcp.json`, config defaults) are staged as exact-diff proposals with expected effect + eval plan + explicit APPROVAL line; they are never hot-applied, regardless of eval results.
 **Confidence:** High. **Reversibility:** Easy (owner can dissolve the rule).
 **Revisit triggers:** owner delegates a bounded operating-surface authority in writing; or the proposal backlog demonstrably rots (then renegotiate the gate, don't bypass it).
+
+### Proposal application record (ADR-105 gate mechanics)
+
+Owner sign-off received via chat directives; recorded here per PROPOSAL_GATE mechanics. Each proposal file carries the citation on its APPROVAL line.
+
+| Proposal | Applied | Authorization | Notes |
+|----------|---------|---------------|-------|
+| P-01 settings-env-repoint | 2026-07-03 | owner chat directive "apply the full fix" | record was owed; logged retroactively 2026-07-04 |
+| P-02 mcp-filesystem-root | 2026-07-03 | same directive | " |
+| P-03 session-handoff-supersession | 2026-07-03 | same directive | " |
+| P-04 simulation-runner-paths | 2026-07-03 | same directive | " |
+| P-05 skill-page-path-fixes | 2026-07-03 | same directive | " |
+| P-06 agents-md-skills-table | 2026-07-03 | same directive | " |
+| P-07 lint-hook-activation | 2026-07-03 | same directive | " |
+| P-08 hook-reliability | 2026-07-04 | owner chat directive (blanket green light) | absolute hook paths + /dev/null regex exemption; cd-away eval passed live |
+| P-09 qe-skill-failure-routing | 2026-07-04 | same directive | applied merged with P-12 per P-12's supersession note |
+| P-10 agents-md-factual-runnability | 2026-07-04 | same directive | redrafted v2 first (v1's "QE broken" claim stale post-rebuild); v2 applied |
+| P-11 skill-discoverability-metadata | 2026-07-04 | same directive | frontmatter live-confirmed in injected skill list same session |
+| P-12 qe-runnability-repoints | 2026-07-04 | same directive | env repoints bind at new session start; verified via env-cleaned --verify |
+| P-13 qe-residual-repoints + CLAUDE.md tree | 2026-07-04 | same directive | drafted and applied this date (simulation-runner, run_qe.sh, project-update row) |

@@ -4,13 +4,12 @@
 
 set -e
 
-# NOTE (2026-07-03): QE is locally UNAVAILABLE. These builds exist on disk but do
-# NOT run (MPI runtime rot: libmpi.so.40 missing; rebase A-04 refuted 2026-07-02),
-# and the gpu-tests workspace was archived to ~/work/archive/gpu-tests-wsl/ (M-3).
-# Toolchain rebuild is on the owner queue; until then this script fails honestly.
-QE_CPU="${QE_CPU:-/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin}"
-QE_GPU="${QE_GPU:-/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin}"
-NVHPC_ENV="${NVHPC_ENV:-/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/env/setup_nvhpc.sh}"
+# NOTE (2026-07-04): QE 7.5 local builds, rebuilt from source 2026-07-03
+# (provenance: /home/sf2/builds/qe/BUILD_NOTES.md). CPU build is MPI-capable;
+# GPU build is SERIAL-ONLY by design (no MPI, runtime libs resolve via RPATH —
+# no environment sourcing needed). Env vars $QE_CPU/$QE_GPU override defaults.
+QE_CPU="${QE_CPU:-/home/sf2/builds/qe/cpu/bin}"
+QE_GPU="${QE_GPU:-/home/sf2/builds/qe/gpu/bin}"
 
 if [ $# -lt 2 ]; then
     echo "Usage: $0 <input_file> <output_file> [gpu|cpu] [nprocs]"
@@ -39,9 +38,11 @@ echo "Processes: $NPROCS"
 echo "==================================="
 
 if [ "$MODE" = "gpu" ]; then
-    echo "Setting up NVHPC environment..."
-    source "$NVHPC_ENV"
     QE_BIN="$QE_GPU"
+    if [ "$NPROCS" -gt 1 ]; then
+        echo "Error: GPU build is serial-only by design (no MPI). Use nprocs=1 or cpu mode."
+        exit 1
+    fi
 else
     QE_BIN="$QE_CPU"
 fi

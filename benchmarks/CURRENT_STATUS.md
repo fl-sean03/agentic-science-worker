@@ -17,7 +17,7 @@
 | Frontier (T10) | 4 | 2 | 50% | T10-001/002 regressed |
 | HPC+ML (T11) | - | - | - | **ARCHIVED** |
 | Theory (T12) | 3 | 3 | 100% | NEW - All passing! |
-| Quality (T13-T16) | 43 | 38 | 88% | Some regressions |
+| Quality (T13-T16) | 43 | 37 | 86% | Some regressions |
 | Cloud GPU (T17) | 8 | 7 | 88% | 1 timeout |
 | Data Analysis (T18) | 4 | 4 | 100% | All expanded benchmarks pass |
 | **ACTIVE** | **97/98** | **80** | **82%** | Fresh run 2026-02-25 |

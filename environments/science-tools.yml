@@ -17,6 +17,8 @@ dependencies:
     - numpy
     - scipy
     - matplotlib
+    - pyyaml  # harness.py imports yaml (benchmarks/evaluation/harness.py --verify)
+    - pytest  # test suites; machine pytest shim was broken (stale py3.9)
 
     # Materials science
     - pymatgen

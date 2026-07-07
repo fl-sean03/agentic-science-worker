@@ -66,6 +66,18 @@ Walk the questions in order. Stop at the first match.
       fallback. Don't wait passively for primary if work can proceed.
 ```
 
+### Code availability by backend (status 2026-07-04)
+
+| Code | LOCAL | Vast.ai | Alpine |
+|------|-------|---------|--------|
+| LAMMPS | ✅ `$LMP` (`~/builds/lammps/build/lmp`, verified) | ✅ image/build per vast-cloud skill | ✅ modules |
+| QE (pw.x) | ✅ **working** — QE 7.5 rebuilt 2026-07-03 (`~/builds/qe/{cpu,gpu}/bin`; CPU-MPI + GPU-serial); see quantum-espresso skill banner | ✅ build-from-source ("QE on VAST" section) | ✅ modules |
+| MLIP stack | ✅ science-tools env (installed 2026-07-04; check `--verify`) | ✅ GPU images | ⚠ per-env |
+
+Verify liveness with `python benchmarks/evaluation/harness.py --verify` before
+routing a job locally; this table records status as of its date, the probe
+records truth.
+
 If none of the above fits, stop and **ask the user** — that's a signal the job has unusual characteristics worth a human-in-the-loop discussion.
 
 ---

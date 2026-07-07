@@ -1,3 +1,8 @@
+---
+name: torch-sim
+description: High-throughput batch atomistic simulation with ML potentials on GPU using torch-sim. Use when screening many structures (10+), running batch relaxations/MD where per-structure ASE loops are too slow, or when GPU-parallel MLIP throughput is the bottleneck. For single-system MLIP work, see mlip-simulation.
+---
+
 # torch-sim Skill
 
 High-throughput atomistic simulation with ML potentials using torch-sim.

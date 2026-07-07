@@ -20,10 +20,10 @@ You have access to VAST AI, an on-demand GPU cloud marketplace. Rent GPUs by the
 
 | Item | Value |
 |------|-------|
-| **CLI** | `vastai` (installed) |
-| **API Key** | `~/.config/vastai/api_key` |
+| **CLI** | `vastai` 1.2.0 — in the `science-tools` conda env, symlinked at `~/.local/bin/vastai` (installed 2026-07-04) |
+| **API Key** | CLI 1.2.0 resolution order: `VAST_API_KEY` env → `~/.config/vastai/vast_api_key` → `~/.vast_api_key`. The bundled `vast_client.py` reads `~/.config/vastai/api_key`. All four exist and match (2026-07-04). |
 | **SSH Key** | Registered (ID: 614140) |
-| **Balance** | ~$25 prepaid |
+| **Balance** | check `vastai show user` (`show credit` was removed in CLI 1.2.0) |
 | **Billing** | Per-hour, stops when you destroy instance |
 
 ---
@@ -341,7 +341,7 @@ python long_simulation.py
 ### Check Balance
 
 ```bash
-vastai show user | grep -i credit
+vastai show user   # `show credit` was removed in CLI 1.2.0; balance is a field of `show user`
 ```
 
 ### Estimate Cost Before Renting
@@ -423,7 +423,7 @@ nvidia-smi
 |---------|---------|
 | `vastai search offers "..."` | Find available GPUs |
 | `vastai create instance <id> --image <img>` | Rent a GPU |
-| `vastai show instances` | List your instances |
+| `vastai show instances` | List your instances (CLI 1.2.0 prefers `show instances-v1`; both work) |
 | `vastai ssh-url <id>` | Get SSH connection |
 | `vastai destroy instance <id>` | Stop billing! |
 | `vastai show user` | Check balance |

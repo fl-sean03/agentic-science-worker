@@ -49,7 +49,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/validate_simulation.py",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/validate_simulation.py\"",
             "timeout": 10
           }
         ]
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 .claude/hooks/format_output.py",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/format_output.py\"",
             "timeout": 30
           }
         ]

@@ -22,6 +22,17 @@ Each campaign has a `WORKFLOW.md` that declares its stages, current position, jo
 
 This is the same pattern that powers Argo Workflows, Airflow, and anything else that has to survive worker restarts.
 
+> **Who re-invokes you matters (2026-07-07).** A tick ends by yielding, expecting
+> a *fresh* agent next. That re-invocation comes from your **surface**: a live/
+> managed session (`ScheduleWakeup`/`/loop`) OR the **`asw-loop` supervisor**
+> (`claude -p --resume`, used for headless/benchmark runs). Under headless
+> single-shot `-p` with NO supervisor, a yield is a DEATH — nothing re-invokes
+> you. So: run long campaigns under `asw-loop` (or a managed session), and for
+> the per-job launch/detach/harvest mechanics follow the **`long-compute`**
+> skill. `status == running` is **never** `done` — always re-validate against the
+> job's own exit sentinel, never your memory. Short jobs (≲10 min): BLOCK in the
+> tick (`run_in_background` + poll), don't detach-and-yield.
+
 ## When this skill is the right pattern
 
 - You have **N ≥ 2 campaigns** (otherwise just drive interactively).

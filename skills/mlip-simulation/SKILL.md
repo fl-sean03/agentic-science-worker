@@ -1,3 +1,8 @@
+---
+name: mlip-simulation
+description: Run molecular dynamics and materials calculations with ML interatomic potentials (MACE, CHGNet, M3GNet) via ASE — near-DFT accuracy at classical-MD cost. Use when asked to run simulations with ML/universal potentials, or when DFT would be too expensive (or is unavailable) but accuracy matters. For high-throughput screening of 10+ structures, see torch-sim.
+---
+
 # MLIP Simulation Skill
 
 Run molecular dynamics and materials calculations using Machine Learning Interatomic Potentials (MLIPs) - achieving near-DFT accuracy at classical MD cost.

@@ -28,6 +28,7 @@ skills/
 ├── resource-acquisition/    # Finding files/parameters
 ├── iff-parameters/          # IFF force field search, export, composition
 ├── theory-synthesis/        # Theory/method synthesis
+├── project-update/          # Project state + weekly/PI-meeting update bundles
 ├── ggen/                    # Generation utilities
 └── archive/                 # Deprecated skills (e.g., hpc-cluster-curc, replaced by compute-strategy)
 ```

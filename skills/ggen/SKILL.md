@@ -1,3 +1,8 @@
+---
+name: ggen
+description: Generate candidate crystal structures from a chemical formula and assess their stability using ggen. Use when you need trial structures for a composition with no known experimental structure, or want stability-ranked polymorph candidates before running MD/DFT.
+---
+
 # ggen Skill
 
 Crystal structure generation and stability assessment using ggen.

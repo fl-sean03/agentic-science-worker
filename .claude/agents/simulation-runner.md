@@ -24,8 +24,8 @@ You are a specialized agent for executing and monitoring computational materials
 ## Binary Paths
 
 - LAMMPS: `$LMP` (see `.claude/settings.json`; working build 2026-07-02: `/home/sf2/builds/lammps/build/lmp`)
-- QE CPU: `/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin/pw.x` (archived 2026-07-03, compute M-3; NOT runnable as of 2026-07-02 — MPI runtime rot, see `harness.py --verify`)
-- QE GPU: `/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin/pw.x` (same caveat; QE locally unavailable until toolchain rebuild — owner queue)
+- QE CPU: `$QE_CPU/pw.x` = `/home/sf2/builds/qe/cpu/bin/pw.x` (QE 7.5 rebuilt 2026-07-03, WORKING; MPI-capable — `mpirun -np N`. Provenance: `/home/sf2/builds/qe/BUILD_NOTES.md`)
+- QE GPU: `$QE_GPU/pw.x` = `/home/sf2/builds/qe/gpu/bin/pw.x` (QE 7.5, WORKING; SERIAL-ONLY by design — never `mpirun` it. Same provenance; `harness.py --verify` reports live state)
 
 ## Workflow
 

@@ -40,8 +40,18 @@ DASH_ROW_RE = re.compile(r"^\|\s*(T\d+-\d+)\s*\|\s*(\d+(?:\.\d+)?)\s*(✅|❌|�
 
 
 def load_runs(results_dir: Path):
-    """Latest result.json per task ID (dirs are BENCH-<id>-<YYYYmmdd-HHMMSS>)."""
-    runs = {}
+    """Latest GENUINE result.json per task ID (dirs are BENCH-<id>-<YYYYmmdd-HHMMSS>).
+
+    A run whose agent_json.is_error is True is an infrastructure failure (session
+    limit hit, CLI crash, transport error) — NOT a capability failure. Such runs
+    record a phantom score-0 and must never masquerade as a real "failed" result
+    (this defect injected 29 phantom score-0s in the Phase-0 B-3 crash, and one in
+    Feb: T9-003). Selection policy: prefer the latest NON-error run for a task;
+    if a task has ONLY error runs, keep the latest but mark it VOID (status=void)
+    so it is excluded from the pass-rate denominator rather than counted as failed.
+    """
+    nonerror = {}   # tid -> record (latest genuine run)
+    erroronly = {}  # tid -> record (latest error run; used only if no genuine run)
     for d in sorted(results_dir.iterdir()):
         rj = d / "result.json"
         if not rj.is_file():
@@ -55,15 +65,31 @@ def load_runs(results_dir: Path):
             print(f"WARN unreadable {rj}: {e}", file=sys.stderr)
             continue
         tid = m.group(1)
-        # sorted() walks run dirs chronologically; keep the latest per task
-        runs[tid] = {
+        aj = data.get("agent_json") or {}
+        is_error = bool(aj.get("is_error"))
+        rec = {
             "dir": d.name,
             "status": data.get("status", "unknown"),
             "score": data.get("score"),
             "threshold": data.get("pass_threshold"),
             "timestamp": data.get("timestamp", ""),
             "model": data.get("model") or "unrecorded",
+            "is_error": is_error,
         }
+        # sorted() walks run dirs chronologically; keep the latest in each bucket
+        if is_error:
+            erroronly[tid] = rec
+        else:
+            nonerror[tid] = rec
+    runs = {}
+    for tid in set(nonerror) | set(erroronly):
+        if tid in nonerror:
+            runs[tid] = nonerror[tid]
+        else:
+            rec = erroronly[tid]
+            rec = dict(rec)
+            rec["status"] = "void"  # infra failure; unscored, not a capability failure
+            runs[tid] = rec
     return runs
 
 
@@ -102,7 +128,10 @@ def main():
     for r in runs.values():
         tally[r["status"]] += 1
     total = len(runs)
+    void = tally.get("void", 0)
+    scored = total - void           # pass-rate denominator excludes infra-void runs
     passed = tally.get("passed", 0)
+    pass_rate = (100.0 * passed / scored) if scored else 0.0
 
     # Divergences: artifact vs dashboard score, or dashboard marks pass while
     # artifact says failed/timeout (and vice versa).
@@ -110,6 +139,8 @@ def main():
     for tid, r in sorted(runs.items(), key=lambda kv: (tier_of(kv[0]), kv[0])):
         if tid not in dash:
             continue
+        if r["status"] == "void":
+            continue  # infra-void run has no genuine score to diff against dashboard
         d_score, d_mark = dash[tid]
         a_score = r["score"]
         notes = []
@@ -140,10 +171,15 @@ def main():
     L.append("")
     L.append("## Outcome tally")
     L.append("")
-    L.append("| Passed | Failed | Timeout | Error | Total | Pass rate |")
-    L.append("|-------:|-------:|--------:|------:|------:|----------:|")
+    L.append("> Pass rate = passed / scored, where scored = total − void. VOID runs are")
+    L.append("> infrastructure failures (agent_json.is_error: session-limit crash, CLI/")
+    L.append("> transport error) that record a phantom score-0; they are NOT capability")
+    L.append("> failures and are excluded from the denominator (see load_runs docstring).")
+    L.append("")
+    L.append("| Passed | Failed | Timeout | Error | Void | Scored | Total | Pass rate |")
+    L.append("|-------:|-------:|--------:|------:|-----:|-------:|------:|----------:|")
     L.append(f"| {passed} | {tally.get('failed', 0)} | {tally.get('timeout', 0)} "
-             f"| {tally.get('error', 0)} | {total} | {100.0 * passed / total:.1f}% |")
+             f"| {tally.get('error', 0)} | {void} | {scored} | {total} | {pass_rate:.1f}% |")
     L.append("")
 
     L.append("## Per-tier results (latest run per task)")
@@ -154,7 +190,10 @@ def main():
     for tier in sorted(tiers):
         rows = sorted(tiers[tier])
         tp = sum(1 for _, r in rows if r["status"] == "passed")
-        L.append(f"### Tier {tier} — {tp}/{len(rows)} passed")
+        tv = sum(1 for _, r in rows if r["status"] == "void")
+        tscored = len(rows) - tv
+        void_note = f" ({tv} void/infra)" if tv else ""
+        L.append(f"### Tier {tier} — {tp}/{tscored} passed{void_note}")
         L.append("")
         L.append("| Task | Status | Score | Threshold | Model | Run dir |")
         L.append("|------|--------|------:|----------:|-------|---------|")
@@ -183,9 +222,10 @@ def main():
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text("\n".join(L) + "\n")
-    print(f"Wrote {args.out}: {passed}/{total} passed "
-          f"({tally.get('failed', 0)} failed, {tally.get('timeout', 0)} timeout, "
-          f"{tally.get('error', 0)} error); {len(divergences)} divergence(s) flagged.")
+    print(f"Wrote {args.out}: {passed}/{scored} passed ({pass_rate:.1f}%) "
+          f"[{tally.get('failed', 0)} failed, {tally.get('timeout', 0)} timeout, "
+          f"{tally.get('error', 0)} error, {void} void/infra; total {total}]; "
+          f"{len(divergences)} divergence(s) flagged.")
     return 0
 
 

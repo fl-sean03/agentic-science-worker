@@ -171,51 +171,44 @@ Si  28.0855  Si.pbe-n-rrkjus_psl.1.0.0.UPF
 
 ## Binary Locations
 
-> **Status 2026-07-03:** these builds are ARCHIVED (WSL-era; moved to
-> `~/work/archive/gpu-tests-wsl/`, compute M-3) and do **not** run on the
-> bare-metal host (MPI runtime rot — `libmpi.so.40` missing; verified
-> 2026-07-02, rebase A-04 refuted). Local QE is unavailable until the
-> toolchain rebuild (owner queue). `harness.py --verify` reports live state.
+> **Status 2026-07-03 (rebuilt):** local QE is WORKING — QE 7.5 rebuilt from
+> source 2026-07-03 (owner-directed; provenance `/home/sf2/builds/qe/BUILD_NOTES.md`).
+> - **CPU (MPI):** `$QE_CPU/pw.x` = `/home/sf2/builds/qe/cpu/bin/pw.x`
+>   (GCC 13.3 + OpenMPI 4.1.6 + OpenBLAS). Parallel runs:
+>   `mpirun -np N $QE_CPU/pw.x -in input.in` (set `OMP_NUM_THREADS=1` for
+>   multi-rank runs to avoid OpenMP oversubscription).
+> - **GPU:** `$QE_GPU/pw.x` = `/home/sf2/builds/qe/gpu/bin/pw.x` (NVHPC 25.11,
+>   OpenACC+CUDA, native cc120/RTX 5080). **SERIAL-ONLY by design** — no MPI;
+>   it avoids the hpcx runtime that hung the old builds. Do not `mpirun` it.
+> - Validated on bulk-Si SCF: CPU and GPU energies agree to 1e-8 Ry
+>   (-22.8397063 Ry); "GPU acceleration is ACTIVE". `harness.py --verify`
+>   reports live state.
+> - The old WSL-era builds under `~/work/archive/gpu-tests-wsl/` remain
+>   archive-only and unsupported — do not route runs to them.
 
-**Local GPU-accelerated QE (RTX 5080):**
-```bash
-# GPU Build (NVHPC-compiled, sm_120)
-QE_GPU="/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin"
+**Archived WSL-era builds (historical record; do NOT execute):**
+The old dead builds live under `~/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/`
+(`$QE_CPU`/`$QE_GPU` no longer point there — repointed to the 7.5 builds,
+see `.claude/settings.json` env and `config.yaml`). Known failure signatures,
+kept for diagnosis:
+- CPU build: `error while loading shared libraries: libmpi_mpifh.so.40` (exit
+  127) — the honest root-cause symptom (OpenMPI-4 runtime rot).
+- GPU build: `liblapack_lp64.so.0` missing — a red herring; the root cause is
+  the same NVHPC/OpenMPI runtime rot, not LAPACK.
+- **Do not** `source .../env/setup_nvhpc.sh` and retry: under the current
+  `~/hpc-sdk` hpcx env the binaries hang indefinitely in MPI init instead of
+  failing fast.
 
-# CPU Build (GCC/MPI)
-QE_CPU="/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin"
-
-# Environment setup for GPU build
-QE_ENV="/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/env/setup_nvhpc.sh"
-```
-
-### Execution
-
-**CPU (general purpose):**
-```bash
-/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
-
-# With MPI
-mpirun -np 4 /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-cpu/bin/pw.x < input.in > output.out
-```
-
-**GPU (RTX 5080 accelerated - recommended for production):**
-```bash
-# First source NVHPC environment
-source /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/env/setup_nvhpc.sh
-
-# Run GPU-accelerated QE
-/home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/build-gpu/bin/pw.x < input.in > output.out
-
-# Or with wrapper variables
-$QE_GPU/pw.x < input.in > output.out
-```
-
-**Test scripts available:**
-```bash
-bash /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/scripts/run_example01_cpu.sh
-bash /home/sf2/work/archive/gpu-tests-wsl/1-GPUTests/dft-qe/scripts/run_example01_gpu.sh
-```
+### Alternatives if local QE is unavailable
+1. **Vast.ai cloud** — `vast-cloud` skill, "QE on VAST" section
+   (build-from-source recipe; pay-per-hour, no queue).
+2. **CU Alpine** — `compute-strategy` skill → `backends/alpine.md` (QE via
+   modules on the cluster; owner-sanctioned SSH session required).
+3. **MLIP screening substitute** — for tasks where DFT accuracy is not the
+   point (relative-energy screening, structure triage), `mlip-simulation` /
+   `torch-sim` can stand in; state the substitution and its accuracy limits
+   explicitly in your report. (Requires the ML stack installed — check
+   `--verify`.)
 
 ---
 

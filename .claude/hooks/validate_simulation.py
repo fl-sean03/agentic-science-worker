@@ -28,7 +28,7 @@ def validate_command(command: str) -> tuple:
     # Check for dangerous patterns
     dangerous_patterns = [
         (r'rm\s+-rf\s+/', "Dangerous: Recursive delete from root"),
-        (r'>\s*/dev/', "Dangerous: Writing to device"),
+        (r'>\s*/dev/(?!null\b|stdout\b|stderr\b|tty\b|fd/)', "Dangerous: Writing to device"),
         (r'dd\s+if=', "Dangerous: Direct disk access"),
         (r'mkfs', "Dangerous: Filesystem creation"),
     ]

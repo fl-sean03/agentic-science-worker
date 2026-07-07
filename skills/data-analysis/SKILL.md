@@ -364,4 +364,4 @@ If your analysis gives unexpected values:
 3. **Research alternative methods** - Maybe a different approach is more appropriate
 4. **Iterate** - Fix and re-run until results match physical expectations
 
-**Do not accept results you know are wrong.** A diffusion coefficient 100x off from literature means your analysis is flawed, not that you've discovered new physics. See CLAUDE.md "When Something Seems Wrong" for full guidance.
+**Do not accept results you know are wrong.** A diffusion coefficient 100x off from literature means your analysis is flawed, not that you've discovered new physics. See AGENTS.md "When Results Don't Match" for full guidance.

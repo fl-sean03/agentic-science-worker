@@ -75,6 +75,11 @@ HPC_HOST=login.cluster.edu
 
 ### Python Dependencies
 
+Use the `science-tools` conda env (`conda activate science-tools`; if it does
+not exist, build it: `conda env create -f environments/science-tools.yml`).
+`--verify`'s "Python packages" check tells you whether the active env is
+complete.
+
 - numpy, matplotlib, scipy
 - pymatgen (materials analysis)
 - ase (atomic simulation environment)
@@ -97,6 +102,12 @@ $LMP -sf gpu -pk gpu 1 neigh yes -in input.lmp
 ```
 
 **Quantum ESPRESSO:**
+
+> QE 7.5 local builds at `~/builds/qe` (rebuilt from source 2026-07-03) —
+> CPU-MPI (`$QE_CPU`) + GPU-serial (`$QE_GPU`; do not `mpirun` it). Run
+> `python benchmarks/evaluation/harness.py --verify` for live state; see the
+> quantum-espresso skill for usage and provenance.
+
 ```bash
 $QE_CPU/pw.x < input.in > output.out
 ```
@@ -850,17 +861,12 @@ fleet refresh. Before trusting any status claim in older docs:
   of record; start there.
 - **Benchmark truth:** `benchmarks/results/GENERATED_STATUS.md` is
   artifact-derived (regenerate with `benchmarks/evaluation/generate_status.py`;
-  never hand-edit). Headline as of 2026-07-03: 80/97 passed (82%).
-  `benchmarks/CURRENT_STATUS.md` is the owner's dashboard; where they
-  disagree, the divergence table in GENERATED_STATUS says so.
-- **Upgrade package:** `08_upgrades/upgrade-2026-07-02/` — audit stages,
-  evidence, and `proposals/` (P-01..P-07, all applied 2026-07-03 under the
-  owner's "apply the full fix" directive).
-- **Predecessor conclusions are evidence, not authority.** Older docs
-  (SESSION_HANDOFF.md, February status claims) carry supersession banners
-  or divergence notes — verify against artifacts before repeating a claim.
-- **Proposal gate discipline:** `08_upgrades/upgrade-2026-07-02/proposals/PROPOSAL_GATE.md`.
-  Behavioral or operating-surface changes (AGENTS.md persona, hooks,
+  never hand-edit). Headline: 88/97 passed (90.7%) on the Opus-4.8 baseline.
+- **Predecessor conclusions are evidence, not authority.** Older docs carry
+  supersession banners or divergence notes — verify against artifacts before
+  repeating a claim.
+- **Proposal gate discipline:** behavioral or operating-surface changes
+  (AGENTS.md persona, hooks,
   settings, skills doctrine, subagent definitions) require an owner-signed
   proposal BEFORE applying. Do not rewrite working systems for taste
   (fleet E-06/E-08/E-09 lessons). No unattended write authority beyond
