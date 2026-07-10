@@ -3,6 +3,23 @@
 All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.0] - 2026-07-10
+
+### Changed — restructured into the project monorepo
+- The repository is now the single home for ongoing development: the agent **capability
+  core** (`skills/`, `AGENTS.md`) plus **Caliber**, the benchmark, as its own product under
+  `caliber/`.
+- **Carved the old `benchmarks/` suite out** of the repo (378 → ~180 files), including the
+  retired v1 runner generations. Removed internal `docs/rebase/` migration notes.
+- **Caliber** (`caliber/`): native session-holder harnesses (`harnesses/`, per-model,
+  versioned), decomposed scoring + frozen judge + provenance (`scoring/`), versioned task
+  generations + sweep/audit tooling (`suite/`), and `METHODOLOGY.md` (three-axis scoring:
+  correctness gate × pass^k × cost-efficiency; oracle-escrow ground truth; a coupled-stage
+  difficulty horizon; contamination defenses).
+- Public methodology, private answers: sealed keys/tolerances live in a separate private
+  store, injected only at grade time. No leaderboard numbers published until a generation is
+  frozen with pass^k + cost. Dropped the preliminary "88/97" headline accordingly.
+
 ## [0.2.0] — 2026-07
 
 ### Added

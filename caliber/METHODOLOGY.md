@@ -70,6 +70,11 @@ ceiling by adding stages.
   generation, with automated construct-validity checks on every instance.
 - **Semi-annual rotation** with a permanent private holdout and disclosed access
   governance. Canary tokens are hygiene, not a primary defense.
+- **Held-out generation** — each published generation is paired with a never-released
+  variant slate in the private store, used for independent verification. Because the
+  agent capability layer and the benchmark share this monorepo, this held-out slate is
+  what keeps results honest: public tasks can be tuned against, the held-out slate cannot.
+  Our own agent is scored through the same public submission path as any entrant.
 - Sealing and rotation defend against *contamination*; the horizon axis is what defends
   against *capability-driven saturation* — both are required.
 
@@ -84,7 +89,7 @@ near 0–10%), with per-item difficulty and discrimination estimated from pilot 
 Each model is run through its **own native harness** (Claude via Claude Code's native
 session-holder; other vendors via their native runners), recorded in a
 `harness:{name,version,config_hash}` provenance field — the measurement path adds no
-custom orchestration. See `runner/RUNNER.md`. Full run traces (reasoning, tool calls,
+custom orchestration. See `harnesses/native-claude/RUNNER.md`. Full run traces (reasoning, tool calls,
 per-turn cost) and a PROV-typed provenance graph are captured for every run.
 
 ## Status

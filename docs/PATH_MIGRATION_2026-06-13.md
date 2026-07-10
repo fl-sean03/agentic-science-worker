@@ -1,3 +1,7 @@
+> **Historical record (2026-06-13).** Paths here predate the 2026-07-10 monorepo
+> restructure; `benchmarks/` was carved out and the benchmark now lives under
+> `caliber/`. Kept for provenance only.
+
 # Path migration record — 2026-06-13 machine reorg (repairs applied 2026-07-02)
 
 **Author:** intelligence rebase, model `claude-fable-5` (rebase-2026-07-02, Slice S5).
