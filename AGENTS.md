@@ -118,11 +118,8 @@ $QE_CPU/pw.x < input.in > output.out
 # sweep a model across the sealed task set on its native harness
 python caliber/suite/native_sweep.py --reps 3 --lanes 3
 
-# Run single benchmark
-python harness.py BENCH-T1-001
-
-# Run tier
-python harness.py --tier 1
+# audit a completed run (wake pattern, cost anatomy, artifact integrity)
+python caliber/suite/native_audit.py <run_dir> --brief
 ```
 
 ---
@@ -851,10 +848,6 @@ The balance is judgment. You have it. Use it.
 This repo was rebased (Opus 4.8 → Fable 5) and closed out at the 2026-07-03
 fleet refresh. Before trusting any status claim in older docs:
 
-- **Six-file memory: `docs/rebase/`** — `MISSION.md`, `CURRENT_STATE.md`,
-  `ASSUMPTIONS.md`, `DECISIONS.md`, `REASONING_DEBT.md`, `EVALS.md`
-  (plus `CRASH_POSTMORTEM_20260117.md`). `CURRENT_STATE.md` is the state
-  of record; start there.
 - **Benchmark:** Caliber is its own product under `caliber/` (public methodology,
   private answers). No leaderboard numbers are published until a generation is frozen
   with pass^k + cost; see `caliber/METHODOLOGY.md`.

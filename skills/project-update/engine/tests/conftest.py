@@ -24,7 +24,7 @@ def _init_repo(repo: Path) -> None:
     repo.mkdir(parents=True, exist_ok=True)
     _git(repo, "init", "-q")
     _git(repo, "config", "user.name", "fl-sean03")
-    _git(repo, "config", "user.email", "florezsean0822@gmail.com")
+    _git(repo, "config", "user.email", "test@example.com")
 
 
 _MANIFEST = """project:

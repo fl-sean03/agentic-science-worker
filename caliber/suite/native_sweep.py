@@ -37,7 +37,7 @@ ORDER = ["BENCH-C-009", "BENCH-C-005", "BENCH-C-002", "BENCH-C-007",
          "BENCH-B-004", "BENCH-B-003", "BENCH-B-006", "BENCH-B-002",
          "BENCH-B-005", "BENCH-B-007", "BENCH-B-001", "BENCH-B-008"]
 
-PREAMBLE = """You are an autonomous computational-materials researcher on host sf2025-ubuntu \
+PREAMBLE = """You are an autonomous computational-materials researcher on this workstation \
 (RTX 5080, 24 cores, 30G RAM — a SHARED machine; nice long CPU jobs, never pkill by \
 process name). You run in a PERSISTENT Claude Code session: for any compute expected \
 to take more than ~2 minutes, launch it with the Bash tool's run_in_background option \
