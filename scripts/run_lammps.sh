@@ -7,7 +7,7 @@ set -e
 # Default = the working bare-metal build (22Jul2025-U4, smoke-verified 2026-07-02).
 # The old gpu-tests binary does NOT run (libmpi.so.40 missing; rebase A-04 refuted)
 # and was archived 2026-07-03 to ~/work/archive/gpu-tests-wsl/1-GPUTests (M-3).
-LMP="${LMP:-/home/sf2/builds/lammps/build/lmp}"
+LMP="${LMP:?set LMP to your lammps binary}"
 
 if [ $# -lt 1 ]; then
     echo "Usage: $0 <input_file> [gpu|cpu] [additional_args...]"
