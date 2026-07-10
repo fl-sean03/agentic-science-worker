@@ -72,13 +72,13 @@ $QE_CPU/pw.x < input.in > output.out
 ### Run Benchmarks
 
 ```bash
-python benchmarks/evaluation/harness.py BENCH-T1-001
+python caliber/suite/native_sweep.py --reps 3 --lanes 3
 ```
 
 ### Verify Infrastructure
 
 ```bash
-python benchmarks/evaluation/harness.py --verify
+python -m pytest caliber/scoring -q
 ```
 
 ---

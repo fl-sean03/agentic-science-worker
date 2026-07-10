@@ -167,8 +167,8 @@ analysis/             # Top candidate deep-dive
 
 ```bash
 cd /path/to/agentic-science-worker
-python benchmarks/evaluation/harness.py BENCH-T10-001
+# historical v1 run id: BENCH-T10-001 (v1 suite retired; see caliber/)
 ```
 
-**Full results:** `benchmarks/results/runs/BENCH-T10-001-*/result.json`
-**Full workspace:** `workspaces/benchmarks/BENCH-T10-001-*/`
+**Full results:** the archived v1 run records
+**Full workspace:** `the run workspace BENCH-T10-001-*/`

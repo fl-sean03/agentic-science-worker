@@ -56,7 +56,7 @@ Binaries are configured via environment variables:
 | QE (CPU) | `$QE_CPU` | `pw.x` in PATH |
 | QE (GPU) | `$QE_GPU` | Same as CPU |
 
-Verify setup: `python benchmarks/evaluation/harness.py --verify`
+Verify setup: `python -m pytest caliber/scoring -q`
 
 ### Required Environment Variables
 
@@ -105,26 +105,21 @@ $LMP -sf gpu -pk gpu 1 neigh yes -in input.lmp
 
 > QE 7.5 local builds at `~/builds/qe` (rebuilt from source 2026-07-03) —
 > CPU-MPI (`$QE_CPU`) + GPU-serial (`$QE_GPU`; do not `mpirun` it). Run
-> `python benchmarks/evaluation/harness.py --verify` for live state; see the
+> the `quantum-espresso` skill for live state; see the
 > quantum-espresso skill for usage and provenance.
 
 ```bash
 $QE_CPU/pw.x < input.in > output.out
 ```
 
-### Running Benchmarks
+### Running the benchmark (Caliber)
 
 ```bash
-cd benchmarks/evaluation
+# sweep a model across the sealed task set on its native harness
+python caliber/suite/native_sweep.py --reps 3 --lanes 3
 
-# Verify infrastructure
-python harness.py --verify
-
-# Run single benchmark
-python harness.py BENCH-T1-001
-
-# Run tier
-python harness.py --tier 1
+# audit a completed run (wake pattern, cost anatomy, artifact integrity)
+python caliber/suite/native_audit.py <run_dir> --brief
 ```
 
 ---
@@ -618,9 +613,7 @@ Archived: `skills/archive/hpc-cluster-curc/` (CURC-era HPC skill, retired
 project/
 ├── AGENTS.md              # This file (primary context)
 ├── skills/                # Skill definitions
-├── benchmarks/            # Test suite
-│   ├── tasks/             # Benchmark definitions
-│   └── evaluation/        # Harness and graders
+├── caliber/               # the benchmark (methodology, harnesses, scoring, suite)
 ├── workspaces/            # Agent work directories
 ├── templates/             # Input file templates
 └── docs/                  # Documentation
@@ -855,13 +848,9 @@ The balance is judgment. You have it. Use it.
 This repo was rebased (Opus 4.8 → Fable 5) and closed out at the 2026-07-03
 fleet refresh. Before trusting any status claim in older docs:
 
-- **Six-file memory: `docs/rebase/`** — `MISSION.md`, `CURRENT_STATE.md`,
-  `ASSUMPTIONS.md`, `DECISIONS.md`, `REASONING_DEBT.md`, `EVALS.md`
-  (plus `CRASH_POSTMORTEM_20260117.md`). `CURRENT_STATE.md` is the state
-  of record; start there.
-- **Benchmark truth:** `benchmarks/results/GENERATED_STATUS.md` is
-  artifact-derived (regenerate with `benchmarks/evaluation/generate_status.py`;
-  never hand-edit). Headline: 88/97 passed (90.7%) on the Opus-4.8 baseline.
+- **Benchmark:** Caliber is its own product under `caliber/` (public methodology,
+  private answers). No leaderboard numbers are published until a generation is frozen
+  with pass^k + cost; see `caliber/METHODOLOGY.md`.
 - **Predecessor conclusions are evidence, not authority.** Older docs carry
   supersession banners or divergence notes — verify against artifacts before
   repeating a claim.

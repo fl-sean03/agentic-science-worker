@@ -1,5 +1,8 @@
 # Showcases
 
+> These are real runs from the project's original evaluation suite (2026 H1),
+> preserved as capability demonstrations. The current benchmark is [Caliber](../caliber/).
+
 Real examples of autonomous research conducted by the Agentic Science Worker. Each showcase demonstrates end-to-end capability on a challenging scientific task.
 
 > **Note:** Showcases represent specific successful runs. Complex autonomous benchmarks show variability - the same benchmark may score differently on different runs. These showcases demonstrate what the agent CAN achieve.
@@ -64,7 +67,7 @@ Every benchmark run captures detailed data for reproducibility and analysis:
 | **Grading Details** | `result.json` | Category scores, evidence, reasoning |
 | **Session Stats** | `result.json` | Turns, duration, cost by model |
 | **Files Created** | `result.json` | Complete list of all outputs |
-| **Workspace Artifacts** | `workspaces/benchmarks/` | Actual deliverables (CIF, JSON, MD) |
+| **Workspace Artifacts** | run workspace | Actual deliverables (CIF, JSON, MD) |
 | **Conversation Transcript** | `transcript.md` | Step-by-step actions (when available) |
 
 ### Example: What You Can Learn
@@ -78,12 +81,12 @@ From `result.json` you can see:
 
 ## Running Your Own
 
-```bash
-# Run any benchmark to see the agent in action
-python benchmarks/evaluation/harness.py BENCH-T10-001
+These showcases came from the original (v1) evaluation suite, preserved here as
+demonstrations of the agent's capabilities. The current benchmark is **Caliber**
+(`caliber/`):
 
-# Results saved to: benchmarks/results/runs/
-# Workspace created at: workspaces/benchmarks/
+```bash
+python caliber/suite/native_sweep.py --reps 3 --lanes 3
 ```
 
 ## Benchmark Scores Explained

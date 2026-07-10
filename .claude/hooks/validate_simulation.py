@@ -52,7 +52,7 @@ def validate_command(command: str) -> tuple:
             warnings.append("QE output not redirected. Consider: pw.x < input > output")
 
     # Deterministic input lint (2026-01-17 CRASH class; see
-    # docs/rebase/CRASH_POSTMORTEM_20260117.md). Extract `< input` / `-in input`
+    # a 2026-01 crash postmortem). Extract `< input` / `-in input`
     # and lint it; a BLOCK becomes an error (hook exit 2).
     m = re.search(r'(?:pw\.x[^|;&]*<\s*(\S+))|(?:\blmp\b[^|;&]*-in\s+(\S+))', command)
     if m:

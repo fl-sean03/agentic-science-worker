@@ -164,8 +164,8 @@ RESEARCH_REPORT.md                  # Full research report
 
 ```bash
 cd /path/to/agentic-science-worker
-python benchmarks/evaluation/harness.py BENCH-T10-002
+# historical v1 run id: BENCH-T10-002 (v1 suite retired; see caliber/)
 ```
 
-**Full results:** `benchmarks/results/runs/BENCH-T10-002-*/result.json`
-**Full workspace:** `workspaces/benchmarks/BENCH-T10-002-*/`
+**Full results:** the archived v1 run records
+**Full workspace:** `the run workspace BENCH-T10-002-*/`

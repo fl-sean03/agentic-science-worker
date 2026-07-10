@@ -74,7 +74,7 @@ Walk the questions in order. Stop at the first match.
 | QE (pw.x) | ✅ **working** — QE 7.5 rebuilt 2026-07-03 (`~/builds/qe/{cpu,gpu}/bin`; CPU-MPI + GPU-serial); see quantum-espresso skill banner | ✅ build-from-source ("QE on VAST" section) | ✅ modules |
 | MLIP stack | ✅ science-tools env (installed 2026-07-04; check `--verify`) | ✅ GPU images | ⚠ per-env |
 
-Verify liveness with `python benchmarks/evaluation/harness.py --verify` before
+Verify liveness with `python -m pytest caliber/scoring -q` (and your compute backends) before
 routing a job locally; this table records status as of its date, the probe
 records truth.
 

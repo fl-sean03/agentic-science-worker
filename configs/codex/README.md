@@ -40,7 +40,7 @@ export MP_API_KEY=your_key
 codex
 
 # Auto-edit mode (for benchmarks)
-codex --auto-edit -p "Run BENCH-T1-001"
+codex --auto-edit -p "Calculate the lattice constant of copper with the Mishin EAM potential"
 
 # Full auto mode
 codex --full-auto -p "Calculate argon diffusion coefficient"

@@ -171,18 +171,14 @@ Si  28.0855  Si.pbe-n-rrkjus_psl.1.0.0.UPF
 
 ## Binary Locations
 
-> **Status 2026-07-03 (rebuilt):** local QE is WORKING — QE 7.5 rebuilt from
-> source 2026-07-03 (owner-directed; provenance `/home/sf2/builds/qe/BUILD_NOTES.md`).
-> - **CPU (MPI):** `$QE_CPU/pw.x` = `/home/sf2/builds/qe/cpu/bin/pw.x`
->   (GCC 13.3 + OpenMPI 4.1.6 + OpenBLAS). Parallel runs:
->   `mpirun -np N $QE_CPU/pw.x -in input.in` (set `OMP_NUM_THREADS=1` for
->   multi-rank runs to avoid OpenMP oversubscription).
-> - **GPU:** `$QE_GPU/pw.x` = `/home/sf2/builds/qe/gpu/bin/pw.x` (NVHPC 25.11,
->   OpenACC+CUDA, native cc120/RTX 5080). **SERIAL-ONLY by design** — no MPI;
->   it avoids the hpcx runtime that hung the old builds. Do not `mpirun` it.
-> - Validated on bulk-Si SCF: CPU and GPU energies agree to 1e-8 Ry
->   (-22.8397063 Ry); "GPU acceleration is ACTIVE". `harness.py --verify`
->   reports live state.
+> QE binaries are referenced through environment variables, set in `config.yaml`
+> (keep machine-specific paths out of the repo):
+> - **CPU (MPI):** `$QE_CPU/pw.x`. Parallel runs: `mpirun -np N $QE_CPU/pw.x -in input.in`
+>   (set `OMP_NUM_THREADS=1` for multi-rank runs to avoid OpenMP oversubscription).
+> - **GPU:** `$QE_GPU/pw.x`. Note some GPU builds (e.g. NVHPC OpenACC+CUDA) are
+>   **serial-only by design** — do not `mpirun` them; check your build.
+> - Sanity-check a new build on a bulk-Si SCF (CPU and GPU energies should agree to
+>   ~1e-8 Ry) before trusting production runs.
 > - The old WSL-era builds under `~/work/archive/gpu-tests-wsl/` remain
 >   archive-only and unsupported — do not route runs to them.
 

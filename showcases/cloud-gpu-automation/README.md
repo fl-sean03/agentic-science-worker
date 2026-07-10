@@ -141,7 +141,7 @@ The benchmark uses LLM-as-judge grading with detailed category scoring:
 ### Files Generated
 
 ```
-workspaces/benchmarks/BENCH-T17-001/
+the run workspace BENCH-T17-001/
 ├── instance_log.md      # Full operation timeline with nvidia-smi output
 └── cost_analysis.md     # Cost tracking and efficiency analysis
 ```
@@ -150,12 +150,12 @@ workspaces/benchmarks/BENCH-T17-001/
 
 ```bash
 cd /path/to/agentic-science-worker
-python benchmarks/evaluation/harness.py BENCH-T17-001
+# historical v1 run id: BENCH-T17-001 (v1 suite retired; see caliber/)
 
 # Check for orphan instances after
 vastai show instances | grep BENCH
 # Should return nothing
 ```
 
-**Full results:** `benchmarks/results/runs/BENCH-T17-001-*/`
+**Full results:** the archived v1 run records
 **Note:** Requires VAST.ai account with API key configured.

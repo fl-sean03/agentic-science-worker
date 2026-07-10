@@ -3,7 +3,6 @@
 > An autonomous AI researcher for computational materials science — not a tool that runs commands, but an independent lab member that takes ownership of research problems.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Benchmarks](https://img.shields.io/badge/benchmarks-88%2F97%20(90.7%25)-brightgreen.svg)](benchmarks/results/GENERATED_STATUS.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Agents](https://img.shields.io/badge/agents-Claude%20Code%20%7C%20Aider%20%7C%20Cursor-8A2BE2.svg)](#supported-agents)
 
@@ -12,9 +11,13 @@ researcher. Given a scientific question, it researches the methodology, finds pa
 runs the simulations, verifies results against the literature, and iterates until the
 physics is sound — the way a capable graduate student works independently.
 
-- **What it is:** a portable capability layer — agent instructions (`AGENTS.md`), a library
-  of domain **skills**, evaluation harness, and configuration — that rides on top of an
-  existing coding agent.
+This repository is the **project monorepo** — the single home for ongoing development:
+
+- **The capability core** — agent instructions (`AGENTS.md`) and a library of domain
+  **skills** that ride on top of an existing coding agent, turning it into a research worker.
+- **[Caliber](caliber/)** — the benchmark that measures autonomous materials-science agents
+  on three axes (correctness × reliability × cost), with its runners/"harnesses" and
+  versioned task generations. Public methodology, private answers.
 - **What it is not:** a chat wrapper. The unit of work is a *research outcome* (a converged
   calculation, a verified property, a tested hypothesis), graded on real scientific criteria.
 
@@ -23,7 +26,7 @@ physics is sound — the way a capable graduate student works independently.
 ## Contents
 
 - [Highlights](#highlights)
-- [Benchmarks](#benchmarks)
+- [Caliber — the benchmark](#caliber--the-benchmark)
 - [How it works](#how-it-works)
 - [Supported agents](#supported-agents)
 - [Quick start](#quick-start)
@@ -49,47 +52,30 @@ physics is sound — the way a capable graduate student works independently.
 
 See it in action: **[Showcases »](showcases/)**
 
-## Benchmarks
+## Caliber — the benchmark
 
-A held-out suite of **97 tasks** measures whether the agent can *do research*, not just run
-commands — spanning molecular dynamics, DFT, ML-potential screening, autonomous multi-step
-campaigns, literature synthesis, data analysis, and cloud-GPU execution. Each task is graded
-on a real, checkable scientific outcome.
+Measuring the agent is a first-class part of this project, kept as its own product:
+**[Caliber »](caliber/)**. It grades autonomous materials-science agents on whether they
+can *do research* — choose a sound method, run the real calculation, verify their own
+numbers, and report honestly — across molecular dynamics, DFT, ML-potential work,
+multi-step campaigns, and robustness traps.
 
-### Current results — 88/97 (90.7%) on the Opus-4.8 baseline
+Every run is scored on **three orthogonal axes**, because a frontier agent can be
+correct-but-unreliable or correct-but-ruinously-expensive:
 
-| Category | Tiers | Pass |
-|----------|-------|-----:|
-| Foundations | T1–T4 | 20/21 |
-| Research campaigns | T7 | 3/3 |
-| ML / MLIP screening | T8 | 5/7 |
-| Autonomous research | T9 | 3/4 |
-| Frontier DFT | T10 | 3/4 |
-| Theory synthesis | T12 | 3/3 |
-| Robustness & cognition | T13–T16 | 41/43 |
-| Cloud GPU (VAST.ai) | T17 | 7/8 |
-| Data analysis | T18 | 3/4 |
-| **Total** | | **88/97 (90.7%)** |
+- **Correctness gate** — mechanical numeric checks against a sealed, high-compute reference
+  the *grader* computes (oracle-escrow); a frozen process judge scores method/uncertainty/
+  provenance but can never overturn the gate.
+- **Reliability (pass^k)** — each task run *k* times; we report the probability it passes
+  *every* trial, not just one lucky run.
+- **Cost-efficiency** — dollars and tokens per correct solution, on an accuracy-vs-cost
+  Pareto frontier.
 
-*One task is excluded as an infrastructure VOID (98 tasks total). Full per-task run logs:
-**[benchmark status »](benchmarks/results/GENERATED_STATUS.md)**.*
-
-### How grading works
-
-Scoring is **correctness-gated and judge-independent**:
-
-- Each task defines **mechanical anchors** — numeric checks against sealed reference values
-  (e.g. a formation energy within tolerance of DFT).
-- A separate **frozen LLM judge** scores *process* quality — verification, uncertainty,
-  provenance — but **can never overturn a failed anchor**.
-- **Infrastructure failures are VOIDed** (unscored), never counted as capability failures.
-
-As frontier models saturate correctness, two further axes keep the suite discriminating:
-
-- **Reliability** — each task is run *k* times; we report pass^k (does it succeed *every*
-  time, not just once).
-- **Cost-efficiency** — spend and wall-time against a per-task reference budget, so a right
-  answer that costs 15× more is scored differently from an efficient one.
+Difficulty is a **dial, not a fixed bar** (a coupled-stage *horizon* from trivial to
+end-to-end paper reproduction), so the benchmark degrades gracefully instead of saturating.
+Public methodology lives in [caliber/METHODOLOGY.md](caliber/METHODOLOGY.md); sealed answers
+stay in a separate private store. No leaderboard numbers are published until a generation is
+frozen with pass^k + cost.
 
 ## How it works
 
@@ -169,7 +155,7 @@ api_keys:
 Verify the setup:
 
 ```bash
-cd benchmarks/evaluation && python harness.py --verify
+python -m pytest caliber/scoring -q     # scoring/evidence/provenance tests
 ```
 
 ### Run the agent
@@ -193,14 +179,18 @@ Find the lattice constant of copper using the Mishin EAM potential.
 Compute the band structure of silicon.
 ```
 
-### Run benchmarks
+### Run the benchmark (Caliber)
 
 ```bash
-cd benchmarks/evaluation
-python harness.py --list                 # list available benchmarks
-python harness.py BENCH-T1-001           # run one
-python harness.py --tier 1               # run a whole tier
+# sweep a model across the sealed task set on its native harness
+python caliber/suite/native_sweep.py --reps 3 --lanes 3
+
+# audit a completed run (wake pattern, cost anatomy, artifact integrity)
+python caliber/suite/native_audit.py <run_dir> --brief
 ```
+
+Sealed answer keys are injected from a separate private store at grade time; see
+[caliber/METHODOLOGY.md](caliber/METHODOLOGY.md).
 
 ## Skills
 
@@ -221,12 +211,14 @@ gates production behind smoke tests, **long-compute** detaches jobs that outlive
 ## Repository structure
 
 ```
-agentic-science-worker/
+agentic-science-worker/          # the project monorepo
 ├── AGENTS.md            # primary agent context (methodology, conventions)
-├── skills/              # capability modules (SKILL.md each)
-├── benchmarks/          # evaluation suite, harness, and results
-│   ├── evaluation/      # harness.py and grading
-│   └── results/         # per-task run logs + GENERATED_STATUS.md
+├── skills/              # capability modules (SKILL.md each) — the capability core
+├── caliber/             # the benchmark (its own product)
+│   ├── METHODOLOGY.md   # three-axis scoring, oracle-escrow grading, difficulty horizon
+│   ├── harnesses/       # per-model native runners (native-claude/; more added over time)
+│   ├── scoring/         # scoring, frozen judge, evidence store, provenance graph
+│   └── suite/           # versioned task generations (batch1/, ...) + sweep/audit tooling
 ├── examples/            # canonical worked examples
 ├── showcases/           # highlight results with full write-ups
 ├── environments/        # conda environment specs
@@ -235,14 +227,16 @@ agentic-science-worker/
 ├── docs/                # methodology and design notes
 ├── research/            # reference material
 ├── scripts/             # utilities
-└── tests/               # harness tests
+└── tests/               # tests
 ```
+Sealed benchmark answers live in a separate private store, never in this repo.
 
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md). In short: deepen durable long-horizon execution, expand the
-verifiable-provenance substrate, and grow the benchmark suite toward multi-day reproduction
-tasks where reliability and cost — not one-shot correctness — are the real frontier.
+verifiable-provenance substrate, and grow **Caliber** toward its next generation — oracle-
+escrowed, procedurally-generated task families reaching multi-day reproduction, where
+reliability and cost (not one-shot correctness) are the real frontier.
 
 ## Contributing
 

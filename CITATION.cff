@@ -3,15 +3,17 @@ message: "If you use this software, please cite it as below."
 title: "Agentic Science Worker: an autonomous AI researcher for computational materials science"
 abstract: >-
   A portable capability layer that turns a coding agent into an autonomous
-  computational-materials researcher: it plans methodology, sources parameters,
-  runs and verifies DFT/MD/ML-potential calculations, and executes long-horizon
-  campaigns durably, graded on real scientific outcomes.
+  computational-materials researcher, together with Caliber, a benchmark that
+  grades such agents on three axes (correctness gate, reliability pass^k, and
+  cost per correct solution) against sealed high-compute reference answers. The
+  agent plans methodology, sources parameters, runs and verifies DFT/MD/ML-
+  potential calculations, and executes long-horizon campaigns durably.
 type: software
 authors:
   - family-names: Florez
     given-names: Sean
-version: 0.2.0
-date-released: "2026-07-07"
+version: 0.3.0
+date-released: "2026-07-10"
 license: MIT
 repository-code: "https://github.com/fl-sean03/agentic-science-worker"
 keywords:

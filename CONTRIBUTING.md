@@ -87,10 +87,10 @@ cp .mcp.json.example .mcp.json
 vim config.yaml
 
 # Verify
-python benchmarks/evaluation/harness.py --verify
+python -m pytest caliber/scoring -q
 
-# Run a benchmark
-python benchmarks/evaluation/harness.py BENCH-T1-001
+# Sweep a model across the benchmark on its native harness
+python caliber/suite/native_sweep.py --reps 3 --lanes 3
 ```
 
 ---
@@ -115,20 +115,14 @@ python benchmarks/evaluation/harness.py BENCH-T1-001
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│               benchmarks/evaluation/                        │
-│  harness.py  - Spawns headless agents, captures output     │
-│  grader.py   - Rule-based grading                          │
-│  llm_grader.py - Claude-as-judge grading                   │
+│                       caliber/  (the benchmark)             │
+│  harnesses/  - per-model native runners (native-claude/...) │
+│  scoring/    - mechanical anchors ⊕ frozen judge, provenance │
+│  suite/      - versioned task generations + sweep/audit     │
+│  METHODOLOGY.md - three axes, oracle-escrow, horizon        │
 └─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                benchmarks/tasks/                            │
-│  YAML files defining each benchmark:                       │
-│  - prompt (what to do)                                     │
-│  - expected_outputs (what files to create)                 │
-│  - grading (evaluation criteria)                           │
-└─────────────────────────────────────────────────────────────┘
+        Sealed answer keys live OUTSIDE this repo (private store),
+        injected only at grade time — public methodology, private answers.
 ```
 
 ### Key Files
@@ -138,8 +132,9 @@ python benchmarks/evaluation/harness.py BENCH-T1-001
 | `CLAUDE.md` | Agent persona and methodology | Changing core behavior |
 | `.claude/skills/*.md` | Domain-specific knowledge | Adding capabilities |
 | `.claude/settings.json` | Permissions, env vars | New tools/paths |
-| `benchmarks/tasks/*.yaml` | Test definitions | New benchmarks |
-| `benchmarks/evaluation/harness.py` | Test runner | Changing execution |
+| `caliber/suite/<gen>/MANIFEST.json` | Public task manifests (no answers) | Proposing tasks |
+| `caliber/harnesses/<name>/` | Per-model native runners | New model/harness |
+| `caliber/scoring/` | Scoring, judge, evidence, provenance | Changing grading |
 
 ---
 
@@ -278,108 +273,52 @@ grading:
 
 ---
 
-## Benchmark Development
+## Contributing to Caliber (the benchmark)
 
-### Creating a New Benchmark
+Caliber grades autonomous materials-science agents on three axes (correctness gate ×
+pass^k × cost-efficiency). **Public methodology, private answers:** task prompts and
+reporting keys are public (`caliber/suite/<generation>/MANIFEST.json`); the sealed
+reference values, tolerances, and grading keys live in a separate private store and are
+never committed here.
 
-1. **Choose the right tier:**
-   - T1-T2: Single tool, basic tasks
-   - T3-T4: Multi-step, research reproduction
-   - T5-T7: HPC execution
-   - T8-T10: ML potentials, autonomous research
-   - T11: Frontier challenges
+### Proposing a task
+Open an issue with: the physical quantity, the difficulty **horizon** it targets
+(H1 trivial → H6+ frontier reproduction/discovery; see `caliber/METHODOLOGY.md`), the
+reporting keys the agent must surface, and how ground truth is obtained (the grader
+computes a high-compute reference — oracle-escrow — not the agent's own numbers). Accepted
+tasks are sealed by a maintainer: the prompt + keys land in a public MANIFEST, the answer
+and tolerance go to the private store.
 
-2. **Write the YAML:**
-```yaml
-id: BENCH-T1-NEW
-name: My New Benchmark
-tier: 1
-category: basic
+### Task design principles
+1. **One horizon, cleanly.** A task's difficulty comes from its coupled-stage count, not
+   from combining unrelated physics.
+2. **Oracle-gradeable.** There must be a defensible high-compute reference and a tolerance
+   set to that reference's own uncertainty (never a global epsilon).
+3. **Grade observable outcomes, not methods.** Multiple valid approaches should pass.
+4. **Contamination-aware.** Prefer parameterized families instantiated fresh per
+   generation; never leak the answer through the prompt, reporting keys, or provided files.
 
-description: |
-  What this benchmark tests.
+### Contributing a harness or skill
+- **Harness** (new model/vendor): add `caliber/harnesses/<name>/`; every run records
+  `harness:{name,version,config_hash}` provenance.
+- **Skill** (agent capability): add `skills/<name>/SKILL.md`. The capability layer is
+  versioned independently of the benchmark.
 
-prompt: |
-  **CRITICAL INSTRUCTIONS:**
-  [Be explicit about what the agent must do]
-
-  Your task:
-  [The actual task]
-
-  Required outputs:
-  - [ ] file1.txt
-  - [ ] file2.py
-
-time_limit_minutes: 15
-
-expected_outputs:
-  files:
-    - name: "file1.txt"
-      description: "What this file should contain"
-
-grading:
-  categories:
-    - name: execution
-      weight: 50
-      criteria:
-        - Task was completed
-        - Files were created
-    - name: quality
-      weight: 50
-      criteria:
-        - Results are correct
-        - Sources are cited
-```
-
-3. **Run and iterate:**
-```bash
-python benchmarks/evaluation/harness.py BENCH-T1-NEW --verbose
-```
-
-### Benchmark Design Principles
-
-1. **Test one thing well** - Don't combine HPC + ML + literature in one benchmark
-2. **Have a ground truth** - Know what the correct answer is
-3. **Allow multiple valid approaches** - Grade outcomes, not methods
-4. **Include verification** - "Compare to literature" catches errors
-
----
-
-## Testing Your Changes
-
-### Running Single Benchmarks
+## Testing your changes
 
 ```bash
-# Basic run
-python benchmarks/evaluation/harness.py BENCH-T1-001
+# scoring / evidence / provenance tests
+python -m pytest caliber/scoring -q
 
-# Verbose output
-python benchmarks/evaluation/harness.py BENCH-T1-001 --verbose
+# sweep a model across the benchmark on its native harness
+python caliber/suite/native_sweep.py --reps 3 --lanes 3
 
-# Run a whole tier
-python benchmarks/evaluation/harness.py --tier 1
+# audit a completed run (wake pattern, cost anatomy, artifact integrity)
+python caliber/suite/native_audit.py <run_dir> --brief
 ```
 
-### Verifying Infrastructure
-
-```bash
-python benchmarks/evaluation/harness.py --verify
-```
-
-### Checking Results
-
-Results are saved to `benchmarks/results/runs/BENCH-XXX-TIMESTAMP/`:
-- `result.json` - Scores and grading
-- `agent_output.txt` - Full agent transcript
-- `benchmark.json` - Original benchmark definition
-
-### Before Submitting a PR
-
-1. Run affected benchmarks
-2. Update `ROADMAP.md` if you completed a roadmap item
-3. Ensure no hardcoded paths leaked in
-
----
+Before submitting a PR: run the scoring tests, update `ROADMAP.md` if you completed a
+roadmap item, and ensure no hardcoded local paths, secrets, or sealed answers leaked in.
 
 ## Questions?
 

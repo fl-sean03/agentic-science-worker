@@ -5,11 +5,11 @@
 set -e
 
 # NOTE (2026-07-04): QE 7.5 local builds, rebuilt from source 2026-07-03
-# (provenance: /home/sf2/builds/qe/BUILD_NOTES.md). CPU build is MPI-capable;
+# CPU build is MPI-capable;
 # GPU build is SERIAL-ONLY by design (no MPI, runtime libs resolve via RPATH —
 # no environment sourcing needed). Env vars $QE_CPU/$QE_GPU override defaults.
-QE_CPU="${QE_CPU:-/home/sf2/builds/qe/cpu/bin}"
-QE_GPU="${QE_GPU:-/home/sf2/builds/qe/gpu/bin}"
+QE_CPU="${QE_CPU:?set QE_CPU to your QE CPU bin dir}"
+QE_GPU="${QE_GPU:?set QE_GPU to your QE GPU bin dir}"
 
 if [ $# -lt 2 ]; then
     echo "Usage: $0 <input_file> <output_file> [gpu|cpu] [nprocs]"
